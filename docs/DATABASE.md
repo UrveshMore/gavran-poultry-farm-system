@@ -43,4 +43,10 @@ MySQL 8.4, `utf8mb4` / `utf8mb4_0900_ai_ci`, session time zone `+00:00`. Migrati
 - `incubator_maintenance` — a service change. The incubator status follows the latest change.
 - Permissions `000000000114` through `000000000116`: `incubator.read`, `incubator.record`, `incubator.manage`.
 
+## 007 incubation
+
+- `incubation_batches` — `incubator` with an incubator id, or `broody_hen` with a hen name. No hatch-date column.
+- `candling_records` and `candling_lines` — each look is its own record. Line labels are text, not a seeded list.
+- Permissions `000000000117` and `000000000118`: `incubation.read`, `incubation.record`. Vet / advisor receives read only.
+
 Queries use `mysql2` `execute()` (server-side prepared statements). Audit list `LIMIT` and `OFFSET` are interpolated only after the values are checked as integers, because the binary protocol rejects placeholders there.

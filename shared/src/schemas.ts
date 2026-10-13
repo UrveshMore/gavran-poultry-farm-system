@@ -295,6 +295,59 @@ export const incubatorMaintenanceInputSchema = z.object({
   notes: z.string().trim().max(500, 'too_big'),
 });
 
+export const incubationInputSchema = z
+  .object({
+    code: z
+      .string()
+      .trim()
+      .min(1, 'too_small')
+      .max(32, 'too_big')
+      .regex(/^[A-Za-z0-9][A-Za-z0-9_-]*$/, 'invalid_format'),
+    mode: z.enum(['incubator', 'broody_hen']),
+    incubatorId: z.union([z.string().uuid('invalid_format'), z.literal('')]),
+    henName: z.string().trim().max(80, 'too_big'),
+    startedOn: calendarDateSchema,
+    eggCount: z.number({ invalid_type_error: 'invalid_format' }).int('invalid_format').min(1, 'too_small').max(1_000_000, 'too_big'),
+    notes: z.string().trim().max(500, 'too_big'),
+  })
+  .superRefine((value, ctx) => {
+    if (value.mode === 'incubator') {
+      if (value.incubatorId === '') ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'required', path: ['incubatorId'] });
+      if (value.henName !== '') ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'invalid_format', path: ['henName'] });
+    } else {
+      if (value.henName.length < 2) ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'too_small', path: ['henName'] });
+      if (value.incubatorId !== '') ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'invalid_format', path: ['incubatorId'] });
+    }
+  });
+
+export const candlingInputSchema = z
+  .object({
+    observedOn: calendarDateSchema,
+    inspectedCount: z.number({ invalid_type_error: 'invalid_format' }).int('invalid_format').min(1, 'too_small').max(1_000_000, 'too_big'),
+    notes: z.string().trim().max(500, 'too_big'),
+    lines: z
+      .array(
+        z.object({
+          label: z.string().trim().min(1, 'too_small').max(80, 'too_big'),
+          eggCount: z.number({ invalid_type_error: 'invalid_format' }).int('invalid_format').min(0, 'too_small').max(1_000_000, 'too_big'),
+        }),
+      )
+      .min(1, 'too_small')
+      .max(20, 'too_big'),
+  })
+  .superRefine((value, ctx) => {
+    const seen = new Set<string>();
+    for (const line of value.lines) {
+      const key = line.label.toLocaleLowerCase();
+      if (seen.has(key)) ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'invalid_format', path: ['lines'] });
+      seen.add(key);
+    }
+    const total = value.lines.reduce((sum, line) => sum + line.eggCount, 0);
+    if (total !== value.inspectedCount) {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'invalid_format', path: ['inspectedCount'] });
+    }
+  });
+
 export const closeBatchSchema = z.object({
   version: z.number({ invalid_type_error: 'invalid_format' }).int('invalid_format').positive('too_small'),
 });
@@ -313,6 +366,8 @@ export type EggCollectionInput = z.infer<typeof eggCollectionInputSchema>;
 export type IncubatorInput = z.infer<typeof incubatorInputSchema>;
 export type IncubatorReadingInput = z.infer<typeof incubatorReadingInputSchema>;
 export type IncubatorMaintenanceInput = z.infer<typeof incubatorMaintenanceInputSchema>;
+export type IncubationInput = z.infer<typeof incubationInputSchema>;
+export type CandlingInput = z.infer<typeof candlingInputSchema>;
 export type RegisterInput = z.infer<typeof registerSchema>;
 export type LoginInput = z.infer<typeof loginSchema>;
 export type FarmInput = z.infer<typeof farmInputSchema>;

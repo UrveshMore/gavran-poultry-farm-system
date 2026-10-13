@@ -97,6 +97,8 @@ export function errorKey(error: unknown): string | null {
     BATCH_CLOSED: 'batches.closedError',
     SHED_INACTIVE: 'batches.inactiveShed',
     BIRDS_REMAIN: 'batches.birdsRemain',
+    INCUBATOR_OUT: 'incubation.outOfService',
+    INCUBATOR_CAPACITY: 'incubation.capacity',
     FORBIDDEN: 'common.permissionDenied',
   };
   return keys[error.code] ?? null;

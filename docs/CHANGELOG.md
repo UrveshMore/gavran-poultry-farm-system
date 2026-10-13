@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.5.0 — 2026-10-13
+
+Phase 5 incubation.
+
+- A sitting is an in-service incubator or a named broody hen.
+- Candling stores the labels the farm types. No hatch day is calculated.
+
 ## 0.4.0 — 2026-10-13
 
 Phase 4 incubators.

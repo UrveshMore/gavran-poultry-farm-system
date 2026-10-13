@@ -38,7 +38,7 @@ Done in this repository. WF-04 equipment records only. Temperature and humidity 
 
 ## Phase 5 — Incubation, candling, and broody hens
 
-WF-03 and WF-05, plus natural sitting for Desi hens. An incubation batch is either an incubator or a named broody hen. Do not invent candling days, hatch days, or a broody period. Refuse date calculations until an approved rule is recorded in `docs/DECISIONS.md`.
+Done in this repository. A sitting is either an in-service incubator or a named broody hen. Egg count is what the farm types. Candling outcomes are labels the farm types on that record, and the counts must add up. No hatch day, candling day, or broody period is calculated.
 
 ## Phase 6 — Hatch
 

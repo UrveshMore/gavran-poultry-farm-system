@@ -80,3 +80,11 @@ A random or foreign farm id is 404.
 `POST /farms/:farmId/incubators/:incubatorId/readings` — `incubator.record`. Temperature and humidity may both be null. A number requires a unit. There is no set-point field.
 
 `POST /farms/:farmId/incubators/:incubatorId/maintenance` — `incubator.manage`. Sets `in_service` or `out_of_service`.
+
+## Incubation
+
+`GET|POST /farms/:farmId/incubation` — `incubation.read` / `incubation.record`. Mode is `incubator` or `broody_hen`. An out-of-service incubator is 409 `INCUBATOR_OUT`. An egg count above a typed capacity is 409 `INCUBATOR_CAPACITY`. The response has no hatch date.
+
+`GET /farms/:farmId/incubation/:sittingId` — `incubation.read`.
+
+`POST /farms/:farmId/incubation/:sittingId/candling` — `incubation.record`. Outcome labels are text on that record. Their counts must equal `inspectedCount`. A second record does not replace the first.

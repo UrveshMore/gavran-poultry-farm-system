@@ -110,6 +110,27 @@ export type AuditPage = {
   total: number;
 };
 
+export type Sitting = {
+  id: string;
+  code: string;
+  mode: 'incubator' | 'broody_hen';
+  incubatorId: string | null;
+  incubatorCode: string | null;
+  henName: string | null;
+  startedOn: string;
+  eggCount: number;
+  notes: string | null;
+  status: 'open' | 'closed';
+};
+
+export type CandlingRecord = {
+  id: string;
+  observedOn: string;
+  inspectedCount: number;
+  notes: string | null;
+  lines: Array<{ label: string; eggCount: number }>;
+};
+
 export type EggCategory = { id: string; name: string; status: 'active' | 'archived' };
 
 export type Incubator = {

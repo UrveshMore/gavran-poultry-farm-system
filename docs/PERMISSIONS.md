@@ -24,6 +24,8 @@ UI navigation inside a farm still shows Sheds, Batches, Eggs, People, and Activi
 | `incubator.read` | List incubators, readings, and service changes. |
 | `incubator.record` | Record a temperature, humidity, or power reading. |
 | `incubator.manage` | Add an incubator and change whether it is in service. |
+| `incubation.read` | View sittings and candling. |
+| `incubation.record` | Start a sitting and record candling. |
 
 `GET /api/v1/farms` lists farms the caller belongs to, including farms where they have zero permissions. It does not include contact details.
 
@@ -34,9 +36,9 @@ Pending owner confirmation. Seeded by the versioned migrations and mirrored in `
 | Role | Permissions |
 |---|---|
 | Owner | All keys in the catalog. |
-| Manager | `farm.read`, `shed.read`, `shed.create`, `shed.update`, `user.read`, `audit.read`, `batch.read`, `batch.create`, `movement.create`, `egg.read`, `egg.record`, `incubator.read`, `incubator.record`, `incubator.manage`. |
-| Worker | `farm.read`, `shed.read`, `batch.read`, `egg.read`, `egg.record`, `incubator.read`, `incubator.record`. |
-| Vet / advisor | `farm.read`, `shed.read`, `batch.read`, `egg.read`, `incubator.read`. |
+| Manager | Farm operations in the catalog except `user.manage` and `farm.update`. |
+| Worker | `farm.read`, `shed.read`, `batch.read`, `egg.read`, `egg.record`, `incubator.read`, `incubator.record`, `incubation.read`, `incubation.record`. |
+| Vet / advisor | `farm.read`, `shed.read`, `batch.read`, `egg.read`, `incubator.read`, `incubation.read`. |
 | Family helper | None from the role. Optional grants on that membership only. |
 | System administrator | None. |
 
