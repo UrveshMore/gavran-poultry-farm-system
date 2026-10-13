@@ -643,6 +643,19 @@ export const reportRangeSchema = z
   })
   .refine((value) => value.from <= value.to, { message: 'too_big', path: ['to'] });
 
+export const reportScheduleInputSchema = z.object({
+  name: z.string().trim().min(2, 'too_small').max(120, 'too_big'),
+  note: z.string().trim().max(500, 'too_big'),
+  namedOn: calendarDateSchema,
+});
+
+export const reportRunSchema = z
+  .object({
+    from: calendarDateSchema,
+    to: calendarDateSchema,
+  })
+  .refine((value) => value.from <= value.to, { message: 'too_big', path: ['to'] });
+
 export const expenseCategoryInputSchema = z.object({
   name: z.string().trim().min(2, 'too_small').max(80, 'too_big'),
 });

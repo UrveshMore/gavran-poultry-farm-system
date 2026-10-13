@@ -48,6 +48,7 @@ Dated 2026-10-13. Technical choices below are provisional engineering defaults f
 | T40 | The device queue accepts only `POST .../attendance`. Stock, expenses, invoices, orders, market prices, losses, medicine, and supplier money return `refused` and are not stored. Replay uses the same idempotency key. Status 409 becomes `conflict` and is not written again. | Decision 10 stays open. |
 | T41 | `document.documentElement.lang` follows `gavran.locale`. Hindi and Marathi strings are provisional. The screen says a fluent review is still needed. | No fluent review is claimed. |
 | T42 | Search uses `LIKE ? ESCAPE '!'` on the current farm. The pattern escapes `!`, `%`, and `_`. Sections run only when the caller has that read permission. Amount columns are not selected. | Workers must not see prices. |
+| T43 | A named report stores the name, note, and date the farm types. `cadence.status` is `not_chosen`. A run calls the existing report with `from` and `to` typed at that moment. `delivery` is `not_sent`. | No clock and no outbound message. |
 
 ## Still open (blueprint section 18)
 

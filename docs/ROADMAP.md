@@ -128,6 +128,10 @@ Done in this repository. The page language follows the chosen locale. Hindi and 
 
 Done in this repository. A search needs at least two characters. `%` and `_` are ordinary characters. Results stay on the farm. A worker does not see suppliers, expenses, or invoice notes. A price is not part of a result.
 
+## Phase 26 — Scheduled reports
+
+Done in this repository. A named report stores a name, a note, and a date the farm types. Running it uses the existing report for a date range typed at that moment. Nothing is sent out. No clock is stored.
+
 ## Explicitly later
 
-P1 continues with scheduled reports. P2 (AI image triage, weather, voice, sensors, forecasting, portals, farm map, route planning, a native app, custom model training) stays unstarted. Medical and feeding standards stay owner-editable and sourced. Nothing in those standards is invented. Invoice posting stays off until the farm decides when a sale is posted.
+P2 (AI image triage, weather, voice, sensors, forecasting, portals, farm map, route planning, a native app, custom model training) stays unstarted. Medical and feeding standards stay owner-editable and sourced. Nothing in those standards is invented. Invoice posting stays off until the farm decides when a sale is posted. Offline capture still refuses stock, money, losses, and medicine.

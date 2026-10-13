@@ -26,6 +26,7 @@ import { NoticesPage } from '@/pages/NoticePages';
 import { DocumentsPage } from '@/pages/DocumentPages';
 import { OfflinePage } from '@/pages/OfflinePages';
 import { SearchPageView } from '@/pages/SearchPages';
+import { SchedulesPage } from '@/pages/SchedulePages';
 
 function RequireAuth() {
   const { t } = useTranslation();
@@ -72,6 +73,7 @@ export function App() {
         <Route path="farms/:farmId/documents" element={<DocumentsPage />} />
         <Route path="farms/:farmId/offline" element={<OfflinePage />} />
         <Route path="farms/:farmId/search" element={<SearchPageView />} />
+        <Route path="farms/:farmId/report-schedules" element={<SchedulesPage />} />
         <Route path="farms/:farmId/tasks/:taskId" element={<TaskDetailPage />} />
         <Route path="farms/:farmId/stock" element={<StockPage />} />
         <Route path="farms/:farmId/health" element={<HealthPage />} />

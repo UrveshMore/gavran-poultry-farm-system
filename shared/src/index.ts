@@ -87,6 +87,8 @@ export {
   vaccineTaskSchema,
   lossIncidentSchema,
   reportRangeSchema,
+  reportScheduleInputSchema,
+  reportRunSchema,
   expenseCategoryInputSchema,
   expenseEntryInputSchema,
   expenseReversalSchema,

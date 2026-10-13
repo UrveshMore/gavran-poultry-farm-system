@@ -204,6 +204,12 @@ The restore drill is the server command `npm run restore-drill -w @gavran/server
 
 `POST /farms/:farmId/notifications/:noticeId/read` — `notification.read`. Only the recipient. A second call keeps the first read time.
 
+## Named reports
+
+`GET|POST /farms/:farmId/report-schedules` — `report.read`. A row stores `name`, `note`, and `namedOn`. `delivery` is `not_sent`. `cadence.status` is `not_chosen`. There is no clock and nothing is sent out.
+
+`POST /farms/:farmId/report-schedules/:scheduleId/run` — `report.read`. Body is `from` and `to`, typed at run time. The payload is the same report as `GET /reports` for that range.
+
 ## Search
 
 `GET /farms/:farmId/search?q=` — `farm.read`. `q` is 2 to 80 characters. `%` and `_` match themselves. Hits are limited to rows the caller may read. Supplier, expense, and invoice hits are omitted without those read permissions. The payload has no price or amount field.

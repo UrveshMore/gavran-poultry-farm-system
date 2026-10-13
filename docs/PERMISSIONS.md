@@ -43,7 +43,7 @@ UI navigation inside a farm still shows Sheds, Batches, Eggs, People, and Activi
 | `sale.record` | Add a customer, a typed price, or a draft order. Invoice posting is refused. |
 | `expense.read` | View expense and income rows. |
 | `expense.record` | Add a category, an amount, or a reversing entry. |
-| `report.read` | View a date-range report of source rows. |
+| `report.read` | View a date-range report of source rows, and name a report that runs only when someone types the dates. |
 | `attendance.read` | View attendance rows. A worker sees only their own. |
 | `attendance.record` | Add an attendance row. A worker adds a row only for themselves. |
 | `training.read` | View training items. A worker sees only their own assignments. |

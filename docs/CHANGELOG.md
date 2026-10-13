@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.27.0 — 2026-10-13
+
+Phase 26 named reports.
+
+- A name, a note, and a date are what the farm types.
+- Running it uses dates typed at that moment.
+- Nothing is sent out, and no clock is stored.
+
 ## 0.26.0 — 2026-10-13
 
 Phase 25 search.
