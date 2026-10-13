@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.10.0 — 2026-10-13
+
+Phase 10 loss notes.
+
+- A loss is a note and a count the farm writes.
+- It can point at a mortality movement. There is no predator list and no mortality rate.
+
 ## 0.9.0 — 2026-10-13
 
 Phase 9 health pages.

@@ -284,6 +284,22 @@ export type BiosecurityStep = {
   mustVerify: boolean;
 };
 
+export type LossIncident = {
+  id: string;
+  occurredOn: string;
+  birdCount: number;
+  note: string;
+  movementId: string | null;
+  batchCode: string | null;
+};
+
+export type LossPage = {
+  incidents: LossIncident[];
+  mortalityMovements: Array<{ id: string; occurredOn: string; birdCount: number; batchCode: string; reason: string | null }>;
+  proposedMortalityRate: { status: 'not_calculated'; reason: string };
+  today: string;
+};
+
 export type Incubator = {
   id: string;
   code: string;

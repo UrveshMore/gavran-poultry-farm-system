@@ -80,4 +80,9 @@ MySQL 8.4, `utf8mb4` / `utf8mb4_0900_ai_ci`, session time zone `+00:00`. Migrati
 - `biosecurity_steps` — `owner` or `pdf`. A PDF step must name `patil-poultry-step-by-step-process.pdf` and a page, and starts unapproved.
 - Permissions `000000000126` through `000000000129`: `health.read`, `health.record`, `health.approve`, `health.treat`. Owner and manager receive all four. Worker and vet / advisor receive read and record.
 
+## 012 losses
+
+- `loss_incidents` — date, bird count, and a note the farm writes. Optional link to a `batch_movements` row of type `mortality`. No predator column and no rate column.
+- Permissions `000000000130` and `000000000131`: `loss.read`, `loss.record`. Owner, manager, and worker receive both. Vet / advisor receives read only.
+
 Queries use `mysql2` `execute()` (server-side prepared statements). Audit list `LIMIT` and `OFFSET` are interpolated only after the values are checked as integers, because the binary protocol rejects placeholders there.

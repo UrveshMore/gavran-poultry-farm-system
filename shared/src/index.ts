@@ -78,6 +78,7 @@ export {
   knowledgeApprovalSchema,
   medicineRecordSchema,
   vaccineTaskSchema,
+  lossIncidentSchema,
 } from './schemas.js';
 export type {
   BatchInput,
@@ -115,4 +116,5 @@ export type {
   KnowledgeApprovalInput,
   MedicineRecordInput,
   VaccineTaskInput,
+  LossIncidentInput,
 } from './schemas.js';

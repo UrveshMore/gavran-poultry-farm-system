@@ -10,6 +10,7 @@ import { EggsPage } from '@/pages/EggPages';
 import { IncubationDetailPage, IncubationPage } from '@/pages/IncubationPages';
 import { IncubatorDetailPage, IncubatorsPage } from '@/pages/IncubatorPages';
 import { ActivityPage, FarmCreatePage, FarmProfilePage, FarmsPage, PeoplePage, ShedsPage } from '@/pages/FarmPages';
+import { LossesPage } from '@/pages/LossPages';
 import { HealthPage } from '@/pages/HealthPages';
 import { StockPage } from '@/pages/StockPages';
 import { TaskDetailPage, TasksPage } from '@/pages/TaskPages';
@@ -54,6 +55,7 @@ export function App() {
         <Route path="farms/:farmId/tasks/:taskId" element={<TaskDetailPage />} />
         <Route path="farms/:farmId/stock" element={<StockPage />} />
         <Route path="farms/:farmId/health" element={<HealthPage />} />
+        <Route path="farms/:farmId/losses" element={<LossesPage />} />
         <Route path="farms/:farmId/people" element={<PeoplePage />} />
         <Route path="farms/:farmId/activity" element={<ActivityPage />} />
       </Route>

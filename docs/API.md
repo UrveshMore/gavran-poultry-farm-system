@@ -134,3 +134,7 @@ A random or foreign farm id is 404.
 `GET|POST /farms/:farmId/biosecurity-steps` — `health.read` / `health.record`. `origin` `owner` stores the typed step. `origin` `pdf` is allowed only for `patil-poultry-step-by-step-process.pdf` and stores that page's text layer, unapproved, ignoring any body the client sent.
 
 `POST /farms/:farmId/biosecurity-steps/:stepId/approve` — `health.approve`. Approves a copied PDF step.
+
+## Losses
+
+`GET|POST /farms/:farmId/losses` — `loss.read` / `loss.record`. A note and a bird count. `movementId` must be a mortality movement on this farm or blank. The list includes `proposedMortalityRate` with status `not_calculated`. There is no predator catalog.

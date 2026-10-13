@@ -31,6 +31,7 @@ Dated 2026-10-13. Technical choices below are provisional engineering defaults f
 | T23 | Tasks are created by a person. Summer heat, monsoon, and winter templates start with zero steps. No task is generated from batch age. Completion is online only, and a second completion is refused. Proof is a note when the creator asks for one. Photos and offline queues are not in this phase. | Blueprint WF-08 steps 1, 6, and 7 need farm rules this build does not invent. |
 | T24 | Stock on hand is the sum of in and out quantities. A typed amount on a receipt is stored and is not a valuation. Reorder level, item unit, target age, and target weight exist only when the farm types them. Water is a note. A laboratory result is stored only as text the farm types. FCR is not calculated. | Decisions 4 and 7 are still open. FIFO, FEFO, and expiry blocking are not assumed. |
 | T25 | The disease base is one row per page of the three Patil PDFs. The stored text is the PDF text layer. Marathi vowel signs in that layer are incomplete, so doses are not reconstructed. Use requires an owner or vet note and an approval flag. There is no withdrawal column. Biosecurity copies only the step-by-step PDF, and the copy starts unapproved. | Decision 5 is still open. The text layer is not a verified prescription. |
+| T26 | A loss incident stores the note and count the farm types. It may link only to a mortality movement. No predator list is seeded. No mortality rate is calculated. | Decision 4 is still open. |
 
 ## Still open (blueprint section 18)
 

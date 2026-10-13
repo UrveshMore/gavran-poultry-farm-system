@@ -58,7 +58,7 @@ Done in this repository. WF-09, plus a Disease & Treatment Knowledge Base. The b
 
 ## Phase 10 — Mortality and predator losses
 
-Mortality and culling events that adjust the derived bird count. A predator or other loss incident is a note the owner writes (what happened, and a count). It can link to a mortality movement. Do not preload a predator list. Mortality-rate formula stays labelled proposed until decision 4.
+Done in this repository. A loss note is text the farm writes, with a count, and an optional link to a mortality movement. There is no predator list. The mortality rate is not calculated. The response says decision 4 is still open.
 
 ## Phase 11 — Customers, orders, and local prices
 
