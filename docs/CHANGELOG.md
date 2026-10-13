@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.23.0 — 2026-10-13
+
+Phase 22 install.
+
+- An install button appears when the browser offers one.
+- Farm records are still loaded from the network.
+
 ## 0.22.0 — 2026-10-13
 
 Phase 21 files.

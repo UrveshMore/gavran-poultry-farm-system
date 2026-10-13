@@ -34,6 +34,8 @@ export type {
   WeightUnit,
 } from './permissions.js';
 export { isIanaTimeZone } from './time.js';
+export { installSurface, isIosUserAgent } from './install.js';
+export type { InstallSurface } from './install.js';
 export {
   batchInputSchema,
   rangeAreaInputSchema,

@@ -6,6 +6,12 @@ import { App } from './App';
 import './i18n';
 import './index.css';
 
+if (import.meta.env.PROD) {
+  void import('virtual:pwa-register').then(({ registerSW }) => {
+    registerSW({ immediate: true });
+  });
+}
+
 const queryClient = new QueryClient({
   defaultOptions: { queries: { retry: false, refetchOnWindowFocus: false }, mutations: { retry: false } },
 });

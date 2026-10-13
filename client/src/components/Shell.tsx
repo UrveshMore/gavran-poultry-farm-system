@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { api } from '@/lib/api';
 import { useQueryClient } from '@tanstack/react-query';
+import { InstallPrompt } from './InstallPrompt';
 import { LanguageSwitcher } from './LanguageSwitcher';
 import { Logo } from './ui';
 
@@ -86,6 +87,7 @@ export function AppShell() {
         <header className="sticky top-0 z-20 flex items-center justify-between gap-3 border-b border-line bg-paper/95 px-4 py-3 backdrop-blur">
           <Brand compact />
           <div className="flex items-center gap-2">
+            <InstallPrompt />
             <LanguageSwitcher />
             <NavLink to="/account" className="min-h-11 rounded-xl px-3 py-2 text-sm font-semibold hover:bg-paper-deep">
               {t('nav.account')}

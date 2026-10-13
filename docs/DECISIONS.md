@@ -44,6 +44,7 @@ Dated 2026-10-13. Technical choices below are provisional engineering defaults f
 | T36 | Report filters are optional shed, batch, and category ids. A section without that column is left on the date range, except hatch, loss, expense, movement, egg, and parentage rows, which narrow when the column exists. Export is the same payload. | Decisions 4 and 9 stay open. |
 | T37 | Notices are rows for one farm member. `delivery` is `in_app`. `urgent.status` is `not_chosen`. | Decision 14 stays open. |
 | T38 | Farm files stay on local disk under `uploads/`. Kind is taken from magic bytes: JPEG, PNG, WebP, or PDF, at most 5 MB. `scan.status` is `not_claimed`. There is no delete. | Decision 15 stays open. |
+| T39 | Install uses the browser prompt, or a share-menu note on iPhone. `/api` stays `NetworkOnly`. | No offline record cache. |
 
 ## Still open (blueprint section 18)
 

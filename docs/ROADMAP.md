@@ -112,6 +112,10 @@ Done in this repository. A notice is a title and a message for one person on the
 
 Done in this repository. A file is a JPEG, PNG, WebP, or PDF, at most 5 MB, checked by its bytes. The note is text the farm types. Workers cannot open these files. Nothing is deleted. `scan.status` is `not_claimed`. `retention.status` is `not_chosen` because decision 15 is open.
 
+## Phase 22 — PWA install
+
+Done in this repository. The install control appears when the browser offers a prompt, or on an iPhone as a note to use the share menu. Farm records stay on the network. The service worker does not cache `/api`.
+
 ## Explicitly later
 
-P1 continues with PWA install, offline-safe capture, multilingual polish, search, and scheduled reports. P2 (AI image triage, weather, voice, sensors, forecasting, portals, farm map, route planning, a native app, custom model training) stays unstarted. Offline capture must not silently merge stock, finance, mortality, or treatment records. Medical and feeding standards stay owner-editable and sourced. Nothing in those standards is invented. Invoice posting stays off until the farm decides when a sale is posted.
+P1 continues with offline-safe capture, multilingual polish, search, and scheduled reports. P2 (AI image triage, weather, voice, sensors, forecasting, portals, farm map, route planning, a native app, custom model training) stays unstarted. Offline capture must not silently merge stock, finance, mortality, or treatment records. Medical and feeding standards stay owner-editable and sourced. Nothing in those standards is invented. Invoice posting stays off until the farm decides when a sale is posted.
