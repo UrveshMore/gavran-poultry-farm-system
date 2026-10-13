@@ -161,7 +161,9 @@ A random or foreign farm id is 404.
 
 ## Reports
 
-`GET /farms/:farmId/reports?from=YYYY-MM-DD&to=YYYY-MM-DD` — `report.read`. Both dates are required, `from` is not after `to`, and `to` is not in the future for the farm timezone. The body includes `generatedAt`, `timezone`, and `offlinePending: "none"`.
+`GET /farms/:farmId/reports?from=YYYY-MM-DD&to=YYYY-MM-DD` — `report.read`. Both dates are required, `from` is not after `to`, and `to` is not in the future for the farm timezone. Optional `shedId`, `batchId`, and `categoryId` narrow sections that store that id. The body includes `generatedAt`, `timezone`, `filters`, and `offlinePending: "none"`.
+
+`GET /farms/:farmId/reports/export` — `report.read`. Same query and the same body, with `Content-Disposition: attachment`.
 
 Sections:
 
@@ -170,6 +172,11 @@ Sections:
 - `hatches` from `hatch_records`. Formula status `proposed`, text `live chicks ÷ eggs set × 100`. Each row repeats `proposedHatchRate`.
 - `losses` from `loss_incidents`. Formula status `not_calculated`, reason `decision 4 is open`. No percent.
 - `expenses` from `expense_entries`. Formula status `not_chosen`, reason `decision 9 is open`. `listedSums` adds rows that share a direction and a money unit. There is no profit field and no feed conversion.
+- `attendance` is a row count.
+- `parentage` lists sire and dam notes. Pairing stays unset.
+- `receipts` list accepted and rejected quantities. Stock is unchanged.
+- `invoiceDocuments` stay `unposted`.
+- `returns` list return rows. No balance is calculated.
 
 ## Safeguards
 

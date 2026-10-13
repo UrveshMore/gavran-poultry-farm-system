@@ -21,10 +21,23 @@ export function ReportsPage() {
   const { t } = useTranslation();
   const [from, setFrom] = useState('');
   const [to, setTo] = useState('');
-  const [range, setRange] = useState<{ from: string; to: string } | null>(null);
+  const [shedId, setShedId] = useState('');
+  const [batchId, setBatchId] = useState('');
+  const [categoryId, setCategoryId] = useState('');
+  const [range, setRange] = useState<{ from: string; to: string; shedId: string; batchId: string; categoryId: string } | null>(null);
+  const sheds = useQuery({ queryKey: ['sheds', farmId], queryFn: () => api<Array<{ id: string; code: string }>>(`/api/v1/farms/${farmId}/sheds`) });
+  const batches = useQuery({ queryKey: ['batches', farmId], queryFn: () => api<Array<{ id: string; code: string }>>(`/api/v1/farms/${farmId}/batches`) });
+  const eggCategories = useQuery({ queryKey: ['egg-categories', farmId], queryFn: () => api<Array<{ id: string; name: string }>>(`/api/v1/farms/${farmId}/egg-categories`) });
+  const expenses = useQuery({ queryKey: ['expenses', farmId], queryFn: () => api<{ categories: Array<{ id: string; name: string }> }>(`/api/v1/farms/${farmId}/expenses`) });
   const report = useQuery({
-    queryKey: ['report', farmId, range?.from, range?.to],
-    queryFn: () => api<FarmReport>(`/api/v1/farms/${farmId}/reports?from=${range?.from}&to=${range?.to}`),
+    queryKey: ['report', farmId, range],
+    queryFn: () => {
+      const params = new URLSearchParams({ from: range?.from ?? '', to: range?.to ?? '' });
+      if (range?.shedId) params.set('shedId', range.shedId);
+      if (range?.batchId) params.set('batchId', range.batchId);
+      if (range?.categoryId) params.set('categoryId', range.categoryId);
+      return api<FarmReport>(`/api/v1/farms/${farmId}/reports?${params.toString()}`);
+    },
     enabled: Boolean(range),
   });
 
@@ -39,7 +52,7 @@ export function ReportsPage() {
           className="grid gap-3"
           onSubmit={(event) => {
             event.preventDefault();
-            setRange({ from, to });
+            setRange({ from, to, shedId, batchId, categoryId });
           }}
         >
           <Field id="report-from" label={t('reports.from')}>
@@ -47,6 +60,25 @@ export function ReportsPage() {
           </Field>
           <Field id="report-to" label={t('reports.to')}>
             <Input id="report-to" type="date" value={to} onChange={(event) => setTo(event.target.value)} />
+          </Field>
+          <Field id="report-shed" label={`${t('reports.shed')} (${t('common.optional')})`}>
+            <select id="report-shed" className="min-h-11 w-full rounded-xl border border-line bg-white px-3" value={shedId} onChange={(event) => setShedId(event.target.value)}>
+              <option value="">{t('reports.any')}</option>
+              {(sheds.data ?? []).map((shed) => <option key={shed.id} value={shed.id}>{shed.code}</option>)}
+            </select>
+          </Field>
+          <Field id="report-batch" label={`${t('reports.batch')} (${t('common.optional')})`}>
+            <select id="report-batch" className="min-h-11 w-full rounded-xl border border-line bg-white px-3" value={batchId} onChange={(event) => setBatchId(event.target.value)}>
+              <option value="">{t('reports.any')}</option>
+              {(batches.data ?? []).map((batch) => <option key={batch.id} value={batch.id}>{batch.code}</option>)}
+            </select>
+          </Field>
+          <Field id="report-category" label={`${t('reports.category')} (${t('common.optional')})`}>
+            <select id="report-category" className="min-h-11 w-full rounded-xl border border-line bg-white px-3" value={categoryId} onChange={(event) => setCategoryId(event.target.value)}>
+              <option value="">{t('reports.any')}</option>
+              {(eggCategories.data ?? []).map((category) => <option key={category.id} value={category.id}>{category.name}</option>)}
+              {(expenses.data?.categories ?? []).map((category) => <option key={category.id} value={category.id}>{category.name}</option>)}
+            </select>
           </Field>
           <Button type="submit">{t('reports.show')}</Button>
         </form>
@@ -68,6 +100,20 @@ function ReportBody({ report }: { report: FarmReport }) {
         {t('reports.range', { from: report.from, to: report.to, when, zone: report.timezone })}
       </p>
       <p className="rounded-xl bg-gold/30 px-3 py-2 text-sm">{t('reports.notOfficial')}</p>
+      <Button
+        type="button"
+        onClick={() => {
+          const blob = new Blob([JSON.stringify(report, null, 2)], { type: 'application/json' });
+          const url = URL.createObjectURL(blob);
+          const link = document.createElement('a');
+          link.href = url;
+          link.download = 'gavran-report.json';
+          link.click();
+          URL.revokeObjectURL(url);
+        }}
+      >
+        {t('reports.download')}
+      </Button>
       {report.sections.map((section) => (
         <SectionCard key={section.id} section={section} />
       ))}
@@ -122,6 +168,21 @@ function RowLine({ section, row }: { section: ReportSection; row: ReportSection[
   }
   if (section.id === 'expenses' && 'unitLabel' in row && 'direction' in row) {
     return <span>{row.occurredOn} · {t(row.direction === 'income' ? 'expenses.income' : 'expenses.expense')} · {row.amount} {row.unitLabel}</span>;
+  }
+  if (section.id === 'attendance' && 'methodLabel' in row) {
+    return <span>{row.attendedOn} · {row.methodLabel}</span>;
+  }
+  if (section.id === 'parentage' && 'sireNote' in row) {
+    return <span>{row.recordedOn} · {row.sireNote} · {row.damNote}</span>;
+  }
+  if (section.id === 'receipts' && 'acceptedQuantity' in row) {
+    return <span>{row.receivedOn} · {row.acceptedQuantity} / {row.rejectedQuantity} {row.unitLabel}</span>;
+  }
+  if (section.id === 'invoiceDocuments' && 'issuedOn' in row) {
+    return <span>{row.issuedOn} · {row.status}</span>;
+  }
+  if (section.id === 'returns' && 'returnedOn' in row) {
+    return <span>{row.returnedOn} · {row.description} · {row.quantity}</span>;
   }
   return null;
 }

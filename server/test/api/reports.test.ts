@@ -105,6 +105,15 @@ describe('essential reports', () => {
     expect(expenses.formula.status).toBe('not_chosen');
     expect(expenses.listedSums).toEqual([{ direction: 'expense', unitLabel: 'rupees', amount: 450 }]);
     expect(JSON.stringify(report.body)).not.toMatch(/fcr|profit|gst/i);
+    expect(report.body.data.sections.find((section: { id: string }) => section.id === 'attendance').formula.status).toBe('row_count');
+    const filtered = await http.get(`/api/v1/farms/${farmId}/reports?from=${today}&to=${today}&categoryId=${category.body.data.id}`);
+    expect(filtered.body.data.sections.find((section: { id: string }) => section.id === 'eggs').total).toBe(4);
+    expect(filtered.body.data.sections.find((section: { id: string }) => section.id === 'expenses').rows).toEqual([]);
+    const exported = await http.get(`/api/v1/farms/${farmId}/reports/export?from=${today}&to=${today}&categoryId=${category.body.data.id}`);
+    expect(exported.status).toBe(200);
+    expect(exported.headers['content-disposition']).toContain('gavran-report.json');
+    expect(exported.body.data.filters.categoryId).toBe(category.body.data.id);
+    expect(exported.body.data.sections.find((section: { id: string }) => section.id === 'eggs').total).toBe(filtered.body.data.sections.find((section: { id: string }) => section.id === 'eggs').total);
 
     const empty = await http.get(`/api/v1/farms/${farmId}/reports?from=2020-01-01&to=2020-01-02`);
     expect(empty.body.data.sections.find((section: { id: string }) => section.id === 'eggs').total).toBe(0);

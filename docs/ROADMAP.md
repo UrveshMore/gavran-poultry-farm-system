@@ -100,6 +100,10 @@ Done in this repository. WF-14. A supplier is a name the farm types. A purchase 
 
 Done in this repository. An invoice document is text and lines the farm types. Its status is only `unposted`. `POST /invoices` still returns 409 until decision 8. A return is a new row that points at the document. The document stays. No balance is calculated. There is no tax column.
 
+## Phase 19 — Advanced reports
+
+Done in this repository. The same date range can also name a shed, a batch, or a category. The download uses those same filters. Extra sections list attendance rows, parentage notes, goods receipts, unposted invoice documents, and returns. The hatch figure stays proposed. Mortality stays uncalculated. There is no feed conversion and no profit.
+
 ## Explicitly later
 
-P1 continues with advanced reports, in-app notifications, documents, PWA install, offline-safe capture, multilingual polish, search, and scheduled reports. P2 (AI image triage, weather, voice, sensors, forecasting, portals, farm map, route planning, a native app, custom model training) stays unstarted. Offline capture must not silently merge stock, finance, mortality, or treatment records. Medical and feeding standards stay owner-editable and sourced. Nothing in those standards is invented. Invoice posting stays off until the farm decides when a sale is posted.
+P1 continues with in-app notifications, documents, PWA install, offline-safe capture, multilingual polish, search, and scheduled reports. P2 (AI image triage, weather, voice, sensors, forecasting, portals, farm map, route planning, a native app, custom model training) stays unstarted. Offline capture must not silently merge stock, finance, mortality, or treatment records. Medical and feeding standards stay owner-editable and sourced. Nothing in those standards is invented. Invoice posting stays off until the farm decides when a sale is posted.

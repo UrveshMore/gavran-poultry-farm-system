@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.20.0 — 2026-10-13
+
+Phase 19 reports.
+
+- A report can filter by shed, batch, or category, and the download uses the same filters.
+- New sections list attendance, parentage, receipts, unposted documents, and returns.
+- No feed conversion and no profit.
+
 ## 0.19.0 — 2026-10-13
 
 Phase 18 invoice documents and returns.

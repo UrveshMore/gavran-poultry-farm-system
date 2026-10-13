@@ -631,10 +631,15 @@ export const orderInputSchema = z.object({
     .max(20, 'too_big'),
 });
 
+const optionalFilterId = z.union([z.string().uuid('invalid_format'), z.literal('')]).optional().default('');
+
 export const reportRangeSchema = z
   .object({
     from: calendarDateSchema,
     to: calendarDateSchema,
+    shedId: optionalFilterId,
+    batchId: optionalFilterId,
+    categoryId: optionalFilterId,
   })
   .refine((value) => value.from <= value.to, { message: 'too_big', path: ['to'] });
 

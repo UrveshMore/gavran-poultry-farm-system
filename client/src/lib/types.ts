@@ -374,11 +374,43 @@ export type ReportSection =
       formula: { status: 'not_chosen'; reason: string };
       listedSums: Array<{ direction: 'expense' | 'income'; unitLabel: string; amount: number }>;
       rows: Array<{ id: string; occurredOn: string; direction: 'expense' | 'income'; amount: number; unitLabel: string }>;
+    }
+  | {
+      id: 'attendance';
+      sourceTable: string;
+      formula: { status: 'row_count'; text: string };
+      rowCount: number;
+      rows: Array<{ id: string; attendedOn: string; methodLabel: string }>;
+    }
+  | {
+      id: 'parentage';
+      sourceTable: string;
+      formula: { status: 'unset'; text: string };
+      rows: Array<{ id: string; recordedOn: string; sireNote: string; damNote: string }>;
+    }
+  | {
+      id: 'receipts';
+      sourceTable: string;
+      formula: { status: 'not_posted'; text: string };
+      rows: Array<{ id: string; receivedOn: string; acceptedQuantity: number; rejectedQuantity: number; unitLabel: string }>;
+    }
+  | {
+      id: 'invoiceDocuments';
+      sourceTable: string;
+      formula: { status: 'unposted'; text: string };
+      rows: Array<{ id: string; issuedOn: string; status: 'unposted' }>;
+    }
+  | {
+      id: 'returns';
+      sourceTable: string;
+      formula: { status: 'listed'; text: string };
+      rows: Array<{ id: string; returnedOn: string; description: string; quantity: number }>;
     };
 
 export type FarmReport = {
   from: string;
   to: string;
+  filters: { shedId: string; batchId: string; categoryId: string };
   timezone: string;
   generatedAt: string;
   offlinePending: 'none';
