@@ -596,6 +596,13 @@ export const orderInputSchema = z.object({
     .max(20, 'too_big'),
 });
 
+export const reportRangeSchema = z
+  .object({
+    from: calendarDateSchema,
+    to: calendarDateSchema,
+  })
+  .refine((value) => value.from <= value.to, { message: 'too_big', path: ['to'] });
+
 export const expenseCategoryInputSchema = z.object({
   name: z.string().trim().min(2, 'too_small').max(80, 'too_big'),
 });
@@ -654,6 +661,7 @@ export type MedicineRecordInput = z.infer<typeof medicineRecordSchema>;
 export type VaccineTaskInput = z.infer<typeof vaccineTaskSchema>;
 export type BiosecurityStepInput = z.infer<typeof biosecurityStepSchema>;
 export type LossIncidentInput = z.infer<typeof lossIncidentSchema>;
+export type ReportRange = z.infer<typeof reportRangeSchema>;
 export type ExpenseCategoryInput = z.infer<typeof expenseCategoryInputSchema>;
 export type ExpenseEntryInput = z.infer<typeof expenseEntryInputSchema>;
 export type ExpenseReversalInput = z.infer<typeof expenseReversalSchema>;

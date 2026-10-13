@@ -107,7 +107,10 @@ describe('migrations', () => {
       const up = await readFile(resolve(dir, file), 'utf8');
       const down = await readFile(resolve(dir, file.replace(/\.sql$/, '.down.sql')), 'utf8');
       const tables = [...up.matchAll(/CREATE TABLE\s+(\w+)/gi)].map((match) => match[1]?.toLowerCase() ?? '');
-      expect(tables.length).toBeGreaterThan(0);
+      if (tables.length === 0) {
+        expect(down.toLowerCase()).not.toContain('drop table');
+        continue;
+      }
       for (const table of tables) {
         expect(down.toLowerCase()).toContain(`drop table if exists ${table}`);
       }

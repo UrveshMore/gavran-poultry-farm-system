@@ -70,7 +70,7 @@ Done in this repository. WF-15 amounts the farm types. Categories start empty. A
 
 ## Phase 13 — Essential reports
 
-WF-17. Every formula is labelled proposed until the owner confirms it. Show the date range and the source rows.
+Done in this repository. WF-17 for one date range. Each section lists the source rows and a formula status. Egg counts are a sum of those rows. The hatch figure stays proposed. The mortality rate stays not calculated. Expense rows are listed with a sum per money unit, and that sum is not a profit. Accounting basis stays open. Feed conversion is not calculated. The response includes the range, the farm timezone, and the time it was generated. There is no offline queue to exclude.
 
 ## Phase 14 — Backup, restore, and P0 hardening
 

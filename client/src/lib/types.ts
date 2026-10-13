@@ -328,6 +328,49 @@ export type ExpensesPageData = {
   accountingBasis: { status: 'not_chosen'; reason: string };
 };
 
+export type ReportSection =
+  | {
+      id: 'movements';
+      sourceTable: string;
+      formula: { status: 'ledger'; text: string };
+      rows: Array<{ id: string; occurredOn: string; movementType: string; birdCount: number; batchCode: string }>;
+    }
+  | {
+      id: 'eggs';
+      sourceTable: string;
+      formula: { status: 'sum'; text: string };
+      total: number;
+      rows: Array<{ id: string; collectedOn: string; eggCount: number }>;
+    }
+  | {
+      id: 'hatches';
+      sourceTable: string;
+      formula: { status: 'proposed'; text: string };
+      rows: Array<{ id: string; hatchedOn: string; eggsSet: number; liveChicks: number; proposedHatchRate: { status: 'proposed'; formula: string; percent: number | null } }>;
+    }
+  | {
+      id: 'losses';
+      sourceTable: string;
+      formula: { status: 'not_calculated'; reason: string };
+      rows: Array<{ id: string; occurredOn: string; birdCount: number; note: string }>;
+    }
+  | {
+      id: 'expenses';
+      sourceTable: string;
+      formula: { status: 'not_chosen'; reason: string };
+      listedSums: Array<{ direction: 'expense' | 'income'; unitLabel: string; amount: number }>;
+      rows: Array<{ id: string; occurredOn: string; direction: 'expense' | 'income'; amount: number; unitLabel: string }>;
+    };
+
+export type FarmReport = {
+  from: string;
+  to: string;
+  timezone: string;
+  generatedAt: string;
+  offlinePending: 'none';
+  sections: ReportSection[];
+};
+
 export type LossPage = {
   incidents: LossIncident[];
   mortalityMovements: Array<{ id: string; occurredOn: string; birdCount: number; batchCode: string; reason: string | null }>;

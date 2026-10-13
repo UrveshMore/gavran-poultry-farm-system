@@ -158,3 +158,15 @@ A random or foreign farm id is 404.
 `POST /farms/:farmId/expenses` — `expense.record`. Direction is `expense` or `income`. Amount is above zero. `unitLabel` is the money unit the caller types. `batchId` may be blank. A future date is 422.
 
 `POST /farms/:farmId/expenses/:entryId/reversal` — `expense.record`. Adds a new row with the same amount that points at the earlier row. The earlier row is not changed. A second reversal of the same row is 409 `ALREADY_REVERSED`. There is no update and no delete.
+
+## Reports
+
+`GET /farms/:farmId/reports?from=YYYY-MM-DD&to=YYYY-MM-DD` — `report.read`. Both dates are required, `from` is not after `to`, and `to` is not in the future for the farm timezone. The body includes `generatedAt`, `timezone`, and `offlinePending: "none"`.
+
+Sections:
+
+- `movements` from `batch_movements`. Formula status `ledger`. Not a mortality rate.
+- `eggs` from `egg_collection_lines`. Formula status `sum`, with `total`.
+- `hatches` from `hatch_records`. Formula status `proposed`, text `live chicks ÷ eggs set × 100`. Each row repeats `proposedHatchRate`.
+- `losses` from `loss_incidents`. Formula status `not_calculated`, reason `decision 4 is open`. No percent.
+- `expenses` from `expense_entries`. Formula status `not_chosen`, reason `decision 9 is open`. `listedSums` adds rows that share a direction and a money unit. There is no profit field and no feed conversion.

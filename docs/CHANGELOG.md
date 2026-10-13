@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.13.0 — 2026-10-13
+
+Phase 13 reports.
+
+- A report needs a start date and an end date, and it lists the source rows.
+- The hatch figure stays proposed. The mortality rate stays uncalculated. There is no feed conversion and no profit.
+
 ## 0.12.0 — 2026-10-13
 
 Phase 12 expenses.
