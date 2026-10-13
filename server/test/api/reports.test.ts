@@ -41,7 +41,7 @@ beforeEach(async () => {
       'growth_weighings', 'growth_targets', 'water_records', 'stock_movements', 'stock_items',
       'task_steps', 'tasks', 'task_template_steps', 'task_templates', 'hatch_records', 'candling_lines', 'candling_records',
       'incubation_batches', 'incubator_readings', 'incubator_maintenance', 'incubators',
-      'egg_collection_lines', 'egg_collections', 'egg_categories', 'batch_movements', 'batches', 'bird_types',
+      'egg_collection_lines', 'egg_collections', 'egg_categories', 'sex_counts', 'range_areas', 'batch_movements', 'batches', 'bird_types',
       'membership_permission_grants', 'sheds', 'farm_settings', 'farm_memberships', 'sessions', 'password_reset_tokens', 'farms', 'users',
     ]) {
       await conn.query(`TRUNCATE TABLE \`${table}\``);

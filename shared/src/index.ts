@@ -36,6 +36,8 @@ export type {
 export { isIanaTimeZone } from './time.js';
 export {
   batchInputSchema,
+  rangeAreaInputSchema,
+  sexCountInputSchema,
   birdTypeInputSchema,
   calendarDateSchema,
   changePasswordSchema,
@@ -89,6 +91,8 @@ export {
 } from './schemas.js';
 export type {
   BatchInput,
+  RangeAreaInput,
+  SexCountInput,
   BirdTypeInput,
   CloseBatchInput,
   CandlingInput,

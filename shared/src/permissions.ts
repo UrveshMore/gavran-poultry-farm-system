@@ -74,7 +74,7 @@ export const BATCH_STATUSES = ['open', 'closed'] as const;
 export type BatchStatus = (typeof BATCH_STATUSES)[number];
 
 /** User-posted movements. The opening placement is created with the batch. */
-export const MOVEMENT_TYPES = ['transfer', 'sale', 'mortality', 'culling', 'other_exit'] as const;
+export const MOVEMENT_TYPES = ['transfer', 'sale', 'mortality', 'culling', 'other_exit', 'to_range', 'from_range'] as const;
 export type MovementType = (typeof MOVEMENT_TYPES)[number];
 
 /**

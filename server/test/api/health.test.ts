@@ -53,6 +53,8 @@ async function truncate(): Promise<void> {
       'market_prices',
       'customers',
       'loss_incidents',
+      'sex_counts',
+      'range_areas',
       'medicine_records',
       'health_observations',
       'biosecurity_steps',

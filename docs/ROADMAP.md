@@ -78,11 +78,11 @@ Done in this repository. A restore drill writes one row into the separate databa
 
 ## After P0 — Desi flock details
 
-These fit this farm and wait until the P0 phases above are done, so they do not delay eggs, hatch, feed, health, or sales.
+Done in this repository.
 
-- Free-range and backyard areas as locations that are not sheds, so a movement can record birds out on range.
-- Breed or strain as text on a bird type. The owner already said the flock is Desi/Gavran. Named strains are still typed by the owner. No breed catalog.
-- Rooster and hen counts the owner enters. The ratio is those two numbers. There is no recommended ratio.
+- A range area is a place the farm names. It is not a shed. A movement can send birds out to that area and bring them back. Birds on the area still count as live. There is no stocking density.
+- A bird type can carry a strain note the farm types. No breed catalog is seeded. Saying the flock is Desi/Gavran does not fill in strains.
+- Rooster and hen counts are numbers the farm types. The ratio is those two numbers. There is no recommended ratio.
 
 ## Explicitly later
 

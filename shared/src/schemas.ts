@@ -179,6 +179,7 @@ export const calendarDateSchema = z.string().trim().regex(/^\d{4}-\d{2}-\d{2}$/,
 
 export const birdTypeInputSchema = z.object({
   name: z.string().trim().min(2, 'too_small').max(80, 'too_big'),
+  strainNote: z.string().trim().max(160, 'too_big').default(''),
 });
 
 export const batchInputSchema = z
@@ -201,21 +202,55 @@ export const batchInputSchema = z
     path: ['hatchDate'],
   });
 
+const optionalId = z.union([z.string().uuid('invalid_format'), z.literal('')]);
+
+export const rangeAreaInputSchema = z.object({
+  name: z.string().trim().min(2, 'too_small').max(80, 'too_big'),
+  notes: z.string().trim().max(500, 'too_big').default(''),
+});
+
+export const sexCountInputSchema = z.object({
+  countedOn: calendarDateSchema,
+  batchId: optionalId,
+  roosterCount: z.number({ invalid_type_error: 'invalid_format' }).int('invalid_format').min(0, 'too_small').max(1_000_000, 'too_big'),
+  henCount: z.number({ invalid_type_error: 'invalid_format' }).int('invalid_format').min(0, 'too_small').max(1_000_000, 'too_big'),
+});
+
 export const movementInputSchema = z
   .object({
     movementType: z.enum(MOVEMENT_TYPES),
-    fromShedId: z.string().uuid('invalid_format'),
-    toShedId: z.union([z.string().uuid('invalid_format'), z.literal('')]),
+    fromShedId: optionalId,
+    toShedId: optionalId,
+    fromRangeAreaId: optionalId.default(''),
+    toRangeAreaId: optionalId.default(''),
     birdCount: z.number({ invalid_type_error: 'invalid_format' }).int('invalid_format').min(1, 'too_small').max(1_000_000, 'too_big'),
     occurredOn: calendarDateSchema,
     reason: z.string().trim().max(255, 'too_big'),
   })
   .superRefine((value, ctx) => {
-    if (value.movementType !== 'transfer') return;
-    if (value.toShedId === '') {
-      ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'required', path: ['toShedId'] });
-    } else if (value.toShedId === value.fromShedId) {
-      ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'invalid_format', path: ['toShedId'] });
+    const fromShed = value.fromShedId !== '';
+    const toShed = value.toShedId !== '';
+    const fromRange = value.fromRangeAreaId !== '';
+    const toRange = value.toRangeAreaId !== '';
+    const exits = value.movementType === 'sale' || value.movementType === 'mortality' || value.movementType === 'culling' || value.movementType === 'other_exit';
+    if (value.movementType === 'transfer') {
+      if (!fromShed) ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'required', path: ['fromShedId'] });
+      if (!toShed) ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'required', path: ['toShedId'] });
+      if (fromShed && toShed && value.fromShedId === value.toShedId) {
+        ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'invalid_format', path: ['toShedId'] });
+      }
+      if (fromRange || toRange) ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'invalid_format', path: ['toRangeAreaId'] });
+    } else if (value.movementType === 'to_range') {
+      if (!fromShed) ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'required', path: ['fromShedId'] });
+      if (!toRange) ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'required', path: ['toRangeAreaId'] });
+      if (toShed || fromRange) ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'invalid_format', path: ['toShedId'] });
+    } else if (value.movementType === 'from_range') {
+      if (!fromRange) ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'required', path: ['fromRangeAreaId'] });
+      if (!toShed) ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'required', path: ['toShedId'] });
+      if (fromShed || toRange) ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'invalid_format', path: ['fromShedId'] });
+    } else if (exits) {
+      if (Number(fromShed) + Number(fromRange) !== 1) ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'required', path: ['fromShedId'] });
+      if (toShed || toRange) ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'invalid_format', path: ['toShedId'] });
     }
   });
 
@@ -633,6 +668,8 @@ export const pageSchema = z.object({
   offset: z.coerce.number().int().min(0).max(1000).default(0),
 });
 
+export type RangeAreaInput = z.infer<typeof rangeAreaInputSchema>;
+export type SexCountInput = z.infer<typeof sexCountInputSchema>;
 export type BirdTypeInput = z.infer<typeof birdTypeInputSchema>;
 export type BatchInput = z.infer<typeof batchInputSchema>;
 export type MovementInput = z.infer<typeof movementInputSchema>;

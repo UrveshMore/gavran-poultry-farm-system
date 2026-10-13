@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.15.0 — 2026-10-13
+
+Desi flock details after P0.
+
+- A named area that is not a shed can hold birds. They stay in the live count.
+- A strain is text on a bird type. There is no breed list.
+- Rooster and hen counts are the ratio. No recommended ratio is stored.
+
 ## 0.14.0 — 2026-10-13
 
 Phase 14 safeguards. This closes P0.

@@ -36,6 +36,7 @@ Dated 2026-10-13. Technical choices below are provisional engineering defaults f
 | T28 | An expense or income row stores the amount and money unit the farm types. Categories start empty. A correction is a new row with `reverses_entry_id`. The earlier row is not edited or deleted. No profit is calculated and no tax column exists. | Decision 9 is still open. |
 | T29 | A report is a date range plus the source rows. Egg counts are a sum of those rows. The hatch figure stays the proposed ratio from Phase 6. Mortality stays uncalculated. Expense sums are per money unit and are not a profit. Feed conversion is absent. | Decisions 4 and 9 are still open. |
 | T30 | The restore drill is allowed only on `gavran_restore_drill`. RPO, RTO, backup schedule, off-site copy, and retention are null or `not_chosen`. | Decisions 12 and 15 are still open. |
+| T31 | A range area is a named place, not a shed, and has no capacity. Strain is optional text on a bird type. Rooster and hen counts are stored as typed integers and returned as those two numbers. | Decision 3 stays open. No breed list and no recommended ratio. |
 
 ## Still open (blueprint section 18)
 

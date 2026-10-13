@@ -108,4 +108,11 @@ MySQL 8.4, `utf8mb4` / `utf8mb4_0900_ai_ci`, session time zone `+00:00`. Migrati
 
 There is no backup table. `npm run restore-drill -w @gavran/server` creates `gavran_restore_drill`, migrates it, restores one user row from an in-memory copy, checks the row, and drops that database. The application database name is refused.
 
+## 016 desi flock
+
+- `bird_types.strain_note` — optional text. No breed catalog.
+- `range_areas` — a name that is not a shed. No row is seeded.
+- `batch_movements` gains `to_range` and `from_range`, plus optional range-area links. An exit may start from a range area.
+- `sex_counts` — rooster count and hen count the farm types. No ratio column and no recommended value.
+
 Queries use `mysql2` `execute()` (server-side prepared statements). Audit list `LIMIT` and `OFFSET` are interpolated only after the values are checked as integers, because the binary protocol rejects placeholders there.

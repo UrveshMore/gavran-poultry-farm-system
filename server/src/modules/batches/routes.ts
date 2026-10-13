@@ -2,7 +2,7 @@ import { Router, type Request } from 'express';
 import { asyncHandler } from '../../http/asyncHandler.js';
 import { sendData } from '../../http/respond.js';
 import { currentFarm, currentUser, requireFarmPermission } from '../../middleware/requirePermission.js';
-import { closeOpenBatch, createBatch, createBirdType, createMovement, getBatch, getBatches, getBirdTypes } from './service.js';
+import { closeOpenBatch, createBatch, createBirdType, createMovement, createRangeArea, createSexCount, getBatch, getBatches, getBirdTypes, getRangeAreas, getSexCounts } from './service.js';
 
 export const batchRoutes = Router();
 
@@ -76,3 +76,21 @@ batchRoutes.post(
     sendData(res, 200, await closeOpenBatch(actor(req), currentFarm(req), param(req.params.batchId), req.body), req.requestId);
   }),
 );
+
+batchRoutes.get('/:farmId/range-areas', ...requireFarmPermission('batch.read'), asyncHandler(async (req, res) => {
+  sendData(res, 200, await getRangeAreas(currentFarm(req).farmId), req.requestId);
+}));
+
+batchRoutes.post('/:farmId/range-areas', ...requireFarmPermission('movement.create'), asyncHandler(async (req, res) => {
+  const result = await createRangeArea(actor(req), currentFarm(req), req.body, idempotencyOf(req));
+  sendData(res, result.status, result.data, req.requestId);
+}));
+
+batchRoutes.get('/:farmId/sex-counts', ...requireFarmPermission('batch.read'), asyncHandler(async (req, res) => {
+  sendData(res, 200, await getSexCounts(currentFarm(req).farmId), req.requestId);
+}));
+
+batchRoutes.post('/:farmId/sex-counts', ...requireFarmPermission('movement.create'), asyncHandler(async (req, res) => {
+  const result = await createSexCount(actor(req), currentFarm(req), req.body, idempotencyOf(req));
+  sendData(res, result.status, result.data, req.requestId);
+}));

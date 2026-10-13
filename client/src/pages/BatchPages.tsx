@@ -1,4 +1,4 @@
-import { batchInputSchema, birdTypeInputSchema, movementInputSchema, MOVEMENT_TYPES } from '@gavran/shared';
+import { batchInputSchema, birdTypeInputSchema, movementInputSchema, MOVEMENT_TYPES, rangeAreaInputSchema, sexCountInputSchema } from '@gavran/shared';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
@@ -8,7 +8,7 @@ import { Link, useParams } from 'react-router-dom';
 import { z } from 'zod';
 import { Alert, Button, Card, Field, Input, TextArea } from '@/components/ui';
 import { ApiError, api, errorKey } from '@/lib/api';
-import type { Batch, BatchMovement, BirdType, FarmSummary, Shed } from '@/lib/types';
+import type { Batch, BatchMovement, BirdType, FarmSummary, RangeArea, SexCount, Shed } from '@/lib/types';
 
 function text(t: (key: string, options?: { defaultValue?: string }) => string, code?: string) {
   if (!code) return undefined;
@@ -102,7 +102,7 @@ function BirdTypeForm({ farmId, onDone }: { farmId: string; onDone: () => void }
   const { t } = useTranslation();
   const form = useForm<z.infer<typeof birdTypeInputSchema>>({
     resolver: zodResolver(birdTypeInputSchema),
-    defaultValues: { name: '' },
+    defaultValues: { name: '', strainNote: '' },
   });
   const mutation = useMutation({
     mutationFn: (values: z.infer<typeof birdTypeInputSchema>) => api(`/api/v1/farms/${farmId}/bird-types`, { method: 'POST', json: values }),
@@ -117,6 +117,9 @@ function BirdTypeForm({ farmId, onDone }: { farmId: string; onDone: () => void }
       <form className="grid gap-3" onSubmit={form.handleSubmit((values) => mutation.mutate(values))} noValidate>
         <Field id="bird-type" label={t('batches.birdType')} hint={t('batches.birdTypeHint')} error={text(t, form.formState.errors.name?.message)}>
           <Input id="bird-type" {...form.register('name')} />
+        </Field>
+        <Field id="bird-strain" label={`${t('batches.strain')} (${t('common.optional')})`} hint={t('batches.strainHint')}>
+          <Input id="bird-strain" {...form.register('strainNote')} />
         </Field>
         {mutation.isError ? <Alert>{explain(mutation.error, t)}</Alert> : null}
         <Button type="submit" variant="outline" disabled={mutation.isPending}>
@@ -168,7 +171,7 @@ function BatchForm({
           <select id="batch-type" className={selectClass} {...form.register('birdTypeId')}>
             {types.map((type) => (
               <option key={type.id} value={type.id}>
-                {type.name}
+                {type.name}{type.strainNote ? ` · ${type.strainNote}` : ''}
               </option>
             ))}
           </select>
@@ -215,6 +218,8 @@ export function BatchDetailPage() {
     queryFn: () => api<{ batch: Batch; movements: BatchMovement[] }>(`/api/v1/farms/${farmId}/batches/${batchId}`),
   });
   const sheds = useQuery({ queryKey: ['sheds', farmId], queryFn: () => api<Shed[]>(`/api/v1/farms/${farmId}/sheds`) });
+  const areas = useQuery({ queryKey: ['range-areas', farmId], queryFn: () => api<RangeArea[]>(`/api/v1/farms/${farmId}/range-areas`) });
+  const sexes = useQuery({ queryKey: ['sex-counts', farmId], queryFn: () => api<SexCount[]>(`/api/v1/farms/${farmId}/sex-counts`) });
   if (detail.isLoading) return <p>{t('common.loading')}</p>;
   if (detail.isError || !detail.data) return <Alert>{explain(detail.error, t)}</Alert>;
   const { batch, movements } = detail.data;
@@ -242,15 +247,36 @@ export function BatchDetailPage() {
             ))}
           </ul>
         )}
+        {batch.rangePlacements.length > 0 ? (
+          <ul className="mt-2 grid gap-1 text-sm">
+            {batch.rangePlacements.map((place) => (
+              <li key={place.rangeAreaId}>
+                {place.name}: {place.birdCount}
+              </li>
+            ))}
+          </ul>
+        ) : null}
       </Card>
+      {canMove ? (
+        <RangeAreaForm farmId={farmId} onDone={() => void queryClient.invalidateQueries({ queryKey: ['range-areas', farmId] })} />
+      ) : null}
       {canMove && sheds.data ? (
         <MovementForm
           farmId={farmId}
           batchId={batchId}
           sheds={sheds.data}
+          areas={areas.data ?? []}
           onDone={() => void queryClient.invalidateQueries({ queryKey: ['batch', farmId, batchId] })}
         />
       ) : null}
+      <SexCounts
+        farmId={farmId}
+        batchId={batchId}
+        batchCode={batch.code}
+        canRecord={canMove}
+        rows={(sexes.data ?? []).filter((row) => row.batchId === batchId || row.batchId === null)}
+        onDone={() => void queryClient.invalidateQueries({ queryKey: ['sex-counts', farmId] })}
+      />
       {canMove && batch.liveCount === 0 ? (
         <CloseBatch
           farmId={farmId}
@@ -271,6 +297,8 @@ export function BatchDetailPage() {
                   {movement.occurredOn}
                   {movement.fromShedCode ? ` · ${movement.fromShedCode}` : ''}
                   {movement.toShedCode ? ` → ${movement.toShedCode}` : ''}
+                  {movement.fromRangeName ? ` · ${movement.fromRangeName}` : ''}
+                  {movement.toRangeName ? ` → ${movement.toRangeName}` : ''}
                   {movement.reason ? ` · ${movement.reason}` : ''}
                 </p>
               </Card>
@@ -282,7 +310,7 @@ export function BatchDetailPage() {
   );
 }
 
-function MovementForm({ farmId, batchId, sheds, onDone }: { farmId: string; batchId: string; sheds: Shed[]; onDone: () => void }) {
+function MovementForm({ farmId, batchId, sheds, areas, onDone }: { farmId: string; batchId: string; sheds: Shed[]; areas: RangeArea[]; onDone: () => void }) {
   const { t } = useTranslation();
   const today = new Date().toISOString().slice(0, 10);
   const form = useForm<z.infer<typeof movementInputSchema>>({
@@ -290,23 +318,35 @@ function MovementForm({ farmId, batchId, sheds, onDone }: { farmId: string; batc
     defaultValues: {
       movementType: 'transfer',
       fromShedId: sheds[0]?.id ?? '',
-      toShedId: sheds[1]?.id ?? '',
+      toShedId: sheds[1]?.id ?? sheds[0]?.id ?? '',
+      fromRangeAreaId: '',
+      toRangeAreaId: areas[0]?.id ?? '',
       birdCount: 1,
       occurredOn: today,
       reason: '',
     },
   });
   const kind = form.watch('movementType');
+  const exit = kind === 'sale' || kind === 'mortality' || kind === 'culling' || kind === 'other_exit';
+  const [fromRange, setFromRange] = useState(false);
   const mutation = useMutation({
     mutationFn: (values: z.infer<typeof movementInputSchema>) =>
       api(`/api/v1/farms/${farmId}/batches/${batchId}/movements`, {
         method: 'POST',
-        json: { ...values, toShedId: values.movementType === 'transfer' ? values.toShedId : '' },
+        json: {
+          ...values,
+          fromShedId: kind === 'from_range' || (exit && fromRange) ? '' : values.fromShedId,
+          toShedId: kind === 'transfer' || kind === 'from_range' ? values.toShedId : '',
+          toRangeAreaId: kind === 'to_range' ? values.toRangeAreaId : '',
+          fromRangeAreaId: kind === 'from_range' || (exit && fromRange) ? values.fromRangeAreaId : '',
+        },
       }),
     onSuccess: onDone,
     onError: (error) => applyFields(error, (name, err) => form.setError(name as 'birdCount', err)),
   });
   const errors = form.formState.errors;
+  const showFromShed = kind !== 'from_range' && !(exit && fromRange);
+  const showToShed = kind === 'transfer' || kind === 'from_range';
   return (
     <Card>
       <form className="grid gap-3" onSubmit={form.handleSubmit((values) => mutation.mutate(values))} noValidate>
@@ -320,22 +360,46 @@ function MovementForm({ farmId, batchId, sheds, onDone }: { farmId: string; batc
             ))}
           </select>
         </Field>
-        <Field id="move-from" label={t('batches.fromShed')} error={text(t, errors.fromShedId?.message)}>
-          <select id="move-from" className={selectClass} {...form.register('fromShedId')}>
-            {sheds.map((shed) => (
-              <option key={shed.id} value={shed.id}>
-                {shed.code}
-              </option>
-            ))}
-          </select>
-        </Field>
-        {kind === 'transfer' ? (
+        {exit ? (
+          <label className="flex min-h-11 items-center gap-2 text-sm font-semibold">
+            <input type="checkbox" checked={fromRange} onChange={(event) => setFromRange(event.target.checked)} />
+            {t('batches.fromRangeInstead')}
+          </label>
+        ) : null}
+        {showFromShed ? (
+          <Field id="move-from" label={t('batches.fromShed')} error={text(t, errors.fromShedId?.message)}>
+            <select id="move-from" className={selectClass} {...form.register('fromShedId')}>
+              {sheds.map((shed) => (
+                <option key={shed.id} value={shed.id}>{shed.code}</option>
+              ))}
+            </select>
+          </Field>
+        ) : null}
+        {kind === 'from_range' || (exit && fromRange) ? (
+          <Field id="move-from-range" label={t('batches.fromRange')} error={text(t, errors.fromRangeAreaId?.message)}>
+            <select id="move-from-range" className={selectClass} {...form.register('fromRangeAreaId')}>
+              <option value="">{t('batches.chooseRange')}</option>
+              {areas.map((area) => (
+                <option key={area.id} value={area.id}>{area.name}</option>
+              ))}
+            </select>
+          </Field>
+        ) : null}
+        {showToShed ? (
           <Field id="move-to" label={t('batches.toShed')} error={text(t, errors.toShedId?.message)}>
             <select id="move-to" className={selectClass} {...form.register('toShedId')}>
               {sheds.map((shed) => (
-                <option key={shed.id} value={shed.id}>
-                  {shed.code}
-                </option>
+                <option key={shed.id} value={shed.id}>{shed.code}</option>
+              ))}
+            </select>
+          </Field>
+        ) : null}
+        {kind === 'to_range' ? (
+          <Field id="move-to-range" label={t('batches.toRange')} error={text(t, errors.toRangeAreaId?.message)}>
+            <select id="move-to-range" className={selectClass} {...form.register('toRangeAreaId')}>
+              <option value="">{t('batches.chooseRange')}</option>
+              {areas.map((area) => (
+                <option key={area.id} value={area.id}>{area.name}</option>
               ))}
             </select>
           </Field>
@@ -355,6 +419,94 @@ function MovementForm({ farmId, batchId, sheds, onDone }: { farmId: string; batc
           {mutation.isPending ? t('batches.saving') : t('batches.saveMovement')}
         </Button>
       </form>
+    </Card>
+  );
+}
+
+function RangeAreaForm({ farmId, onDone }: { farmId: string; onDone: () => void }) {
+  const { t } = useTranslation();
+  const form = useForm<z.infer<typeof rangeAreaInputSchema>>({
+    resolver: zodResolver(rangeAreaInputSchema),
+    defaultValues: { name: '', notes: '' },
+  });
+  const mutation = useMutation({
+    mutationFn: (values: z.infer<typeof rangeAreaInputSchema>) => api(`/api/v1/farms/${farmId}/range-areas`, { method: 'POST', json: values }),
+    onSuccess: () => {
+      form.reset({ name: '', notes: '' });
+      onDone();
+    },
+  });
+  return (
+    <Card>
+      <form className="grid gap-3" onSubmit={form.handleSubmit((values) => mutation.mutate(values))}>
+        <h2 className="font-display text-2xl">{t('batches.rangeTitle')}</h2>
+        <p className="text-sm text-ink-soft">{t('batches.rangeBody')}</p>
+        <Field id="range-name" label={t('batches.rangeName')} error={text(t, form.formState.errors.name?.message)}>
+          <Input id="range-name" {...form.register('name')} />
+        </Field>
+        {mutation.isError ? <Alert>{explain(mutation.error, t)}</Alert> : null}
+        <Button type="submit" variant="outline">{mutation.isPending ? t('batches.saving') : t('batches.saveRange')}</Button>
+      </form>
+    </Card>
+  );
+}
+
+function SexCounts({
+  farmId,
+  batchId,
+  batchCode,
+  canRecord,
+  rows,
+  onDone,
+}: {
+  farmId: string;
+  batchId: string;
+  batchCode: string;
+  canRecord: boolean;
+  rows: SexCount[];
+  onDone: () => void;
+}) {
+  const { t } = useTranslation();
+  const form = useForm<z.infer<typeof sexCountInputSchema>>({
+    resolver: zodResolver(sexCountInputSchema),
+    defaultValues: { countedOn: '', batchId, roosterCount: '' as unknown as number, henCount: '' as unknown as number },
+  });
+  const mutation = useMutation({
+    mutationFn: (values: z.infer<typeof sexCountInputSchema>) => api(`/api/v1/farms/${farmId}/sex-counts`, {
+      method: 'POST',
+      json: { ...values, batchId, roosterCount: Number(values.roosterCount), henCount: Number(values.henCount) },
+    }),
+    onSuccess: () => {
+      form.reset({ countedOn: '', batchId, roosterCount: '' as unknown as number, henCount: '' as unknown as number });
+      onDone();
+    },
+  });
+  return (
+    <Card>
+      <h2 className="font-display text-2xl">{t('batches.sexTitle')}</h2>
+      <p className="text-sm text-ink-soft">{t('batches.sexBody')}</p>
+      {rows.length === 0 ? <p className="mt-2">{t('batches.sexEmpty')}</p> : (
+        <ul className="mt-2 grid gap-1 text-sm">
+          {rows.map((row) => (
+            <li key={row.id}>{row.countedOn} · {t('batches.sexLine', { roosters: row.roosterCount, hens: row.henCount, batch: row.batchCode ?? batchCode })}</li>
+          ))}
+        </ul>
+      )}
+      {canRecord ? (
+        <form className="mt-3 grid gap-3" onSubmit={form.handleSubmit((values) => mutation.mutate(values))}>
+          <Field id="sex-date" label={t('batches.date')}>
+            <Input id="sex-date" type="date" {...form.register('countedOn')} />
+          </Field>
+          <Field id="sex-roosters" label={t('batches.roosters')}>
+            <Input id="sex-roosters" type="number" min={0} {...form.register('roosterCount', { valueAsNumber: true })} />
+          </Field>
+          <Field id="sex-hens" label={t('batches.hens')}>
+            <Input id="sex-hens" type="number" min={0} {...form.register('henCount', { valueAsNumber: true })} />
+          </Field>
+          {mutation.isError ? <Alert>{explain(mutation.error, t)}</Alert> : null}
+          <Button type="submit" variant="outline">{mutation.isPending ? t('batches.saving') : t('batches.saveSex')}</Button>
+        </form>
+      ) : null}
     </Card>
   );
 }

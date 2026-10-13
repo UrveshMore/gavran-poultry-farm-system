@@ -176,3 +176,13 @@ Sections:
 `GET /farms/:farmId/safeguards` — `farm.read`. `retention.status` is `not_chosen`. `recovery.rpo` and `recovery.rto` are null. `backup.schedule` and `backup.offsiteCopy` are `not_chosen`. `backup.isolatedDatabase` is `gavran_restore_drill`. No duration is stored.
 
 The restore drill is the server command `npm run restore-drill -w @gavran/server`. It is not an HTTP route.
+
+## Flock details
+
+`GET|POST /farms/:farmId/range-areas` — `batch.read` / `movement.create`. A name the farm types. None are seeded. This is not a shed.
+
+`POST /farms/:farmId/batches/:batchId/movements` also accepts `to_range` (from a shed to a range area) and `from_range` (back to an active shed). Sale, mortality, culling, and other exit may name `fromRangeAreaId` instead of a shed. Birds on a range area stay in `liveCount`. No capacity is applied to a range area.
+
+`POST /farms/:farmId/bird-types` accepts `strainNote`. Empty becomes null. There is no breed table.
+
+`GET|POST /farms/:farmId/sex-counts` — `batch.read` / `movement.create`. `roosterCount` and `henCount` are typed. `ratio` is those two numbers. There is no recommended field.

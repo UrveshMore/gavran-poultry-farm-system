@@ -7,10 +7,12 @@ export type BirdTypeRecord = {
   id: string;
   farmId: string;
   name: string;
+  strainNote: string | null;
   status: 'active' | 'archived';
 };
 
 export type Placement = { shedId: string; shedCode: string; shedName: string; birdCount: number };
+export type RangePlacement = { rangeAreaId: string; name: string; birdCount: number };
 
 export type BatchRecord = {
   id: string;
@@ -25,6 +27,7 @@ export type BatchRecord = {
   version: number;
   liveCount: number;
   placements: Placement[];
+  rangePlacements: RangePlacement[];
 };
 
 export type MovementRecord = {
@@ -35,6 +38,10 @@ export type MovementRecord = {
   toShedId: string | null;
   fromShedCode: string | null;
   toShedCode: string | null;
+  fromRangeAreaId: string | null;
+  toRangeAreaId: string | null;
+  fromRangeName: string | null;
+  toRangeName: string | null;
   birdCount: number;
   occurredOn: string;
   reason: string | null;
@@ -47,8 +54,8 @@ type ShedLock = RowDataPacket & { id: string; status: string; usable_capacity: n
 const LIVE_BY_BATCH = `
   SELECT s.id AS shed_id, s.code AS shed_code, s.name AS shed_name,
          COALESCE(SUM(CASE
-           WHEN m.to_shed_id = s.id AND m.movement_type IN ('opening', 'transfer') THEN m.bird_count
-           WHEN m.from_shed_id = s.id AND m.movement_type IN ('transfer', 'sale', 'mortality', 'culling', 'other_exit') THEN -m.bird_count
+           WHEN m.to_shed_id = s.id AND m.movement_type IN ('opening', 'transfer', 'from_range') THEN m.bird_count
+           WHEN m.from_shed_id = s.id AND m.movement_type IN ('transfer', 'sale', 'mortality', 'culling', 'other_exit', 'to_range') THEN -m.bird_count
            ELSE 0
          END), 0) AS live_count
   FROM batch_movements m
@@ -58,33 +65,33 @@ const LIVE_BY_BATCH = `
   HAVING live_count <> 0
 `;
 
-export async function insertBirdType(db: Db, farmId: string, name: string, createdBy: string): Promise<BirdTypeRecord> {
+export async function insertBirdType(db: Db, farmId: string, name: string, strainNote: string | null, createdBy: string): Promise<BirdTypeRecord> {
   const id = randomUUID();
   await exec(
     db,
-    `INSERT INTO bird_types (id, farm_id, name, created_by) VALUES (?, ?, ?, ?)`,
-    [id, farmId, name, createdBy],
+    `INSERT INTO bird_types (id, farm_id, name, strain_note, created_by) VALUES (?, ?, ?, ?, ?)`,
+    [id, farmId, name, strainNote, createdBy],
   );
-  return { id, farmId, name, status: 'active' };
+  return { id, farmId, name, strainNote, status: 'active' };
 }
 
 export async function listBirdTypes(db: Db, farmId: string): Promise<BirdTypeRecord[]> {
-  const rows = await many<RowDataPacket & BirdTypeRecord & { farm_id: string }>(
+  const rows = await many<RowDataPacket & { id: string; farm_id: string; name: string; strain_note: string | null; status: 'active' | 'archived' }>(
     db,
-    `SELECT id, farm_id, name, status FROM bird_types WHERE farm_id = ? ORDER BY name`,
+    `SELECT id, farm_id, name, strain_note, status FROM bird_types WHERE farm_id = ? ORDER BY name`,
     [farmId],
   );
-  return rows.map((row) => ({ id: row.id, farmId: row.farm_id, name: row.name, status: row.status }));
+  return rows.map((row) => ({ id: row.id, farmId: row.farm_id, name: row.name, strainNote: row.strain_note, status: row.status }));
 }
 
 export async function findActiveBirdType(db: Db, farmId: string, id: string): Promise<BirdTypeRecord | null> {
-  const row = await one<RowDataPacket & { id: string; farm_id: string; name: string; status: 'active' | 'archived' }>(
+  const row = await one<RowDataPacket & { id: string; farm_id: string; name: string; strain_note: string | null; status: 'active' | 'archived' }>(
     db,
-    `SELECT id, farm_id, name, status FROM bird_types WHERE farm_id = ? AND id = ?`,
+    `SELECT id, farm_id, name, strain_note, status FROM bird_types WHERE farm_id = ? AND id = ?`,
     [farmId, id],
   );
   if (!row || row.status !== 'active') return null;
-  return { id: row.id, farmId: row.farm_id, name: row.name, status: row.status };
+  return { id: row.id, farmId: row.farm_id, name: row.name, strainNote: row.strain_note, status: row.status };
 }
 
 export async function lockSheds(db: Db, farmId: string, ids: string[]): Promise<Map<string, { status: string; usableCapacity: number }>> {
@@ -107,8 +114,8 @@ export async function shedLiveCount(db: Db, farmId: string, shedId: string): Pro
   const row = await one<RowDataPacket & { live_count: number | string }>(
     db,
     `SELECT COALESCE(SUM(CASE
-        WHEN to_shed_id = ? AND movement_type IN ('opening', 'transfer') THEN bird_count
-        WHEN from_shed_id = ? AND movement_type IN ('transfer', 'sale', 'mortality', 'culling', 'other_exit') THEN -bird_count
+        WHEN to_shed_id = ? AND movement_type IN ('opening', 'transfer', 'from_range') THEN bird_count
+        WHEN from_shed_id = ? AND movement_type IN ('transfer', 'sale', 'mortality', 'culling', 'other_exit', 'to_range') THEN -bird_count
         ELSE 0
       END), 0) AS live_count
      FROM batch_movements
@@ -122,8 +129,8 @@ export async function batchShedLiveCount(db: Db, farmId: string, batchId: string
   const row = await one<RowDataPacket & { live_count: number | string }>(
     db,
     `SELECT COALESCE(SUM(CASE
-        WHEN to_shed_id = ? AND movement_type IN ('opening', 'transfer') THEN bird_count
-        WHEN from_shed_id = ? AND movement_type IN ('transfer', 'sale', 'mortality', 'culling', 'other_exit') THEN -bird_count
+        WHEN to_shed_id = ? AND movement_type IN ('opening', 'transfer', 'from_range') THEN bird_count
+        WHEN from_shed_id = ? AND movement_type IN ('transfer', 'sale', 'mortality', 'culling', 'other_exit', 'to_range') THEN -bird_count
         ELSE 0
       END), 0) AS live_count
      FROM batch_movements
@@ -144,6 +151,43 @@ async function placementsFor(db: Db, farmId: string, batchId: string): Promise<P
     }))
     .filter((row) => row.birdCount > 0)
     .sort((a, b) => a.shedCode.localeCompare(b.shedCode));
+}
+
+async function rangePlacementsFor(db: Db, farmId: string, batchId: string): Promise<RangePlacement[]> {
+  const rows = await many<RowDataPacket & { range_area_id: string; name: string; live_count: number | string }>(
+    db,
+    `SELECT a.id AS range_area_id, a.name,
+            COALESCE(SUM(CASE
+              WHEN m.to_range_area_id = a.id AND m.movement_type = 'to_range' THEN m.bird_count
+              WHEN m.from_range_area_id = a.id AND m.movement_type IN ('from_range', 'sale', 'mortality', 'culling', 'other_exit') THEN -m.bird_count
+              ELSE 0
+            END), 0) AS live_count
+     FROM batch_movements m
+     JOIN range_areas a ON a.farm_id = m.farm_id AND (a.id = m.to_range_area_id OR a.id = m.from_range_area_id)
+     WHERE m.farm_id = ? AND m.batch_id = ?
+     GROUP BY a.id, a.name
+     HAVING live_count <> 0`,
+    [farmId, batchId],
+  );
+  return rows
+    .map((row) => ({ rangeAreaId: row.range_area_id, name: row.name, birdCount: asNumber(row.live_count) }))
+    .filter((row) => row.birdCount > 0)
+    .sort((a, b) => a.name.localeCompare(b.name));
+}
+
+export async function rangeLiveCount(db: Db, farmId: string, batchId: string, rangeAreaId: string): Promise<number> {
+  const row = await one<RowDataPacket & { live_count: number | string }>(
+    db,
+    `SELECT COALESCE(SUM(CASE
+        WHEN to_range_area_id = ? AND movement_type = 'to_range' THEN bird_count
+        WHEN from_range_area_id = ? AND movement_type IN ('from_range', 'sale', 'mortality', 'culling', 'other_exit') THEN -bird_count
+        ELSE 0
+      END), 0) AS live_count
+     FROM batch_movements
+     WHERE farm_id = ? AND batch_id = ?`,
+    [rangeAreaId, rangeAreaId, farmId, batchId],
+  );
+  return asNumber(row?.live_count ?? 0);
 }
 
 type BatchRow = RowDataPacket & {
@@ -167,6 +211,7 @@ function asDate(value: Date | string | null): string | null {
 
 async function mapBatch(db: Db, row: BatchRow): Promise<BatchRecord> {
   const placements = await placementsFor(db, row.farm_id, row.id);
+  const rangePlacements = await rangePlacementsFor(db, row.farm_id, row.id);
   return {
     id: row.id,
     farmId: row.farm_id,
@@ -178,8 +223,9 @@ async function mapBatch(db: Db, row: BatchRow): Promise<BatchRecord> {
     openedOn: asDate(row.opened_on) ?? '',
     status: row.status,
     version: Number(row.version),
-    liveCount: placements.reduce((sum, item) => sum + item.birdCount, 0),
+    liveCount: placements.reduce((sum, item) => sum + item.birdCount, 0) + rangePlacements.reduce((sum, item) => sum + item.birdCount, 0),
     placements,
+    rangePlacements,
   };
 }
 
@@ -234,6 +280,8 @@ export async function insertMovement(
     movementType: 'opening' | MovementType;
     fromShedId: string | null;
     toShedId: string | null;
+    fromRangeAreaId?: string | null;
+    toRangeAreaId?: string | null;
     birdCount: number;
     occurredOn: string;
     reason: string | null;
@@ -248,6 +296,8 @@ export async function insertMovement(
     input.movementType,
     input.fromShedId,
     input.toShedId,
+    input.toRangeAreaId ?? null,
+    input.fromRangeAreaId ?? null,
     input.birdCount,
     input.occurredOn,
     input.reason,
@@ -256,8 +306,8 @@ export async function insertMovement(
   await exec(
     db,
     `INSERT INTO batch_movements
-      (id, farm_id, batch_id, movement_type, from_shed_id, to_shed_id, bird_count, occurred_on, reason, created_by)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      (id, farm_id, batch_id, movement_type, from_shed_id, to_shed_id, to_range_area_id, from_range_area_id, bird_count, occurred_on, reason, created_by)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
     params,
   );
   return id;
@@ -300,6 +350,10 @@ export async function listMovements(db: Db, farmId: string, batchId: string): Pr
       to_shed_id: string | null;
       from_code: string | null;
       to_code: string | null;
+      from_range_area_id: string | null;
+      to_range_area_id: string | null;
+      from_range_name: string | null;
+      to_range_name: string | null;
       bird_count: number;
       occurred_on: Date | string;
       reason: string | null;
@@ -308,10 +362,15 @@ export async function listMovements(db: Db, farmId: string, batchId: string): Pr
   >(
     db,
     `SELECT m.id, m.batch_id, m.movement_type, m.from_shed_id, m.to_shed_id,
-            fs.code AS from_code, ts.code AS to_code, m.bird_count, m.occurred_on, m.reason, m.created_at
+            m.from_range_area_id, m.to_range_area_id,
+            fs.code AS from_code, ts.code AS to_code,
+            fr.name AS from_range_name, tr.name AS to_range_name,
+            m.bird_count, m.occurred_on, m.reason, m.created_at
      FROM batch_movements m
      LEFT JOIN sheds fs ON fs.id = m.from_shed_id
      LEFT JOIN sheds ts ON ts.id = m.to_shed_id
+     LEFT JOIN range_areas fr ON fr.id = m.from_range_area_id
+     LEFT JOIN range_areas tr ON tr.id = m.to_range_area_id
      WHERE m.farm_id = ? AND m.batch_id = ?
      ORDER BY m.occurred_on DESC, m.created_at DESC`,
     [farmId, batchId],
@@ -324,9 +383,81 @@ export async function listMovements(db: Db, farmId: string, batchId: string): Pr
     toShedId: row.to_shed_id,
     fromShedCode: row.from_code,
     toShedCode: row.to_code,
+    fromRangeAreaId: row.from_range_area_id,
+    toRangeAreaId: row.to_range_area_id,
+    fromRangeName: row.from_range_name,
+    toRangeName: row.to_range_name,
     birdCount: asNumber(row.bird_count),
     occurredOn: asDate(row.occurred_on) ?? '',
     reason: row.reason,
     createdAt: row.created_at instanceof Date ? row.created_at.toISOString() : new Date(row.created_at).toISOString(),
   }));
+}
+
+export async function listRangeAreas(db: Db, farmId: string): Promise<Array<{ id: string; name: string; notes: string | null }>> {
+  const rows = await many<RowDataPacket & { id: string; name: string; notes: string | null }>(
+    db,
+    `SELECT id, name, notes FROM range_areas WHERE farm_id = ? ORDER BY name`,
+    [farmId],
+  );
+  return rows.map((row) => ({ id: row.id, name: row.name, notes: row.notes }));
+}
+
+export async function insertRangeArea(db: Db, farmId: string, name: string, notes: string | null, createdBy: string): Promise<string> {
+  const id = randomUUID();
+  await exec(db, `INSERT INTO range_areas (id, farm_id, name, notes, created_by) VALUES (?, ?, ?, ?, ?)`, [id, farmId, name, notes, createdBy]);
+  return id;
+}
+
+export async function rangeAreaExists(db: Db, farmId: string, id: string): Promise<boolean> {
+  const row = await one<RowDataPacket>(db, `SELECT id FROM range_areas WHERE farm_id = ? AND id = ?`, [farmId, id]);
+  return Boolean(row);
+}
+
+export type SexCountRecord = {
+  id: string;
+  countedOn: string;
+  batchId: string | null;
+  batchCode: string | null;
+  roosterCount: number;
+  henCount: number;
+};
+
+export async function listSexCounts(db: Db, farmId: string): Promise<SexCountRecord[]> {
+  const rows = await many<RowDataPacket & { id: string; counted_on: Date | string; batch_id: string | null; batch_code: string | null; rooster_count: number; hen_count: number }>(
+    db,
+    `SELECT s.id, s.counted_on, s.batch_id, b.code AS batch_code, s.rooster_count, s.hen_count
+     FROM sex_counts s
+     LEFT JOIN batches b ON b.id = s.batch_id
+     WHERE s.farm_id = ?
+     ORDER BY s.counted_on DESC, s.created_at DESC
+     LIMIT 50`,
+    [farmId],
+  );
+  return rows.map((row) => ({
+    id: row.id,
+    countedOn: asDate(row.counted_on) ?? '',
+    batchId: row.batch_id,
+    batchCode: row.batch_code,
+    roosterCount: Number(row.rooster_count),
+    henCount: Number(row.hen_count),
+  }));
+}
+
+export async function insertSexCount(
+  db: Db,
+  input: { farmId: string; batchId: string | null; countedOn: string; roosterCount: number; henCount: number; createdBy: string },
+): Promise<string> {
+  const id = randomUUID();
+  await exec(
+    db,
+    `INSERT INTO sex_counts (id, farm_id, batch_id, counted_on, rooster_count, hen_count, created_by) VALUES (?, ?, ?, ?, ?, ?, ?)`,
+    [id, input.farmId, input.batchId, input.countedOn, input.roosterCount, input.henCount, input.createdBy],
+  );
+  return id;
+}
+
+export async function batchOnFarm(db: Db, farmId: string, batchId: string): Promise<boolean> {
+  const row = await one<RowDataPacket>(db, `SELECT id FROM batches WHERE farm_id = ? AND id = ?`, [farmId, batchId]);
+  return Boolean(row);
 }

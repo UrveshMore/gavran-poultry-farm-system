@@ -69,7 +69,7 @@ beforeEach(async () => {
       'egg_collection_lines',
       'egg_collections',
       'egg_categories',
-      'batch_movements',
+      'sex_counts', 'range_areas', 'batch_movements',
       'batches',
       'bird_types',
       'membership_permission_grants',

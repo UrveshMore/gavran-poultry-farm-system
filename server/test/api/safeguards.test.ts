@@ -39,7 +39,7 @@ beforeEach(async () => {
     await conn.query('SET FOREIGN_KEY_CHECKS = 0');
     for (const table of [
       'idempotency_keys', 'audit_logs', 'expense_entries', 'expense_categories', 'order_lines', 'orders', 'market_prices', 'customers',
-      'loss_incidents', 'batch_movements', 'batches', 'bird_types', 'membership_permission_grants', 'sheds', 'farm_settings',
+      'loss_incidents', 'sex_counts', 'range_areas', 'batch_movements', 'batches', 'bird_types', 'membership_permission_grants', 'sheds', 'farm_settings',
       'farm_memberships', 'sessions', 'password_reset_tokens', 'farms', 'users',
     ]) {
       await conn.query(`TRUNCATE TABLE \`${table}\``);
