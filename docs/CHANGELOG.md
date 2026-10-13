@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.22.0 — 2026-10-13
+
+Phase 21 files.
+
+- A photo or PDF is stored with a note the farm types.
+- No scan is claimed, and no retention period is stored.
+
 ## 0.21.0 — 2026-10-13
 
 Phase 20 notices.

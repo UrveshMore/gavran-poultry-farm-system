@@ -149,4 +149,9 @@ There is no backup table. `npm run restore-drill -w @gavran/server` creates `gav
 - Permissions `000000000146` and `000000000147`: `notification.read`, `notification.write`. Owner and manager receive both. Worker and vet / advisor receive `notification.read`.
 - `notifications` — title, body, and an optional read time. No delivery column.
 
+## 022 files
+
+- Permissions `000000000148` and `000000000149`: `document.read`, `document.record`. Owner and manager only.
+- `farm_files` — original name, stored name, media type, byte size, and a note. Bytes live under `uploads/` and are not removed by a schedule. No scan-result column.
+
 Queries use `mysql2` `execute()` (server-side prepared statements). Audit list `LIMIT` and `OFFSET` are interpolated only after the values are checked as integers, because the binary protocol rejects placeholders there.

@@ -43,6 +43,14 @@ export const errorHandler: ErrorRequestHandler = (err, req, res, _next) => {
     });
     return;
   }
+  if (typeof err === 'object' && err !== null && 'code' in err && (err as { code?: string }).code === 'LIMIT_FILE_SIZE') {
+    res.status(413).json({
+      ok: false,
+      error: { code: 'FILE_TOO_LARGE', message: 'That file is larger than 5 MB.' },
+      requestId: req.requestId,
+    });
+    return;
+  }
   if (isDup(err)) {
     res.status(409).json({
       ok: false,

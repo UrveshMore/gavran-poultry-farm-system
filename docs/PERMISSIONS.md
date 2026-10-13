@@ -55,6 +55,8 @@ UI navigation inside a farm still shows Sheds, Batches, Eggs, People, and Activi
 | `supplier.record` | Add those rows. A receipt does not change stock. |
 | `notification.read` | View in-app notices. A person without `notification.write` sees only their own. |
 | `notification.write` | Write an in-app notice for a farm member. |
+| `document.read` | View farm files. Owner and manager only. |
+| `document.record` | Store a JPEG, PNG, WebP, or PDF with a note. |
 
 `GET /api/v1/farms` lists farms the caller belongs to, including farms where they have zero permissions. It does not include contact details.
 

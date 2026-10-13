@@ -14,7 +14,7 @@ export class ApiError extends Error {
   }
 }
 
-type Options = { method?: string; json?: unknown; retry?: boolean };
+type Options = { method?: string; json?: unknown; form?: FormData; retry?: boolean };
 
 let refreshPromise: Promise<boolean> | null = null;
 
@@ -52,7 +52,7 @@ export async function api<T>(path: string, options: Options = {}): Promise<T> {
     method,
     headers,
     credentials: 'include',
-    body: options.json !== undefined ? JSON.stringify(options.json) : undefined,
+    body: options.form ?? (options.json !== undefined ? JSON.stringify(options.json) : undefined),
   });
   if (
     res.status === 401 &&
@@ -106,6 +106,7 @@ export function errorKey(error: unknown): string | null {
     ALREADY_REVERSED: 'expenses.alreadyReversed',
     TRAINING_REQUIRED: 'workforce.required',
     TRAINING_ALREADY_DONE: 'workforce.alreadyDone',
+    FILE_TOO_LARGE: 'documents.tooLarge',
     FORBIDDEN: 'common.permissionDenied',
   };
   return keys[error.code] ?? null;

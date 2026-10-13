@@ -204,6 +204,14 @@ The restore drill is the server command `npm run restore-drill -w @gavran/server
 
 `POST /farms/:farmId/notifications/:noticeId/read` — `notification.read`. Only the recipient. A second call keeps the first read time.
 
+## Files
+
+`GET /farms/:farmId/documents` — `document.read`. Owner and manager only. `scan.status` is `not_claimed`. `retention.status` is `not_chosen` because decision 15 is open. There is no delete.
+
+`POST /farms/:farmId/documents` — `document.record`. Multipart field `file` plus optional `note`. The bytes must be JPEG, PNG, WebP, or PDF, and at most 5 MB. A larger file is 413 `FILE_TOO_LARGE`. Other bytes are 422 `invalid_format` on `file`.
+
+`GET /farms/:farmId/documents/:fileId/file` — `document.read`. The bytes, with the stored media type. The response is not the JSON envelope.
+
 ## Invoice documents
 
 `POST /farms/:farmId/invoices` — `sale.record`. Still 409 `INVOICE_POSTING_DISABLED`.

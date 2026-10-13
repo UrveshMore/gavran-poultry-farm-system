@@ -108,6 +108,10 @@ Done in this repository. The same date range can also name a shed, a batch, or a
 
 Done in this repository. A notice is a title and a message for one person on the farm. It stays in the app. The recipient can mark it read. `urgent.status` is `not_chosen` because decision 14 is open. Nothing is sent out.
 
+## Phase 21 — Documents and media
+
+Done in this repository. A file is a JPEG, PNG, WebP, or PDF, at most 5 MB, checked by its bytes. The note is text the farm types. Workers cannot open these files. Nothing is deleted. `scan.status` is `not_claimed`. `retention.status` is `not_chosen` because decision 15 is open.
+
 ## Explicitly later
 
-P1 continues with documents, PWA install, offline-safe capture, multilingual polish, search, and scheduled reports. P2 (AI image triage, weather, voice, sensors, forecasting, portals, farm map, route planning, a native app, custom model training) stays unstarted. Offline capture must not silently merge stock, finance, mortality, or treatment records. Medical and feeding standards stay owner-editable and sourced. Nothing in those standards is invented. Invoice posting stays off until the farm decides when a sale is posted.
+P1 continues with PWA install, offline-safe capture, multilingual polish, search, and scheduled reports. P2 (AI image triage, weather, voice, sensors, forecasting, portals, farm map, route planning, a native app, custom model training) stays unstarted. Offline capture must not silently merge stock, finance, mortality, or treatment records. Medical and feeding standards stay owner-editable and sourced. Nothing in those standards is invented. Invoice posting stays off until the farm decides when a sale is posted.
