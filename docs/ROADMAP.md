@@ -124,6 +124,10 @@ Done in this repository. An attendance row can wait on the device and is sent la
 
 Done in this repository. The page language follows the chosen locale. Hindi and Marathi stay provisional, and the screen says a fluent review is still needed. The brand name Gavran stays in Latin letters.
 
+## Phase 25 — Search
+
+Done in this repository. A search needs at least two characters. `%` and `_` are ordinary characters. Results stay on the farm. A worker does not see suppliers, expenses, or invoice notes. A price is not part of a result.
+
 ## Explicitly later
 
-P1 continues with search and scheduled reports. P2 (AI image triage, weather, voice, sensors, forecasting, portals, farm map, route planning, a native app, custom model training) stays unstarted. Medical and feeding standards stay owner-editable and sourced. Nothing in those standards is invented. Invoice posting stays off until the farm decides when a sale is posted.
+P1 continues with scheduled reports. P2 (AI image triage, weather, voice, sensors, forecasting, portals, farm map, route planning, a native app, custom model training) stays unstarted. Medical and feeding standards stay owner-editable and sourced. Nothing in those standards is invented. Invoice posting stays off until the farm decides when a sale is posted.

@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.26.0 — 2026-10-13
+
+Phase 25 search.
+
+- A search needs two characters, and a percent sign is not a wildcard.
+- A worker does not see suppliers, expenses, or invoice notes.
+- A price is not part of a result.
+
 ## 0.25.0 — 2026-10-13
 
 Phase 24 languages.

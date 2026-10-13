@@ -38,6 +38,7 @@ export { installSurface, isIosUserAgent } from './install.js';
 export type { InstallSurface } from './install.js';
 export { OFFLINE_DECISION, applySyncResult, captureClass, enqueueCapture } from './offline.js';
 export type { CaptureClass, QueueItem, QueueState } from './offline.js';
+export { likePattern } from './search.js';
 export {
   batchInputSchema,
   rangeAreaInputSchema,

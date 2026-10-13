@@ -47,6 +47,7 @@ Dated 2026-10-13. Technical choices below are provisional engineering defaults f
 | T39 | Install uses the browser prompt, or a share-menu note on iPhone. `/api` stays `NetworkOnly`. | No offline record cache. |
 | T40 | The device queue accepts only `POST .../attendance`. Stock, expenses, invoices, orders, market prices, losses, medicine, and supplier money return `refused` and are not stored. Replay uses the same idempotency key. Status 409 becomes `conflict` and is not written again. | Decision 10 stays open. |
 | T41 | `document.documentElement.lang` follows `gavran.locale`. Hindi and Marathi strings are provisional. The screen says a fluent review is still needed. | No fluent review is claimed. |
+| T42 | Search uses `LIKE ? ESCAPE '!'` on the current farm. The pattern escapes `!`, `%`, and `_`. Sections run only when the caller has that read permission. Amount columns are not selected. | Workers must not see prices. |
 
 ## Still open (blueprint section 18)
 
