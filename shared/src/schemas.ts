@@ -6,6 +6,7 @@ import {
   PERMISSIONS,
   SHED_STATUSES,
   SHED_TYPES,
+  TASK_SEASONS,
   VOLUME_UNITS,
   WEIGHT_UNITS,
 } from './permissions.js';
@@ -384,6 +385,36 @@ export function proposedHatchRate(liveChicks: number, eggsSet: number) {
   };
 }
 
+export const taskTemplateInputSchema = z.object({
+  name: z.string().trim().min(2, 'too_small').max(120, 'too_big'),
+  season: z.union([z.enum(TASK_SEASONS), z.literal('')]),
+});
+
+export const taskTemplateRenameSchema = z.object({
+  name: z.string().trim().min(2, 'too_small').max(120, 'too_big'),
+});
+
+export const taskStepInputSchema = z.object({
+  body: z.string().trim().min(1, 'too_small').max(500, 'too_big'),
+});
+
+export const taskStepStatusSchema = z.object({
+  status: z.enum(['active', 'skipped']),
+});
+
+export const taskInputSchema = z.object({
+  title: z.string().trim().min(2, 'too_small').max(160, 'too_big'),
+  dueOn: calendarDateSchema,
+  instructions: z.string().trim().max(1000, 'too_big'),
+  assigneeUserId: z.union([z.string().uuid('invalid_format'), z.literal('')]),
+  proofRequired: z.boolean({ invalid_type_error: 'invalid_format' }),
+  templateId: z.union([z.string().uuid('invalid_format'), z.literal('')]),
+});
+
+export const taskCompleteSchema = z.object({
+  note: z.string().trim().max(500, 'too_big'),
+});
+
 export const closeBatchSchema = z.object({
   version: z.number({ invalid_type_error: 'invalid_format' }).int('invalid_format').positive('too_small'),
 });
@@ -405,6 +436,11 @@ export type IncubatorMaintenanceInput = z.infer<typeof incubatorMaintenanceInput
 export type IncubationInput = z.infer<typeof incubationInputSchema>;
 export type HatchInput = z.infer<typeof hatchInputSchema>;
 export type CandlingInput = z.infer<typeof candlingInputSchema>;
+export type TaskTemplateInput = z.infer<typeof taskTemplateInputSchema>;
+export type TaskTemplateRenameInput = z.infer<typeof taskTemplateRenameSchema>;
+export type TaskStepInput = z.infer<typeof taskStepInputSchema>;
+export type TaskInput = z.infer<typeof taskInputSchema>;
+export type TaskCompleteInput = z.infer<typeof taskCompleteSchema>;
 export type RegisterInput = z.infer<typeof registerSchema>;
 export type LoginInput = z.infer<typeof loginSchema>;
 export type FarmInput = z.infer<typeof farmInputSchema>;

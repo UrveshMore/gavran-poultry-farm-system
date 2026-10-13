@@ -9,6 +9,7 @@ export {
   ROLE_PERMISSIONS,
   SHED_STATUSES,
   SHED_TYPES,
+  TASK_SEASONS,
   VOLUME_UNITS,
   WEIGHT_UNITS,
   isFarmRole,
@@ -24,6 +25,7 @@ export type {
   PlatformRole,
   ShedStatus,
   ShedType,
+  TaskSeason,
   VolumeUnit,
   WeightUnit,
 } from './permissions.js';
@@ -56,6 +58,12 @@ export {
   registerSchema,
   shedInputSchema,
   shedUpdateSchema,
+  taskCompleteSchema,
+  taskInputSchema,
+  taskStepInputSchema,
+  taskStepStatusSchema,
+  taskTemplateInputSchema,
+  taskTemplateRenameSchema,
 } from './schemas.js';
 export type {
   BatchInput,
@@ -78,4 +86,9 @@ export type {
   RegisterInput,
   ShedInput,
   ShedUpdateInput,
+  TaskCompleteInput,
+  TaskInput,
+  TaskStepInput,
+  TaskTemplateInput,
+  TaskTemplateRenameInput,
 } from './schemas.js';

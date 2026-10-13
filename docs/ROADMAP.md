@@ -46,7 +46,7 @@ Done in this repository. A hatch from an open sitting records eggs set, live chi
 
 ## Phase 7 — Tasks and seasonal checklists
 
-WF-08, online only. Offline queue is not part of this phase. Summer heat, monsoon, and winter are owner-editable checklist templates with empty steps until the owner writes them. Do not preload care tasks.
+Done in this repository. WF-08, online only. Offline queue is not part of this phase. Summer heat, monsoon, and winter are owner-editable checklist templates with empty steps until the owner writes them. No care task is preloaded. A task is not generated from batch age. Completing a task twice is refused.
 
 ## Phase 8 — Feed, water, inventory, and owner-set growth
 

@@ -18,6 +18,7 @@ import { hatchRoutes } from './modules/hatch/routes.js';
 import { incubationRoutes } from './modules/incubation/routes.js';
 import { incubatorRoutes } from './modules/incubators/routes.js';
 import { farmRoutes } from './modules/farms/routes.js';
+import { taskRoutes } from './modules/tasks/routes.js';
 
 export function createApp() {
   const app = express();
@@ -54,6 +55,7 @@ export function createApp() {
   app.use('/api/v1/farms', incubatorRoutes);
   app.use('/api/v1/farms', incubationRoutes);
   app.use('/api/v1/farms', hatchRoutes);
+  app.use('/api/v1/farms', taskRoutes);
   app.use(notFound);
   app.use(errorHandler);
   return app;

@@ -153,6 +153,32 @@ export type CandlingRecord = {
 
 export type EggCategory = { id: string; name: string; status: 'active' | 'archived' };
 
+export type TaskSeason = 'summer_heat' | 'monsoon' | 'winter';
+
+export type TaskTemplate = {
+  id: string;
+  name: string;
+  season: TaskSeason | null;
+  steps: Array<{ id: string; position: number; body: string; status: 'active' | 'skipped' }>;
+};
+
+export type FarmTask = {
+  id: string;
+  title: string;
+  instructions: string | null;
+  dueOn: string;
+  assigneeUserId: string | null;
+  assigneeName: string | null;
+  proofRequired: boolean;
+  status: 'open' | 'done';
+  templateId: string | null;
+  templateName: string | null;
+  completionNote: string | null;
+  completedAt: string | null;
+  steps: Array<{ position: number; body: string }>;
+  overdue: boolean;
+};
+
 export type Incubator = {
   id: string;
   code: string;

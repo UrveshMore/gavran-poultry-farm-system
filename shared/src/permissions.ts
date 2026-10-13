@@ -27,6 +27,9 @@ export const PERMISSIONS = [
   'incubation.read',
   'incubation.record',
   'hatch.record',
+  'task.read',
+  'task.manage',
+  'task.complete',
 ] as const;
 export type PermissionCode = (typeof PERMISSIONS)[number];
 
@@ -44,6 +47,9 @@ export type VolumeUnit = (typeof VOLUME_UNITS)[number];
 
 export const CAPACITY_UNIT = 'birds' as const;
 
+export const TASK_SEASONS = ['summer_heat', 'monsoon', 'winter'] as const;
+export type TaskSeason = (typeof TASK_SEASONS)[number];
+
 export const BATCH_STATUSES = ['open', 'closed'] as const;
 export type BatchStatus = (typeof BATCH_STATUSES)[number];
 
@@ -58,10 +64,10 @@ export type MovementType = (typeof MOVEMENT_TYPES)[number];
  */
 export const ROLE_PERMISSIONS: Record<FarmRole | PlatformRole, readonly PermissionCode[]> = {
   owner: PERMISSIONS,
-  manager: ['farm.read', 'shed.read', 'shed.create', 'shed.update', 'user.read', 'audit.read', 'batch.read', 'batch.create', 'movement.create', 'egg.read', 'egg.record', 'incubator.read', 'incubator.record', 'incubator.manage', 'incubation.read', 'incubation.record', 'hatch.record'],
-  worker: ['farm.read', 'shed.read', 'batch.read', 'egg.read', 'egg.record', 'incubator.read', 'incubator.record', 'incubation.read', 'incubation.record', 'hatch.record'],
+  manager: ['farm.read', 'shed.read', 'shed.create', 'shed.update', 'user.read', 'audit.read', 'batch.read', 'batch.create', 'movement.create', 'egg.read', 'egg.record', 'incubator.read', 'incubator.record', 'incubator.manage', 'incubation.read', 'incubation.record', 'hatch.record', 'task.read', 'task.manage', 'task.complete'],
+  worker: ['farm.read', 'shed.read', 'batch.read', 'egg.read', 'egg.record', 'incubator.read', 'incubator.record', 'incubation.read', 'incubation.record', 'hatch.record', 'task.read', 'task.complete'],
   family_helper: [],
-  vet_advisor: ['farm.read', 'shed.read', 'batch.read', 'egg.read', 'incubator.read', 'incubation.read'],
+  vet_advisor: ['farm.read', 'shed.read', 'batch.read', 'egg.read', 'incubator.read', 'incubation.read', 'task.read'],
   system_administrator: [],
 };
 

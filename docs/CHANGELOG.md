@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.7.0 — 2026-10-13
+
+Phase 7 tasks.
+
+- Seasonal checklists for summer heat, monsoon, and winter start with no steps.
+- A task can be completed once. A second completion is refused.
+- There is no offline queue and no schedule generated from batch age.
+
 ## 0.6.0 — 2026-10-13
 
 Phase 6 hatch.

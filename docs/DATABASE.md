@@ -54,4 +54,12 @@ MySQL 8.4, `utf8mb4` / `utf8mb4_0900_ai_ci`, session time zone `+00:00`. Migrati
 - `hatch_records` — eggs set, live chicks, losses, other, optional difference note, optional chick batch. No approved rate column.
 - Permission `000000000119`: `hatch.record` for owner, manager, and worker.
 
+## 009 tasks
+
+- `task_templates` — a name the farm types. Season is `summer_heat`, `monsoon`, `winter`, or null. No steps are seeded.
+- `task_template_steps` — text the farm adds. Status is `active` or `skipped`.
+- `tasks` — title, due date, optional assignee, optional instructions, `open` or `done`. Proof is a completion note when requested. No photo column and no sync table.
+- `task_steps` — a copy of the active template steps at the moment the task was created.
+- Permissions `000000000120` through `000000000122`: `task.read`, `task.manage`, `task.complete`. Owner and manager receive all three. Worker receives read and complete. Vet / advisor receives read only.
+
 Queries use `mysql2` `execute()` (server-side prepared statements). Audit list `LIMIT` and `OFFSET` are interpolated only after the values are checked as integers, because the binary protocol rejects placeholders there.

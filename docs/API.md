@@ -90,3 +90,19 @@ A random or foreign farm id is 404.
 `POST /farms/:farmId/incubation/:sittingId/candling` — `incubation.record`. Outcome labels are text on that record. Their counts must equal `inspectedCount`. A second record does not replace the first.
 
 `POST /farms/:farmId/incubation/:sittingId/hatches` — `hatch.record`. Live chicks above zero open a chick batch. Counts that do not add up to eggs set need `differenceNote`. More eggs than the sitting still has is 409 `EGGS_ALREADY_SET`. The response includes `proposedHatchRate` with status `proposed`.
+
+## Tasks
+
+`GET|POST /farms/:farmId/task-templates` — `task.read` / `task.manage`. A season is `summer_heat`, `monsoon`, `winter`, or blank. Creating a template stores no steps. A repeated season or name is 409 `DUPLICATE_CODE`.
+
+`PATCH /farms/:farmId/task-templates/:templateId` — `task.manage`. Renames the template.
+
+`POST /farms/:farmId/task-templates/:templateId/steps` — `task.manage`. Appends a step the farm types.
+
+`PATCH /farms/:farmId/task-templates/:templateId/steps/:stepId` — `task.manage`. Sets the step `active` or `skipped`.
+
+`GET|POST /farms/:farmId/tasks` — `task.read` / `task.manage`. A worker sees tasks assigned to them. Owner, manager, and vet see the farm's tasks. A future due date is allowed. Skipped template steps are not copied onto the task. Nothing is created from batch age.
+
+`GET /farms/:farmId/tasks/:taskId` — `task.read`. A task the caller cannot see is 404.
+
+`POST /farms/:farmId/tasks/:taskId/complete` — `task.complete`. A second completion is 409 `TASK_ALREADY_DONE`. If the task asks for proof, an empty note is 422. There is no offline queue.

@@ -27,6 +27,9 @@ UI navigation inside a farm still shows Sheds, Batches, Eggs, People, and Activi
 | `incubation.read` | View sittings and candling. |
 | `incubation.record` | Start a sitting and record candling. |
 | `hatch.record` | Record a hatch and open a chick batch when there are live chicks. |
+| `task.read` | View checklist templates and the tasks this role may see. |
+| `task.manage` | Create a checklist, write or skip a step, and create a task. |
+| `task.complete` | Mark an open task done. A second completion is refused. |
 
 `GET /api/v1/farms` lists farms the caller belongs to, including farms where they have zero permissions. It does not include contact details.
 
@@ -38,8 +41,8 @@ Pending owner confirmation. Seeded by the versioned migrations and mirrored in `
 |---|---|
 | Owner | All keys in the catalog. |
 | Manager | Farm operations in the catalog except `user.manage` and `farm.update`. |
-| Worker | `farm.read`, `shed.read`, `batch.read`, `egg.read`, `egg.record`, `incubator.read`, `incubator.record`, `incubation.read`, `incubation.record`, `hatch.record`. |
-| Vet / advisor | `farm.read`, `shed.read`, `batch.read`, `egg.read`, `incubator.read`, `incubation.read`. |
+| Worker | `farm.read`, `shed.read`, `batch.read`, `egg.read`, `egg.record`, `incubator.read`, `incubator.record`, `incubation.read`, `incubation.record`, `hatch.record`, `task.read`, `task.complete`. A worker sees tasks assigned to them. |
+| Vet / advisor | `farm.read`, `shed.read`, `batch.read`, `egg.read`, `incubator.read`, `incubation.read`, `task.read`. |
 | Family helper | None from the role. Optional grants on that membership only. |
 | System administrator | None. |
 

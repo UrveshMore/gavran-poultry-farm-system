@@ -28,6 +28,7 @@ Dated 2026-10-13. Technical choices below are provisional engineering defaults f
 | T20 | Incubator temperature and humidity have no default and no set-point. A reading may omit both. A number requires the unit the farm types. Service status is `in_service` or `out_of_service`. | Decision 5 leaves incubation SOPs unanswered. |
 | T21 | An incubation sitting is `incubator` or `broody_hen`. No expected hatch date is stored or calculated. Candling has no schedule. Outcome labels are typed on the record. | Decision 4 and decision 5 are still open. |
 | T22 | The hatch figure shown in the app is `live chicks ÷ eggs set × 100` and is labelled proposed. It is not decision 4. | Decision 4 is still open. |
+| T23 | Tasks are created by a person. Summer heat, monsoon, and winter templates start with zero steps. No task is generated from batch age. Completion is online only, and a second completion is refused. Proof is a note when the creator asks for one. Photos and offline queues are not in this phase. | Blueprint WF-08 steps 1, 6, and 7 need farm rules this build does not invent. |
 
 ## Still open (blueprint section 18)
 
