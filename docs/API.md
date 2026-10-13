@@ -191,6 +191,14 @@ The restore drill is the server command `npm run restore-drill -w @gavran/server
 
 `POST /farms/:farmId/tasks/:taskId/training-requirements` — `training.manage`. Completing that task is 409 `TRAINING_REQUIRED` until the person finishing it has a completion for the item.
 
+## Invoice documents
+
+`POST /farms/:farmId/invoices` — `sale.record`. Still 409 `INVOICE_POSTING_DISABLED`.
+
+`GET|POST /farms/:farmId/invoice-documents` — `sale.read` / `sale.record`. Status is only `unposted`. A line price is null unless an amount and a money unit are typed. `orderId` is optional and must be an order on this farm. `issuedOn` is not in the future. `posting` is `disabled`. `balance.status` is `not_calculated` because decision 9 is open.
+
+`POST /farms/:farmId/invoice-documents/:documentId/returns` — `sale.record`. Adds a row. The document stays. `amount` is null unless typed, and then `unitLabel` is required.
+
 ## Suppliers
 
 `GET /farms/:farmId/suppliers` — `supplier.read`. Includes suppliers, draft orders, receipts, bills, and payments. `stockPosting` is `disabled`. `valuation.status` is `not_chosen` because decision 7 is open. Workers are refused.

@@ -697,6 +697,58 @@ const typedMoney = z.number({ invalid_type_error: 'invalid_format' }).positive('
 const typedQuantity = z.number({ invalid_type_error: 'invalid_format' }).positive('too_small').max(1_000_000, 'too_big');
 const unitLabelSchema = z.string().trim().min(1, 'required').max(32, 'too_big');
 
+export const invoiceDocumentInputSchema = z.object({
+  customerId: z.string().uuid('invalid_format'),
+  orderId: z.union([z.string().uuid('invalid_format'), z.literal('')]),
+  issuedOn: calendarDateSchema,
+  notes: z.string().trim().max(500, 'too_big'),
+  lines: z
+    .array(
+      z
+        .object({
+          description: z.string().trim().min(1, 'too_small').max(160, 'too_big'),
+          quantity: z.number({ invalid_type_error: 'invalid_format' }).positive('too_small').max(1_000_000, 'too_big'),
+          unitLabel: z.string().trim().min(1, 'required').max(32, 'too_big'),
+          unitPrice: z.union([
+            z.number({ invalid_type_error: 'invalid_format' }).min(0, 'too_small').max(1_000_000_000, 'too_big'),
+            z.null(),
+          ]),
+          priceUnit: z.string().trim().max(32, 'too_big'),
+        })
+        .superRefine((line, ctx) => {
+          if (line.unitPrice !== null && line.priceUnit === '') {
+            ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'required', path: ['priceUnit'] });
+          }
+          if (line.unitPrice === null && line.priceUnit !== '') {
+            ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'invalid_format', path: ['priceUnit'] });
+          }
+        }),
+    )
+    .min(1, 'too_small')
+    .max(20, 'too_big'),
+});
+
+export const saleReturnInputSchema = z
+  .object({
+    returnedOn: calendarDateSchema,
+    description: z.string().trim().min(1, 'too_small').max(160, 'too_big'),
+    quantity: z.number({ invalid_type_error: 'invalid_format' }).min(0, 'too_small').max(1_000_000, 'too_big'),
+    amount: z.union([
+      z.number({ invalid_type_error: 'invalid_format' }).positive('too_small').max(1_000_000_000, 'too_big'),
+      z.null(),
+    ]),
+    unitLabel: z.string().trim().max(32, 'too_big'),
+    note: z.string().trim().max(500, 'too_big'),
+  })
+  .superRefine((value, ctx) => {
+    if (value.amount !== null && value.unitLabel === '') {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'required', path: ['unitLabel'] });
+    }
+    if (value.amount === null && value.unitLabel !== '') {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'invalid_format', path: ['unitLabel'] });
+    }
+  });
+
 export const supplierInputSchema = z.object({
   name: z.string().trim().min(2, 'too_small').max(160, 'too_big'),
   contactName: z.string().trim().max(120, 'too_big'),
@@ -837,6 +889,8 @@ export type TrainingCompletionInput = z.infer<typeof trainingCompletionSchema>;
 export type TaskTrainingRequirementInput = z.infer<typeof taskTrainingRequirementSchema>;
 export type ParentageInput = z.infer<typeof parentageInputSchema>;
 export type SupplierInput = z.infer<typeof supplierInputSchema>;
+export type InvoiceDocumentInput = z.infer<typeof invoiceDocumentInputSchema>;
+export type SaleReturnInput = z.infer<typeof saleReturnInputSchema>;
 export type PurchaseOrderInput = z.infer<typeof purchaseOrderInputSchema>;
 export type GoodsReceiptInput = z.infer<typeof goodsReceiptInputSchema>;
 export type SupplierBillInput = z.infer<typeof supplierBillInputSchema>;

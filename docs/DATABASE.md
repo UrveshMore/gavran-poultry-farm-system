@@ -137,4 +137,11 @@ There is no backup table. `npm run restore-drill -w @gavran/server` creates `gav
 - `goods_receipts` — accepted and rejected quantities. No stock foreign key.
 - `supplier_bills` and `supplier_payments` — separate typed amounts. No tax column.
 
+## 020 invoice documents
+
+- No new permission. `sale.read` and `sale.record` cover these rows.
+- `invoice_documents.status` is only `unposted`.
+- `invoice_lines` — quantity and unit. Price and money unit are null together unless typed.
+- `sale_returns` — a new row pointing at a document. The document is not removed. No balance column.
+
 Queries use `mysql2` `execute()` (server-side prepared statements). Audit list `LIMIT` and `OFFSET` are interpolated only after the values are checked as integers, because the binary protocol rejects placeholders there.

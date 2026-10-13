@@ -40,6 +40,7 @@ Dated 2026-10-13. Technical choices below are provisional engineering defaults f
 | T32 | Attendance stores a method label the farm types. The response count is a row count. Training stores a version label the farm types. A task link blocks completion until that person has a completion row. There is no score and no course catalog. | Blueprint WF-16. No performance formula was chosen. |
 | T33 | Parentage stores typed sire and dam text and optional batch ids on the same farm. `pairing.status` is `unset`. | Decision 3 stays open. No coefficient. |
 | T34 | Supplier orders stay `draft`. A line price is null unless an amount and a money unit are typed. Receipts do not insert stock rows. Bills and payments are separate tables. `stockPosting` is `disabled`. Valuation stays `not_chosen`. | Decisions 7 and 8 stay open. No tax column. |
+| T35 | Invoice documents use status `unposted` only. `POST /invoices` stays 409. A return row references the document and does not delete it. `balance.status` is `not_calculated`. | Decision 8 stays open. No tax column. |
 
 ## Still open (blueprint section 18)
 

@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.19.0 — 2026-10-13
+
+Phase 18 invoice documents and returns.
+
+- A document stays unposted. Posting a sale is still refused.
+- A return is a new row. The document stays. No balance is calculated.
+
 ## 0.18.0 — 2026-10-13
 
 Phase 17 suppliers.

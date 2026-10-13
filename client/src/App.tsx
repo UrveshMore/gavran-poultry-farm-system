@@ -21,6 +21,7 @@ import { TaskDetailPage, TasksPage } from '@/pages/TaskPages';
 import { WorkforcePage } from '@/pages/WorkforcePages';
 import { ParentagePageView } from '@/pages/ParentagePages';
 import { SuppliersPage } from '@/pages/SupplierPages';
+import { InvoiceDocumentsPage } from '@/pages/InvoicePages';
 
 function RequireAuth() {
   const { t } = useTranslation();
@@ -62,6 +63,7 @@ export function App() {
         <Route path="farms/:farmId/workforce" element={<WorkforcePage />} />
         <Route path="farms/:farmId/parentage" element={<ParentagePageView />} />
         <Route path="farms/:farmId/suppliers" element={<SuppliersPage />} />
+        <Route path="farms/:farmId/invoice-documents" element={<InvoiceDocumentsPage />} />
         <Route path="farms/:farmId/tasks/:taskId" element={<TaskDetailPage />} />
         <Route path="farms/:farmId/stock" element={<StockPage />} />
         <Route path="farms/:farmId/health" element={<HealthPage />} />

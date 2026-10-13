@@ -29,6 +29,7 @@ import { taskRoutes } from './modules/tasks/routes.js';
 import { workforceRoutes } from './modules/workforce/routes.js';
 import { parentageRoutes } from './modules/parentage/routes.js';
 import { supplierRoutes } from './modules/suppliers/routes.js';
+import { invoiceRoutes } from './modules/invoices/routes.js';
 
 export function createApp() {
   const app = express();
@@ -69,6 +70,7 @@ export function createApp() {
   app.use('/api/v1/farms', workforceRoutes);
   app.use('/api/v1/farms', parentageRoutes);
   app.use('/api/v1/farms', supplierRoutes);
+  app.use('/api/v1/farms', invoiceRoutes);
   app.use('/api/v1/farms', stockRoutes);
   app.use('/api/v1/farms', healthRoutes);
   app.use('/api/v1/farms', lossRoutes);
