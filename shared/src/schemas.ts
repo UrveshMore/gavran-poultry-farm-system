@@ -568,6 +568,34 @@ export const lossIncidentSchema = z.object({
   movementId: z.union([z.string().uuid('invalid_format'), z.literal('')]),
 });
 
+export const customerInputSchema = z.object({
+  name: z.string().trim().min(2, 'too_small').max(160, 'too_big'),
+  phone: z.string().trim().max(32, 'too_big'),
+  notes: z.string().trim().max(500, 'too_big'),
+});
+
+export const marketPriceInputSchema = z.object({
+  itemName: z.string().trim().min(1, 'too_small').max(160, 'too_big'),
+  amount: z.number({ invalid_type_error: 'invalid_format' }).min(0, 'too_small').max(1_000_000_000, 'too_big'),
+  unitLabel: z.string().trim().min(1, 'too_small').max(32, 'too_big'),
+  effectiveOn: calendarDateSchema,
+});
+
+export const orderInputSchema = z.object({
+  customerId: z.string().uuid('invalid_format'),
+  orderedOn: calendarDateSchema,
+  lines: z
+    .array(
+      z.object({
+        description: z.string().trim().min(1, 'too_small').max(160, 'too_big'),
+        quantity: z.number({ invalid_type_error: 'invalid_format' }).positive('too_small').max(1_000_000, 'too_big'),
+        unitPrice: z.number({ invalid_type_error: 'invalid_format' }).min(0, 'too_small').max(1_000_000_000, 'too_big'),
+      }),
+    )
+    .min(1, 'too_small')
+    .max(20, 'too_big'),
+});
+
 export const closeBatchSchema = z.object({
   version: z.number({ invalid_type_error: 'invalid_format' }).int('invalid_format').positive('too_small'),
 });
@@ -605,6 +633,9 @@ export type MedicineRecordInput = z.infer<typeof medicineRecordSchema>;
 export type VaccineTaskInput = z.infer<typeof vaccineTaskSchema>;
 export type BiosecurityStepInput = z.infer<typeof biosecurityStepSchema>;
 export type LossIncidentInput = z.infer<typeof lossIncidentSchema>;
+export type CustomerInput = z.infer<typeof customerInputSchema>;
+export type MarketPriceInput = z.infer<typeof marketPriceInputSchema>;
+export type OrderInput = z.infer<typeof orderInputSchema>;
 export type RegisterInput = z.infer<typeof registerSchema>;
 export type LoginInput = z.infer<typeof loginSchema>;
 export type FarmInput = z.infer<typeof farmInputSchema>;

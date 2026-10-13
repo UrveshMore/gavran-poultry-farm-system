@@ -62,7 +62,7 @@ Done in this repository. A loss note is text the farm writes, with a count, and 
 
 ## Phase 11 — Customers, orders, and local prices
 
-WF-13 with prices the owner types, including a local market price list that stays empty until the owner enters each rate. No default market price. Invoice posting stays disabled until decision 8 (when a sale is posted).
+Done in this repository. WF-13 with prices the owner types. The local market price list stays empty until the owner enters each rate. No default market price. Orders stay drafts. Invoice posting stays disabled until decision 8 (when a sale is posted). No GST.
 
 ## Phase 12 — Expenses
 

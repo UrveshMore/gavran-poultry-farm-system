@@ -102,6 +102,7 @@ export function errorKey(error: unknown): string | null {
     EGGS_ALREADY_SET: 'hatch.tooMany',
     INSUFFICIENT_STOCK: 'stock.insufficient',
     ENTRY_UNAPPROVED: 'health.unapproved',
+    INVOICE_POSTING_DISABLED: 'sales.invoiceOff',
     FORBIDDEN: 'common.permissionDenied',
   };
   return keys[error.code] ?? null;

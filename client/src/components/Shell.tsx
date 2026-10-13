@@ -1,4 +1,4 @@
-import { Bird, ClipboardList, Egg, Feather, Home, ListTodo, LogOut, ShieldAlert, Stethoscope, Thermometer, Users, Warehouse, Wheat } from 'lucide-react';
+import { Bird, ClipboardList, Egg, Feather, Home, ListTodo, LogOut, ShieldAlert, ShoppingBasket, Stethoscope, Thermometer, Users, Warehouse, Wheat } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom';
@@ -51,6 +51,7 @@ export function AppShell() {
         { to: `/farms/${farmId}/stock`, label: t('nav.stock'), icon: Wheat, end: false },
         { to: `/farms/${farmId}/health`, label: t('nav.health'), icon: Stethoscope, end: false },
         { to: `/farms/${farmId}/losses`, label: t('nav.losses'), icon: ShieldAlert, end: false },
+        { to: `/farms/${farmId}/sales`, label: t('nav.sales'), icon: ShoppingBasket, end: false },
         { to: `/farms/${farmId}/people`, label: t('nav.people'), icon: Users, end: false },
         { to: `/farms/${farmId}/activity`, label: t('nav.activity'), icon: ClipboardList, end: false },
       ]

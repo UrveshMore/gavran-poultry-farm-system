@@ -79,6 +79,9 @@ export {
   medicineRecordSchema,
   vaccineTaskSchema,
   lossIncidentSchema,
+  customerInputSchema,
+  marketPriceInputSchema,
+  orderInputSchema,
 } from './schemas.js';
 export type {
   BatchInput,
@@ -117,4 +120,7 @@ export type {
   MedicineRecordInput,
   VaccineTaskInput,
   LossIncidentInput,
+  CustomerInput,
+  MarketPriceInput,
+  OrderInput,
 } from './schemas.js';

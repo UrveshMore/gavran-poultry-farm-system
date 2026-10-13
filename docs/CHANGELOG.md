@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.11.0 — 2026-10-13
+
+Phase 11 customers, draft orders, and typed prices.
+
+- A market price exists only after someone types the amount and the unit.
+- Orders stay drafts. Posting an invoice is refused until the farm decides when a sale is posted.
+- There is no tax column.
+
 ## 0.10.0 — 2026-10-13
 
 Phase 10 loss notes.

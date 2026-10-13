@@ -85,4 +85,12 @@ MySQL 8.4, `utf8mb4` / `utf8mb4_0900_ai_ci`, session time zone `+00:00`. Migrati
 - `loss_incidents` — date, bird count, and a note the farm writes. Optional link to a `batch_movements` row of type `mortality`. No predator column and no rate column.
 - Permissions `000000000130` and `000000000131`: `loss.read`, `loss.record`. Owner, manager, and worker receive both. Vet / advisor receives read only.
 
+## 013 sales
+
+- `customers` — name unique per farm. Phone and notes are optional.
+- `market_prices` — item name, amount, and unit label the farm types. No row is seeded.
+- `orders` — `status` is only `draft`. No posted state.
+- `order_lines` — description, quantity above zero, unit price of zero or more. No tax column.
+- Permissions `000000000132` and `000000000133`: `sale.read`, `sale.record`. Owner and manager receive both. Worker and vet / advisor receive neither.
+
 Queries use `mysql2` `execute()` (server-side prepared statements). Audit list `LIMIT` and `OFFSET` are interpolated only after the values are checked as integers, because the binary protocol rejects placeholders there.

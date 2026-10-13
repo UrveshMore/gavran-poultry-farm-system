@@ -293,6 +293,18 @@ export type LossIncident = {
   batchCode: string | null;
 };
 
+export type Customer = { id: string; name: string; phone: string | null; notes: string | null };
+export type MarketPrice = { id: string; itemName: string; amount: number; unitLabel: string; effectiveOn: string };
+export type FarmOrder = {
+  id: string;
+  customerId: string;
+  customerName: string;
+  orderedOn: string;
+  status: 'draft';
+  lines: Array<{ description: string; quantity: number; unitPrice: number }>;
+};
+export type OrdersPage = { orders: FarmOrder[]; invoicePosting: 'disabled' };
+
 export type LossPage = {
   incidents: LossIncident[];
   mortalityMovements: Array<{ id: string; occurredOn: string; birdCount: number; batchCode: string; reason: string | null }>;

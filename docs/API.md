@@ -138,3 +138,13 @@ A random or foreign farm id is 404.
 ## Losses
 
 `GET|POST /farms/:farmId/losses` — `loss.read` / `loss.record`. A note and a bird count. `movementId` must be a mortality movement on this farm or blank. The list includes `proposedMortalityRate` with status `not_calculated`. There is no predator catalog.
+
+## Sales
+
+`GET|POST /farms/:farmId/customers` — `sale.read` / `sale.record`. A name is unique on the farm. Phone and notes may be blank.
+
+`GET|POST /farms/:farmId/market-prices` — `sale.read` / `sale.record`. The list starts empty. `amount` and `unitLabel` are what the caller types. A future `effectiveOn` is 422.
+
+`GET|POST /farms/:farmId/orders` — `sale.read` / `sale.record`. Status is only `draft`. The list includes `invoicePosting: "disabled"`. A line needs a description, a quantity above zero, and a unit price of zero or more.
+
+`POST /farms/:farmId/invoices` — `sale.record`. Always 409 `INVOICE_POSTING_DISABLED`. No invoice row is created.
