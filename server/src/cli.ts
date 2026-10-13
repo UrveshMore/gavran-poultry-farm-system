@@ -2,6 +2,7 @@ import { env } from './config/env.js';
 import { migrate, rollback } from './db/migrate.js';
 import { pool } from './db/pool.js';
 import { findUserByEmail, insertUser } from './modules/auth/repository.js';
+import { runRestoreDrill } from './ops/restoreDrill.js';
 import { hashPassword } from './security/password.js';
 
 const command = process.argv[2];
@@ -29,8 +30,12 @@ try {
       });
       console.log(`Created local user ${env.SEED_OWNER_EMAIL}. Password is SEED_OWNER_PASSWORD from the environment.`);
     }
+  } else if (command === 'restore-drill') {
+    const result = await runRestoreDrill();
+    console.log(`Restored ${result.restoredEmail} into ${result.database}, then removed that database.`);
+    console.log('RPO, RTO, and retention are not set.');
   } else {
-    throw new Error('Usage: tsx src/cli.ts <migrate|rollback|seed>');
+    throw new Error('Usage: tsx src/cli.ts <migrate|rollback|seed|restore-drill>');
   }
 } catch (error) {
   console.error(error instanceof Error ? error.message : error);

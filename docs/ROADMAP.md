@@ -74,7 +74,7 @@ Done in this repository. WF-17 for one date range. Each section lists the source
 
 ## Phase 14 — Backup, restore, and P0 hardening
 
-WF-20, threat-model notes, retention once decision 15 is answered, and a demonstrated restore in an isolated database. This closes blueprint P0.
+Done in this repository. A restore drill writes one row into the separate database `gavran_restore_drill`, reads it back, and drops that database. It does not touch the application database. No backup schedule, off-site copy, RPO, or RTO is stored. Retention stays a placeholder until decision 15. This closes blueprint P0.
 
 ## After P0 — Desi flock details
 

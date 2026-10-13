@@ -170,3 +170,9 @@ Sections:
 - `hatches` from `hatch_records`. Formula status `proposed`, text `live chicks ÷ eggs set × 100`. Each row repeats `proposedHatchRate`.
 - `losses` from `loss_incidents`. Formula status `not_calculated`, reason `decision 4 is open`. No percent.
 - `expenses` from `expense_entries`. Formula status `not_chosen`, reason `decision 9 is open`. `listedSums` adds rows that share a direction and a money unit. There is no profit field and no feed conversion.
+
+## Safeguards
+
+`GET /farms/:farmId/safeguards` — `farm.read`. `retention.status` is `not_chosen`. `recovery.rpo` and `recovery.rto` are null. `backup.schedule` and `backup.offsiteCopy` are `not_chosen`. `backup.isolatedDatabase` is `gavran_restore_drill`. No duration is stored.
+
+The restore drill is the server command `npm run restore-drill -w @gavran/server`. It is not an HTTP route.

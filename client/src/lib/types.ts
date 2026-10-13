@@ -371,6 +371,12 @@ export type FarmReport = {
   sections: ReportSection[];
 };
 
+export type Safeguards = {
+  retention: { status: 'not_chosen'; reason: string };
+  recovery: { rpo: null; rto: null; reason: string };
+  backup: { schedule: 'not_chosen'; offsiteCopy: 'not_chosen'; isolatedDatabase: string };
+};
+
 export type LossPage = {
   incidents: LossIncident[];
   mortalityMovements: Array<{ id: string; occurredOn: string; birdCount: number; batchCode: string; reason: string | null }>;

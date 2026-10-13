@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.14.0 — 2026-10-13
+
+Phase 14 safeguards. This closes P0.
+
+- A restore drill uses a separate database and then removes it.
+- Retention, backup schedule, RPO, and RTO stay unset.
+
 ## 0.13.0 — 2026-10-13
 
 Phase 13 reports.

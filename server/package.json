@@ -11,7 +11,8 @@
     "test": "vitest run",
     "migrate": "tsx src/cli.ts migrate",
     "rollback": "tsx src/cli.ts rollback",
-    "seed": "tsx src/cli.ts seed"
+    "seed": "tsx src/cli.ts seed",
+    "restore-drill": "tsx src/cli.ts restore-drill"
   },
   "dependencies": {
     "@gavran/shared": "0.1.0",

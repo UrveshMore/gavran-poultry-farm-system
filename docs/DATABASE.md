@@ -104,4 +104,8 @@ MySQL 8.4, `utf8mb4` / `utf8mb4_0900_ai_ci`, session time zone `+00:00`. Migrati
 - No report table. A report is calculated from the rows already stored.
 - Permission `000000000136`: `report.read`. Owner and manager receive it. Worker and vet / advisor do not.
 
+## Restore drill
+
+There is no backup table. `npm run restore-drill -w @gavran/server` creates `gavran_restore_drill`, migrates it, restores one user row from an in-memory copy, checks the row, and drops that database. The application database name is refused.
+
 Queries use `mysql2` `execute()` (server-side prepared statements). Audit list `LIMIT` and `OFFSET` are interpolated only after the values are checked as integers, because the binary protocol rejects placeholders there.
