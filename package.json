@@ -1,0 +1,34 @@
+{
+  "name": "gavran-poultry",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Gavran Poultry Farm Management System",
+  "engines": {
+    "node": ">=22"
+  },
+  "workspaces": [
+    "shared",
+    "server",
+    "client"
+  ],
+  "scripts": {
+    "dev": "npm run build -w @gavran/shared && concurrently -n server,client -c green,blue \"npm run dev -w @gavran/server\" \"npm run dev -w @gavran/client\"",
+    "build": "npm run build -w @gavran/shared && npm run build -w @gavran/server && npm run build -w @gavran/client",
+    "typecheck": "npm run build -w @gavran/shared && npm run typecheck -w @gavran/server && npm run typecheck -w @gavran/client",
+    "lint": "eslint .",
+    "test": "npm run test -w @gavran/server",
+    "db:up": "docker compose up -d --wait",
+    "db:down": "docker compose down",
+    "db:migrate": "npm run migrate -w @gavran/server",
+    "db:rollback": "npm run rollback -w @gavran/server",
+    "db:seed": "SEED_DEV=true npm run seed -w @gavran/server",
+    "check": "npm run typecheck && npm run lint && npm test && npm run build"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.2",
+    "eslint": "^9.20.0",
+    "eslint-plugin-react-hooks": "^5.1.0",
+    "typescript-eslint": "^8.24.0"
+  }
+}

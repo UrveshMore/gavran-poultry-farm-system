@@ -1,0 +1,209 @@
+openapi: 3.0.3
+info:
+  title: Gavran Poultry API
+  version: 0.1.0
+  description: Phase 1 only. See docs/API.md for the narrative contract.
+servers:
+  - url: /api/v1
+paths:
+  /health:
+    get:
+      summary: Database ping
+      responses:
+        '200':
+          description: Database answered
+        '503':
+          description: DB_UNAVAILABLE
+  /auth/csrf:
+    get:
+      summary: Issue a CSRF token
+      responses:
+        '200':
+          description: csrfToken
+  /auth/bootstrap:
+    get:
+      summary: Whether the first owner can still register
+      responses:
+        '200':
+          description: bootstrapRequired
+  /auth/register:
+    post:
+      summary: Create the first owner when no users exist
+      responses:
+        '201':
+          description: Session cookies set
+        '403':
+          description: BOOTSTRAP_CLOSED
+  /auth/login:
+    post:
+      summary: Sign in
+      responses:
+        '200':
+          description: Session cookies set
+        '401':
+          description: AUTH_INVALID_CREDENTIALS
+        '403':
+          description: ACCOUNT_DEACTIVATED
+        '429':
+          description: RATE_LIMITED
+  /auth/refresh:
+    post:
+      summary: Rotate the refresh cookie
+      responses:
+        '200':
+          description: New cookies
+        '401':
+          description: Missing, expired, or reused refresh token
+  /auth/logout:
+    post:
+      summary: Revoke the current session
+      responses:
+        '200':
+          description: Cookies cleared
+  /auth/logout-all:
+    post:
+      summary: Revoke every session for the user
+      responses:
+        '200':
+          description: Cookies cleared
+  /auth/me:
+    get:
+      summary: Current user
+      responses:
+        '200':
+          description: Public user
+        '401':
+          description: Not signed in
+    patch:
+      summary: Update own name or locale
+      responses:
+        '200':
+          description: Public user
+  /auth/change-password:
+    post:
+      summary: Change password and revoke other sessions
+      responses:
+        '200':
+          description: changed true
+  /farms:
+    get:
+      summary: Farms the caller belongs to
+      responses:
+        '200':
+          description: Farm summaries
+    post:
+      summary: Create a farm
+      parameters:
+        - in: header
+          name: Idempotency-Key
+          schema: { type: string }
+          required: false
+      responses:
+        '201':
+          description: Farm created
+        '409':
+          description: DUPLICATE_CODE
+  /farms/{farmId}:
+    get:
+      summary: Farm profile
+      parameters:
+        - $ref: '#/components/parameters/farmId'
+      responses:
+        '200':
+          description: Farm detail
+        '403':
+          description: Missing farm.read
+        '404':
+          description: Not a member
+    patch:
+      summary: Update farm profile
+      parameters:
+        - $ref: '#/components/parameters/farmId'
+      responses:
+        '200':
+          description: Updated
+        '409':
+          description: VERSION_CONFLICT or DUPLICATE_CODE
+  /farms/{farmId}/sheds:
+    get:
+      summary: List sheds
+      parameters:
+        - $ref: '#/components/parameters/farmId'
+      responses:
+        '200':
+          description: Sheds
+    post:
+      summary: Create a shed
+      parameters:
+        - $ref: '#/components/parameters/farmId'
+        - in: header
+          name: Idempotency-Key
+          schema: { type: string }
+          required: false
+      responses:
+        '201':
+          description: Shed created
+  /farms/{farmId}/sheds/{shedId}:
+    patch:
+      summary: Update a shed
+      parameters:
+        - $ref: '#/components/parameters/farmId'
+        - in: path
+          name: shedId
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        '200':
+          description: Updated
+  /farms/{farmId}/members:
+    get:
+      summary: List members
+      parameters:
+        - $ref: '#/components/parameters/farmId'
+      responses:
+        '200':
+          description: Members
+    post:
+      summary: Invite or link a person
+      parameters:
+        - $ref: '#/components/parameters/farmId'
+      responses:
+        '201':
+          description: Membership created
+        '409':
+          description: Already a member
+  /farms/{farmId}/members/{membershipId}:
+    patch:
+      summary: Change role, revoke, deactivate, or reactivate
+      parameters:
+        - $ref: '#/components/parameters/farmId'
+        - in: path
+          name: membershipId
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        '200':
+          description: Updated member
+        '409':
+          description: LAST_OWNER
+  /farms/{farmId}/audit:
+    get:
+      summary: Farm activity
+      parameters:
+        - $ref: '#/components/parameters/farmId'
+        - in: query
+          name: limit
+          schema: { type: integer, minimum: 1, maximum: 100, default: 20 }
+        - in: query
+          name: offset
+          schema: { type: integer, minimum: 0, maximum: 1000, default: 0 }
+      responses:
+        '200':
+          description: Audit page
+components:
+  parameters:
+    farmId:
+      in: path
+      name: farmId
+      required: true
+      schema: { type: string, format: uuid }

@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Gavran">
+  <rect width="64" height="64" rx="14" fill="#1b4332"/>
+  <circle cx="30" cy="36" r="14" fill="#f4efe4"/>
+  <circle cx="35" cy="33" r="1.8" fill="#1b1914"/>
+  <path d="M42 35h10l-6 4z" fill="#c4522a"/>
+  <path d="M22 24c2-6 4-6 6 0 2-7 5-8 7 0" fill="none" stroke="#e0b15a" stroke-width="3" stroke-linecap="round"/>
+</svg>

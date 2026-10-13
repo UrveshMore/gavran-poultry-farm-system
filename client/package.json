@@ -1,0 +1,40 @@
+{
+  "name": "@gavran/client",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host 0.0.0.0 --port 4317 --strictPort",
+    "build": "tsc -p tsconfig.json --noEmit && vite build",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "preview": "vite preview --host 0.0.0.0 --port 4317 --strictPort"
+  },
+  "dependencies": {
+    "@gavran/shared": "0.1.0",
+    "@hookform/resolvers": "^3.10.0",
+    "@radix-ui/react-label": "^2.1.2",
+    "@radix-ui/react-slot": "^1.1.2",
+    "@tanstack/react-query": "^5.66.9",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
+    "i18next": "^24.2.2",
+    "lucide-react": "^0.475.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "react-hook-form": "^7.54.2",
+    "react-i18next": "^15.4.0",
+    "react-router-dom": "^7.2.0",
+    "tailwind-merge": "^3.0.1",
+    "zod": "^3.24.2"
+  },
+  "devDependencies": {
+    "@tailwindcss/vite": "^4.0.7",
+    "@types/react": "^19.0.10",
+    "@types/react-dom": "^19.0.4",
+    "@vitejs/plugin-react": "^4.3.4",
+    "tailwindcss": "^4.0.7",
+    "typescript": "^5.7.3",
+    "vite": "^6.1.1",
+    "vite-plugin-pwa": "^0.21.1"
+  }
+}
