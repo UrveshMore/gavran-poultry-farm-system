@@ -34,7 +34,7 @@ Done in this repository. WF-02, counts only. On 2026-10-13 the owner said this f
 
 ## Phase 4 — Incubators
 
-WF-04 equipment records only. Do not hardcode temperature or humidity set-points. Leave them empty until an approved SOP exists. Broody hens are not a substitute for this record; they are the parallel path in Phase 5.
+Done in this repository. WF-04 equipment records only. Temperature and humidity are optional readings with a unit the farm types. No set-point is stored. An incubator can be marked out of service. Broody hens are the parallel path in Phase 5.
 
 ## Phase 5 — Incubation, candling, and broody hens
 

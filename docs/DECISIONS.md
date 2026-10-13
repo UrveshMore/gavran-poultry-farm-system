@@ -25,6 +25,7 @@ Dated 2026-10-13. Technical choices below are provisional engineering defaults f
 | T17 | Canonical Git history remote is https://github.com/UrveshMore/gavran-poultry-farm-system on `main`. | Owner request, 2026-10-13. |
 | T18 | Bird types are names the farm types. Batch status is only `open` or `closed`. Movement types are opening, transfer, sale, mortality, culling, and other exit. A sale has no price field. | Decision 3 is still open, so no species catalog was seeded. |
 | T19 | Egg sorts are names the farm types. Fertile and table are optional labels the screen can create; they are not required rows. A collection may omit batch and shed. Counts are whole eggs. There is no price column. | Owner answer on 2026-10-13, decision 2. |
+| T20 | Incubator temperature and humidity have no default and no set-point. A reading may omit both. A number requires the unit the farm types. Service status is `in_service` or `out_of_service`. | Decision 5 leaves incubation SOPs unanswered. |
 
 ## Still open (blueprint section 18)
 

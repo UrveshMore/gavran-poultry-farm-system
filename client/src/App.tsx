@@ -7,6 +7,7 @@ import { ApiError, fetchMe } from '@/lib/api';
 import { AccountPage, LoginPage, RegisterPage } from '@/pages/AuthPages';
 import { BatchDetailPage, BatchesPage } from '@/pages/BatchPages';
 import { EggsPage } from '@/pages/EggPages';
+import { IncubatorDetailPage, IncubatorsPage } from '@/pages/IncubatorPages';
 import { ActivityPage, FarmCreatePage, FarmProfilePage, FarmsPage, PeoplePage, ShedsPage } from '@/pages/FarmPages';
 
 function RequireAuth() {
@@ -40,6 +41,8 @@ export function App() {
         <Route path="farms/:farmId/sheds" element={<ShedsPage />} />
         <Route path="farms/:farmId/batches" element={<BatchesPage />} />
         <Route path="farms/:farmId/eggs" element={<EggsPage />} />
+        <Route path="farms/:farmId/incubators" element={<IncubatorsPage />} />
+        <Route path="farms/:farmId/incubators/:incubatorId" element={<IncubatorDetailPage />} />
         <Route path="farms/:farmId/batches/:batchId" element={<BatchDetailPage />} />
         <Route path="farms/:farmId/people" element={<PeoplePage />} />
         <Route path="farms/:farmId/activity" element={<ActivityPage />} />

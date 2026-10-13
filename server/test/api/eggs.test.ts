@@ -34,7 +34,7 @@ async function csrf(http: Http): Promise<string> {
   return res.body.data.csrfToken as string;
 }
 
-async function send(http: Http, method: 'post' | 'patch', path: string, body: unknown, headers: Record<string, string> = {}) {
+async function send(http: Http, method: 'post' | 'patch', path: string, body: object, headers: Record<string, string> = {}) {
   const token = await csrf(http);
   const req = http[method](path).set('X-CSRF-Token', token);
   for (const [key, value] of Object.entries(headers)) req.set(key, value);
@@ -48,6 +48,9 @@ async function truncate(): Promise<void> {
     for (const table of [
       'idempotency_keys',
       'audit_logs',
+      'incubator_readings',
+      'incubator_maintenance',
+      'incubators',
       'egg_collection_lines',
       'egg_collections',
       'egg_categories',

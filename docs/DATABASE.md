@@ -36,4 +36,11 @@ MySQL 8.4, `utf8mb4` / `utf8mb4_0900_ai_ci`, session time zone `+00:00`. Migrati
 - `egg_collection_lines` — whole-egg count, `egg_count >= 0`. A line with zero is not inserted.
 - Permissions `000000000112` and `000000000113`: `egg.read`, `egg.record`. Owner, manager, and worker receive both. Vet / advisor receives read only.
 
+## 006 incubators
+
+- `incubators` — code, name, optional egg capacity, `in_service` or `out_of_service`. No set-point columns.
+- `incubator_readings` — optional temperature and humidity values with the unit the farm typed. Power is `on`, `off`, or `unknown`.
+- `incubator_maintenance` — a service change. The incubator status follows the latest change.
+- Permissions `000000000114` through `000000000116`: `incubator.read`, `incubator.record`, `incubator.manage`.
+
 Queries use `mysql2` `execute()` (server-side prepared statements). Audit list `LIMIT` and `OFFSET` are interpolated only after the values are checked as integers, because the binary protocol rejects placeholders there.

@@ -250,6 +250,51 @@ export const eggCollectionInputSchema = z
     }
   });
 
+const optionalMeasure = z
+  .object({
+    value: z.union([z.number({ invalid_type_error: 'invalid_format' }).finite('invalid_format'), z.null()]),
+    unit: z.string().trim().max(16, 'too_big'),
+  })
+  .superRefine((measure, ctx) => {
+    if (measure.value !== null && measure.unit === '') {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'required', path: ['unit'] });
+    }
+    if (measure.value === null && measure.unit !== '') {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'required', path: ['value'] });
+    }
+  });
+
+export const incubatorInputSchema = z.object({
+  code: z
+    .string()
+    .trim()
+    .min(1, 'too_small')
+    .max(32, 'too_big')
+    .regex(/^[A-Za-z0-9][A-Za-z0-9_-]*$/, 'invalid_format'),
+  name: z.string().trim().min(2, 'too_small').max(120, 'too_big'),
+  capacityEggs: z.union([
+    z.number({ invalid_type_error: 'invalid_format' }).int('invalid_format').min(0, 'too_small').max(1_000_000, 'too_big'),
+    z.null(),
+  ]),
+  notes: z.string().trim().max(500, 'too_big'),
+});
+
+export const incubatorReadingInputSchema = z.object({
+  recordedOn: calendarDateSchema,
+  recordedTime: z.union([z.string().regex(/^([01]\d|2[0-3]):[0-5]\d$/, 'invalid_format'), z.literal('')]),
+  temperature: optionalMeasure,
+  humidity: optionalMeasure,
+  powerStatus: z.enum(['on', 'off', 'unknown']),
+  source: z.enum(['manual', 'sensor']),
+  notes: z.string().trim().max(500, 'too_big'),
+});
+
+export const incubatorMaintenanceInputSchema = z.object({
+  occurredOn: calendarDateSchema,
+  status: z.enum(['in_service', 'out_of_service']),
+  notes: z.string().trim().max(500, 'too_big'),
+});
+
 export const closeBatchSchema = z.object({
   version: z.number({ invalid_type_error: 'invalid_format' }).int('invalid_format').positive('too_small'),
 });
@@ -265,6 +310,9 @@ export type MovementInput = z.infer<typeof movementInputSchema>;
 export type CloseBatchInput = z.infer<typeof closeBatchSchema>;
 export type EggCategoryInput = z.infer<typeof eggCategoryInputSchema>;
 export type EggCollectionInput = z.infer<typeof eggCollectionInputSchema>;
+export type IncubatorInput = z.infer<typeof incubatorInputSchema>;
+export type IncubatorReadingInput = z.infer<typeof incubatorReadingInputSchema>;
+export type IncubatorMaintenanceInput = z.infer<typeof incubatorMaintenanceInputSchema>;
 export type RegisterInput = z.infer<typeof registerSchema>;
 export type LoginInput = z.infer<typeof loginSchema>;
 export type FarmInput = z.infer<typeof farmInputSchema>;

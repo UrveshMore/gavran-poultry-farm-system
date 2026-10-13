@@ -70,3 +70,13 @@ A random or foreign farm id is 404.
 `GET|POST /farms/:farmId/egg-categories` — `egg.read` / `egg.record`. The name is text the farm enters. Nothing is seeded. 409 `DUPLICATE_CODE`.
 
 `GET|POST /farms/:farmId/eggs` — `egg.read` / `egg.record`. A collection stores a date, optional batch, optional shed, optional shift label, notes, and whole-egg counts by sort. At least one count must be greater than zero. Create accepts an idempotency key. There is no price field. A future date is 422. A closed or foreign batch, a shed from another farm, or an unknown sort is 422.
+
+## Incubators
+
+`GET|POST /farms/:farmId/incubators` — `incubator.read` / `incubator.manage`. Create accepts an idempotency key. Capacity is an optional egg count the farm types. 409 `DUPLICATE_CODE`.
+
+`GET /farms/:farmId/incubators/:incubatorId` — `incubator.read`. Returns the machine, readings, and service changes.
+
+`POST /farms/:farmId/incubators/:incubatorId/readings` — `incubator.record`. Temperature and humidity may both be null. A number requires a unit. There is no set-point field.
+
+`POST /farms/:farmId/incubators/:incubatorId/maintenance` — `incubator.manage`. Sets `in_service` or `out_of_service`.

@@ -1,4 +1,4 @@
-import { Bird, ClipboardList, Egg, Home, LogOut, Users, Warehouse } from 'lucide-react';
+import { Bird, ClipboardList, Egg, Home, LogOut, Thermometer, Users, Warehouse } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom';
@@ -45,6 +45,7 @@ export function AppShell() {
         { to: `/farms/${farmId}/sheds`, label: t('nav.sheds'), icon: Warehouse, end: false },
         { to: `/farms/${farmId}/batches`, label: t('nav.batches'), icon: Bird, end: false },
         { to: `/farms/${farmId}/eggs`, label: t('nav.eggs'), icon: Egg, end: false },
+        { to: `/farms/${farmId}/incubators`, label: t('nav.incubators'), icon: Thermometer, end: false },
         { to: `/farms/${farmId}/people`, label: t('nav.people'), icon: Users, end: false },
         { to: `/farms/${farmId}/activity`, label: t('nav.activity'), icon: ClipboardList, end: false },
       ]

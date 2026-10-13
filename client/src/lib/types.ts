@@ -112,6 +112,36 @@ export type AuditPage = {
 
 export type EggCategory = { id: string; name: string; status: 'active' | 'archived' };
 
+export type Incubator = {
+  id: string;
+  code: string;
+  name: string;
+  capacityEggs: number | null;
+  status: 'in_service' | 'out_of_service';
+  notes: string | null;
+  version: number;
+};
+
+export type IncubatorReading = {
+  id: string;
+  recordedOn: string;
+  recordedTime: string | null;
+  temperatureValue: number | null;
+  temperatureUnit: string | null;
+  humidityValue: number | null;
+  humidityUnit: string | null;
+  powerStatus: 'on' | 'off' | 'unknown';
+  source: 'manual' | 'sensor';
+  notes: string | null;
+};
+
+export type IncubatorMaintenance = {
+  id: string;
+  occurredOn: string;
+  status: 'in_service' | 'out_of_service';
+  notes: string | null;
+};
+
 export type EggCollection = {
   id: string;
   collectedOn: string;

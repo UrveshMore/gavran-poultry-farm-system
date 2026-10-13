@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.4.0 — 2026-10-13
+
+Phase 4 incubators.
+
+- Equipment records with an optional egg capacity the farm types.
+- Readings may omit temperature and humidity. There is no set-point.
+- A machine can be marked out of service.
+
 ## 0.3.0 — 2026-10-13
 
 Phase 3 egg collection.
