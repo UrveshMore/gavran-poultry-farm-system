@@ -179,6 +179,70 @@ export type FarmTask = {
   overdue: boolean;
 };
 
+export type StockItem = {
+  id: string;
+  name: string;
+  unitLabel: string;
+  reorderLevel: number | null;
+  notes: string | null;
+  onHand: number;
+  belowReorder: boolean;
+};
+
+export type StockMovement = {
+  id: string;
+  itemId: string;
+  itemName: string;
+  unitLabel: string;
+  movementType: 'receipt' | 'use' | 'wastage' | 'reversal';
+  direction: 'in' | 'out';
+  quantity: number;
+  occurredOn: string;
+  batchId: string | null;
+  shedId: string | null;
+  lotCode: string | null;
+  expiresOn: string | null;
+  unitCost: number | null;
+  supplierName: string | null;
+  reason: string | null;
+};
+
+export type WaterRecord = {
+  id: string;
+  recordedOn: string;
+  batchId: string | null;
+  shedId: string | null;
+  quantity: number | null;
+  unitLabel: string | null;
+  sourceNote: string | null;
+  testNote: string | null;
+  notes: string | null;
+  laboratoryResult: boolean;
+};
+
+export type GrowthTarget = {
+  id: string;
+  birdTypeId: string;
+  birdTypeName: string;
+  ageDays: number;
+  targetWeight: number;
+  weightUnit: 'kg' | 'g';
+};
+
+export type Weighing = {
+  id: string;
+  batchId: string;
+  batchCode: string;
+  birdTypeId: string;
+  weighedOn: string;
+  ageDays: number | null;
+  weightValue: number;
+  weightUnit: 'kg' | 'g';
+  birdCount: number | null;
+  notes: string | null;
+  ownerTarget: { ageDays: number; targetWeight: number; weightUnit: 'kg' | 'g' } | null;
+};
+
 export type Incubator = {
   id: string;
   code: string;

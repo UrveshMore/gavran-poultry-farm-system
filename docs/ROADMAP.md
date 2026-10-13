@@ -50,7 +50,7 @@ Done in this repository. WF-08, online only. Offline queue is not part of this p
 
 ## Phase 8 — Feed, water, inventory, and owner-set growth
 
-WF-10, WF-11, WF-12. Quantities and user-entered item names. No prices until the owner enters them. No stock valuation method until decision 7. No feed formula is invented. Target weights for a slower Desi growth curve are numbers the owner types per bird type. There is no built-in standard weight.
+Done in this repository. WF-10, WF-11, WF-12. Quantities and user-entered item names. A price is stored only when the owner types an amount on a receipt. No stock valuation method until decision 7. No feed formula is invented. Target weights are numbers the owner types per bird type and age. There is no built-in standard weight. FCR is not calculated.
 
 ## Phase 9 — Health observations and the disease knowledge base
 

@@ -29,6 +29,7 @@ Dated 2026-10-13. Technical choices below are provisional engineering defaults f
 | T21 | An incubation sitting is `incubator` or `broody_hen`. No expected hatch date is stored or calculated. Candling has no schedule. Outcome labels are typed on the record. | Decision 4 and decision 5 are still open. |
 | T22 | The hatch figure shown in the app is `live chicks ÷ eggs set × 100` and is labelled proposed. It is not decision 4. | Decision 4 is still open. |
 | T23 | Tasks are created by a person. Summer heat, monsoon, and winter templates start with zero steps. No task is generated from batch age. Completion is online only, and a second completion is refused. Proof is a note when the creator asks for one. Photos and offline queues are not in this phase. | Blueprint WF-08 steps 1, 6, and 7 need farm rules this build does not invent. |
+| T24 | Stock on hand is the sum of in and out quantities. A typed amount on a receipt is stored and is not a valuation. Reorder level, item unit, target age, and target weight exist only when the farm types them. Water is a note. A laboratory result is stored only as text the farm types. FCR is not calculated. | Decisions 4 and 7 are still open. FIFO, FEFO, and expiry blocking are not assumed. |
 
 ## Still open (blueprint section 18)
 

@@ -6,6 +6,8 @@ import {
   PERMISSIONS,
   SHED_STATUSES,
   SHED_TYPES,
+  STOCK_DIRECTIONS,
+  STOCK_MOVEMENT_TYPES,
   TASK_SEASONS,
   VOLUME_UNITS,
   WEIGHT_UNITS,
@@ -415,6 +417,97 @@ export const taskCompleteSchema = z.object({
   note: z.string().trim().max(500, 'too_big'),
 });
 
+const optionalQuantity = z.union([
+  z.number({ invalid_type_error: 'invalid_format' }).positive('too_small').max(1_000_000, 'too_big'),
+  z.null(),
+]);
+
+export const stockItemInputSchema = z.object({
+  name: z.string().trim().min(1, 'too_small').max(120, 'too_big'),
+  unitLabel: z.string().trim().min(1, 'too_small').max(32, 'too_big'),
+  reorderLevel: z.union([
+    z.number({ invalid_type_error: 'invalid_format' }).min(0, 'too_small').max(1_000_000, 'too_big'),
+    z.null(),
+  ]),
+  notes: z.string().trim().max(500, 'too_big'),
+});
+
+export const stockMovementInputSchema = z
+  .object({
+    itemId: z.string().uuid('invalid_format'),
+    movementType: z.enum(STOCK_MOVEMENT_TYPES),
+    direction: z.enum(STOCK_DIRECTIONS),
+    quantity: z.number({ invalid_type_error: 'invalid_format' }).positive('too_small').max(1_000_000, 'too_big'),
+    occurredOn: calendarDateSchema,
+    batchId: z.union([z.string().uuid('invalid_format'), z.literal('')]),
+    shedId: z.union([z.string().uuid('invalid_format'), z.literal('')]),
+    lotCode: z.string().trim().max(64, 'too_big'),
+    expiresOn: z.union([calendarDateSchema, z.literal('')]),
+    unitCost: z.union([
+      z.number({ invalid_type_error: 'invalid_format' }).min(0, 'too_small').max(1_000_000_000, 'too_big'),
+      z.null(),
+    ]),
+    supplierName: z.string().trim().max(160, 'too_big'),
+    reason: z.string().trim().max(500, 'too_big'),
+  })
+  .superRefine((value, ctx) => {
+    if (value.movementType === 'receipt' && value.direction !== 'in') {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'invalid_format', path: ['direction'] });
+    }
+    if ((value.movementType === 'use' || value.movementType === 'wastage') && value.direction !== 'out') {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'invalid_format', path: ['direction'] });
+    }
+    if (value.movementType === 'reversal' && value.reason === '') {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'required', path: ['reason'] });
+    }
+    if (value.unitCost !== null && value.movementType !== 'receipt') {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'invalid_format', path: ['unitCost'] });
+    }
+  });
+
+export const waterInputSchema = z
+  .object({
+    recordedOn: calendarDateSchema,
+    batchId: z.union([z.string().uuid('invalid_format'), z.literal('')]),
+    shedId: z.union([z.string().uuid('invalid_format'), z.literal('')]),
+    quantity: optionalQuantity,
+    unitLabel: z.string().trim().max(32, 'too_big'),
+    sourceNote: z.string().trim().max(160, 'too_big'),
+    testNote: z.string().trim().max(500, 'too_big'),
+    notes: z.string().trim().max(500, 'too_big'),
+  })
+  .superRefine((value, ctx) => {
+    if (value.quantity !== null && value.unitLabel === '') {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'required', path: ['unitLabel'] });
+    }
+    if (value.quantity === null && value.unitLabel !== '') {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'required', path: ['quantity'] });
+    }
+  });
+
+export const growthTargetInputSchema = z.object({
+  birdTypeId: z.string().uuid('invalid_format'),
+  ageDays: z.number({ invalid_type_error: 'invalid_format' }).int('invalid_format').min(1, 'too_small').max(10_000, 'too_big'),
+  targetWeight: z.number({ invalid_type_error: 'invalid_format' }).positive('too_small').max(1_000_000, 'too_big'),
+  weightUnit: z.enum(WEIGHT_UNITS),
+});
+
+export const weighingInputSchema = z.object({
+  batchId: z.string().uuid('invalid_format'),
+  weighedOn: calendarDateSchema,
+  ageDays: z.union([
+    z.number({ invalid_type_error: 'invalid_format' }).int('invalid_format').min(1, 'too_small').max(10_000, 'too_big'),
+    z.null(),
+  ]),
+  weightValue: z.number({ invalid_type_error: 'invalid_format' }).positive('too_small').max(1_000_000, 'too_big'),
+  weightUnit: z.enum(WEIGHT_UNITS),
+  birdCount: z.union([
+    z.number({ invalid_type_error: 'invalid_format' }).int('invalid_format').min(1, 'too_small').max(1_000_000, 'too_big'),
+    z.null(),
+  ]),
+  notes: z.string().trim().max(500, 'too_big'),
+});
+
 export const closeBatchSchema = z.object({
   version: z.number({ invalid_type_error: 'invalid_format' }).int('invalid_format').positive('too_small'),
 });
@@ -441,6 +534,11 @@ export type TaskTemplateRenameInput = z.infer<typeof taskTemplateRenameSchema>;
 export type TaskStepInput = z.infer<typeof taskStepInputSchema>;
 export type TaskInput = z.infer<typeof taskInputSchema>;
 export type TaskCompleteInput = z.infer<typeof taskCompleteSchema>;
+export type StockItemInput = z.infer<typeof stockItemInputSchema>;
+export type StockMovementInput = z.infer<typeof stockMovementInputSchema>;
+export type WaterInput = z.infer<typeof waterInputSchema>;
+export type GrowthTargetInput = z.infer<typeof growthTargetInputSchema>;
+export type WeighingInput = z.infer<typeof weighingInputSchema>;
 export type RegisterInput = z.infer<typeof registerSchema>;
 export type LoginInput = z.infer<typeof loginSchema>;
 export type FarmInput = z.infer<typeof farmInputSchema>;

@@ -106,3 +106,15 @@ A random or foreign farm id is 404.
 `GET /farms/:farmId/tasks/:taskId` — `task.read`. A task the caller cannot see is 404.
 
 `POST /farms/:farmId/tasks/:taskId/complete` — `task.complete`. A second completion is 409 `TASK_ALREADY_DONE`. If the task asks for proof, an empty note is 422. There is no offline queue.
+
+## Stock, water, and growth
+
+`GET|POST /farms/:farmId/stock-items` — `stock.read` / `stock.manage`. The name and the unit are text the farm types. Reorder level is optional. The response has `onHand` and no stock value.
+
+`GET|POST /farms/:farmId/stock-movements` — `stock.read` / `stock.record`. Types are `receipt` (in), `use` and `wastage` (out), and `reversal` (in or out, reason required). An out movement above the quantity on hand is 409 `INSUFFICIENT_STOCK`. `unitCost` is accepted only on a receipt and may be null. Movements are not deleted.
+
+`GET|POST /farms/:farmId/water` — `stock.read` / `stock.record`. Quantity and unit are both omitted or both present. `laboratoryResult` is true only when `testNote` is not empty. No schedule is stored.
+
+`GET|POST /farms/:farmId/growth-targets` — `stock.read` / `stock.manage`. Age in days and target weight are numbers the farm types. A repeated age for the same bird type is 409 `DUPLICATE_CODE`.
+
+`GET|POST /farms/:farmId/weighings` — `stock.read` / `stock.record`. Age is optional and is not calculated from a hatch date. If that age has a target the farm typed, the response includes `ownerTarget`. There is no FCR field.

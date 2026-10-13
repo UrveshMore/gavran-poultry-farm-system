@@ -100,7 +100,7 @@ export function errorKey(error: unknown): string | null {
     INCUBATOR_OUT: 'incubation.outOfService',
     INCUBATOR_CAPACITY: 'incubation.capacity',
     EGGS_ALREADY_SET: 'hatch.tooMany',
-    TASK_ALREADY_DONE: 'tasks.alreadyDone',
+    INSUFFICIENT_STOCK: 'stock.insufficient',
     FORBIDDEN: 'common.permissionDenied',
   };
   return keys[error.code] ?? null;

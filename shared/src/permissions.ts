@@ -30,6 +30,9 @@ export const PERMISSIONS = [
   'task.read',
   'task.manage',
   'task.complete',
+  'stock.read',
+  'stock.record',
+  'stock.manage',
 ] as const;
 export type PermissionCode = (typeof PERMISSIONS)[number];
 
@@ -46,6 +49,12 @@ export const VOLUME_UNITS = ['L', 'mL'] as const;
 export type VolumeUnit = (typeof VOLUME_UNITS)[number];
 
 export const CAPACITY_UNIT = 'birds' as const;
+
+export const STOCK_MOVEMENT_TYPES = ['receipt', 'use', 'wastage', 'reversal'] as const;
+export type StockMovementType = (typeof STOCK_MOVEMENT_TYPES)[number];
+
+export const STOCK_DIRECTIONS = ['in', 'out'] as const;
+export type StockDirection = (typeof STOCK_DIRECTIONS)[number];
 
 export const TASK_SEASONS = ['summer_heat', 'monsoon', 'winter'] as const;
 export type TaskSeason = (typeof TASK_SEASONS)[number];
@@ -64,10 +73,10 @@ export type MovementType = (typeof MOVEMENT_TYPES)[number];
  */
 export const ROLE_PERMISSIONS: Record<FarmRole | PlatformRole, readonly PermissionCode[]> = {
   owner: PERMISSIONS,
-  manager: ['farm.read', 'shed.read', 'shed.create', 'shed.update', 'user.read', 'audit.read', 'batch.read', 'batch.create', 'movement.create', 'egg.read', 'egg.record', 'incubator.read', 'incubator.record', 'incubator.manage', 'incubation.read', 'incubation.record', 'hatch.record', 'task.read', 'task.manage', 'task.complete'],
-  worker: ['farm.read', 'shed.read', 'batch.read', 'egg.read', 'egg.record', 'incubator.read', 'incubator.record', 'incubation.read', 'incubation.record', 'hatch.record', 'task.read', 'task.complete'],
+  manager: ['farm.read', 'shed.read', 'shed.create', 'shed.update', 'user.read', 'audit.read', 'batch.read', 'batch.create', 'movement.create', 'egg.read', 'egg.record', 'incubator.read', 'incubator.record', 'incubator.manage', 'incubation.read', 'incubation.record', 'hatch.record', 'task.read', 'task.manage', 'task.complete', 'stock.read', 'stock.record', 'stock.manage'],
+  worker: ['farm.read', 'shed.read', 'batch.read', 'egg.read', 'egg.record', 'incubator.read', 'incubator.record', 'incubation.read', 'incubation.record', 'hatch.record', 'task.read', 'task.complete', 'stock.read', 'stock.record'],
   family_helper: [],
-  vet_advisor: ['farm.read', 'shed.read', 'batch.read', 'egg.read', 'incubator.read', 'incubation.read', 'task.read'],
+  vet_advisor: ['farm.read', 'shed.read', 'batch.read', 'egg.read', 'incubator.read', 'incubation.read', 'task.read', 'stock.read'],
   system_administrator: [],
 };
 

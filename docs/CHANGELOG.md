@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.8.0 — 2026-10-13
+
+Phase 8 feed, water, and growth.
+
+- Stock is a quantity ledger. An amount is stored only when someone types it on a receipt.
+- No stock value and no feed conversion rate are calculated.
+- Target weights and ages are numbers the farm types. There is no standard weight.
+
 ## 0.7.0 — 2026-10-13
 
 Phase 7 tasks.

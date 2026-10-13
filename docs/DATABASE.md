@@ -62,4 +62,13 @@ MySQL 8.4, `utf8mb4` / `utf8mb4_0900_ai_ci`, session time zone `+00:00`. Migrati
 - `task_steps` — a copy of the active template steps at the moment the task was created.
 - Permissions `000000000120` through `000000000122`: `task.read`, `task.manage`, `task.complete`. Owner and manager receive all three. Worker receives read and complete. Vet / advisor receives read only.
 
+## 010 stock
+
+- `stock_items` — a name and a unit label the farm types. Optional reorder level. No price column.
+- `stock_movements` — receipt, use, wastage, or reversal. Quantity is always positive, with direction `in` or `out`. `unit_cost` is nullable and is not a valuation. Rows are not deleted.
+- `water_records` — optional quantity and unit together. `test_note` is a laboratory result only when the farm typed one. No schedule.
+- `growth_targets` — age in days and target weight the farm types for a bird type. No standard weight is seeded.
+- `growth_weighings` — a measured weight. `age_days` is nullable and is not derived from a hatch date.
+- Permissions `000000000123` through `000000000125`: `stock.read`, `stock.record`, `stock.manage`. Owner and manager receive all three. Worker receives read and record. Vet / advisor receives read only.
+
 Queries use `mysql2` `execute()` (server-side prepared statements). Audit list `LIMIT` and `OFFSET` are interpolated only after the values are checked as integers, because the binary protocol rejects placeholders there.
