@@ -693,6 +693,22 @@ export const taskTrainingRequirementSchema = z.object({
   itemId: z.string().uuid('invalid_format'),
 });
 
+export const parentageInputSchema = z
+  .object({
+    recordedOn: calendarDateSchema,
+    offspringBatchId: z.union([z.string().uuid('invalid_format'), z.literal('')]),
+    sireNote: z.string().trim().max(160, 'too_big'),
+    damNote: z.string().trim().max(160, 'too_big'),
+    sireBatchId: z.union([z.string().uuid('invalid_format'), z.literal('')]),
+    damBatchId: z.union([z.string().uuid('invalid_format'), z.literal('')]),
+    note: z.string().trim().max(500, 'too_big'),
+  })
+  .superRefine((value, ctx) => {
+    if (value.sireNote === '' && value.damNote === '' && value.sireBatchId === '' && value.damBatchId === '') {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'required', path: ['sireNote'] });
+    }
+  });
+
 export const expenseReversalSchema = z.object({
   occurredOn: calendarDateSchema,
   note: z.string().trim().min(1, 'too_small').max(500, 'too_big'),
@@ -746,6 +762,7 @@ export type TrainingItemInput = z.infer<typeof trainingItemInputSchema>;
 export type TrainingAssignmentInput = z.infer<typeof trainingAssignmentInputSchema>;
 export type TrainingCompletionInput = z.infer<typeof trainingCompletionSchema>;
 export type TaskTrainingRequirementInput = z.infer<typeof taskTrainingRequirementSchema>;
+export type ParentageInput = z.infer<typeof parentageInputSchema>;
 export type CustomerInput = z.infer<typeof customerInputSchema>;
 export type MarketPriceInput = z.infer<typeof marketPriceInputSchema>;
 export type OrderInput = z.infer<typeof orderInputSchema>;

@@ -27,6 +27,7 @@ import { healthRoutes } from './modules/health/routes.js';
 import { stockRoutes } from './modules/stock/routes.js';
 import { taskRoutes } from './modules/tasks/routes.js';
 import { workforceRoutes } from './modules/workforce/routes.js';
+import { parentageRoutes } from './modules/parentage/routes.js';
 
 export function createApp() {
   const app = express();
@@ -65,6 +66,7 @@ export function createApp() {
   app.use('/api/v1/farms', hatchRoutes);
   app.use('/api/v1/farms', taskRoutes);
   app.use('/api/v1/farms', workforceRoutes);
+  app.use('/api/v1/farms', parentageRoutes);
   app.use('/api/v1/farms', stockRoutes);
   app.use('/api/v1/farms', healthRoutes);
   app.use('/api/v1/farms', lossRoutes);

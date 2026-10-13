@@ -36,7 +36,7 @@ beforeEach(async () => {
   try {
     await conn.query('SET FOREIGN_KEY_CHECKS = 0');
     for (const table of [
-      'task_training_requirements', 'training_completions', 'training_assignments', 'training_items', 'attendance_records',
+      'parentage_records', 'task_training_requirements', 'training_completions', 'training_assignments', 'training_items', 'attendance_records',
       'idempotency_keys', 'audit_logs', 'expense_entries', 'expense_categories', 'order_lines', 'orders', 'market_prices', 'customers',
       'loss_incidents', 'medicine_records', 'health_observations', 'biosecurity_steps', 'knowledge_approvals',
       'growth_weighings', 'growth_targets', 'water_records', 'stock_movements', 'stock_items',

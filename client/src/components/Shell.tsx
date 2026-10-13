@@ -1,4 +1,4 @@
-import { BarChart3, Bird, ClipboardList, Egg, Feather, GraduationCap, Home, ListTodo, LogOut, Receipt, Shield, ShieldAlert, ShoppingBasket, Stethoscope, Thermometer, Users, Warehouse, Wheat } from 'lucide-react';
+import { BarChart3, Bird, ClipboardList, Egg, Feather, GitBranch, GraduationCap, Home, ListTodo, LogOut, Receipt, Shield, ShieldAlert, ShoppingBasket, Stethoscope, Thermometer, Users, Warehouse, Wheat } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom';
@@ -49,6 +49,7 @@ export function AppShell() {
         { to: `/farms/${farmId}/incubation`, label: t('nav.incubation'), icon: Feather, end: false },
         { to: `/farms/${farmId}/tasks`, label: t('nav.tasks'), icon: ListTodo, end: false },
         { to: `/farms/${farmId}/workforce`, label: t('nav.workforce'), icon: GraduationCap, end: false },
+        { to: `/farms/${farmId}/parentage`, label: t('nav.parentage'), icon: GitBranch, end: false },
         { to: `/farms/${farmId}/stock`, label: t('nav.stock'), icon: Wheat, end: false },
         { to: `/farms/${farmId}/health`, label: t('nav.health'), icon: Stethoscope, end: false },
         { to: `/farms/${farmId}/losses`, label: t('nav.losses'), icon: ShieldAlert, end: false },

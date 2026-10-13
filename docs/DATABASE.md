@@ -124,4 +124,9 @@ There is no backup table. `npm run restore-drill -w @gavran/server` creates `gav
 - `training_completions` — one row per assignment.
 - `task_training_requirements` — optional link from a task to a training item.
 
+## 018 parentage
+
+- Permissions `000000000142` and `000000000143`: `breeding.read`, `breeding.record`. Owner, manager, and worker receive both. Vet / advisor receives `breeding.read`.
+- `parentage_records` — typed sire and dam text, optional batch links on the same farm. No coefficient column.
+
 Queries use `mysql2` `execute()` (server-side prepared statements). Audit list `LIMIT` and `OFFSET` are interpolated only after the values are checked as integers, because the binary protocol rejects placeholders there.

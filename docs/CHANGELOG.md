@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.17.0 — 2026-10-13
+
+Phase 16 parentage.
+
+- A sire or a dam is text, or a batch on the same farm.
+- No pairing rule is stored.
+
 ## 0.16.0 — 2026-10-13
 
 Phase 15 attendance and training.

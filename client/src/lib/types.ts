@@ -455,6 +455,23 @@ export type TrainingAssignment = {
   completionNote: string | null;
 };
 
+export type ParentagePage = {
+  records: Array<{
+    id: string;
+    recordedOn: string;
+    offspringBatchId: string | null;
+    offspringCode: string | null;
+    sireNote: string;
+    damNote: string;
+    sireBatchId: string | null;
+    sireCode: string | null;
+    damBatchId: string | null;
+    damCode: string | null;
+    note: string;
+  }>;
+  pairing: { status: 'unset' };
+};
+
 export type TrainingPage = {
   items: TrainingItem[];
   assignments: TrainingAssignment[];

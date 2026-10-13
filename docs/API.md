@@ -191,6 +191,10 @@ The restore drill is the server command `npm run restore-drill -w @gavran/server
 
 `POST /farms/:farmId/tasks/:taskId/training-requirements` — `training.manage`. Completing that task is 409 `TRAINING_REQUIRED` until the person finishing it has a completion for the item.
 
+## Parentage
+
+`GET|POST /farms/:farmId/parentage` — `breeding.read` / `breeding.record`. At least one of `sireNote`, `damNote`, `sireBatchId`, or `damBatchId` is required. Batch ids must belong to the farm. `recordedOn` is not in the future. `pairing.status` is `unset`. There is no coefficient. Rows are not edited or deleted.
+
 ## Flock details
 
 `GET|POST /farms/:farmId/range-areas` — `batch.read` / `movement.create`. A name the farm types. None are seeded. This is not a shed.

@@ -38,6 +38,7 @@ Dated 2026-10-13. Technical choices below are provisional engineering defaults f
 | T30 | The restore drill is allowed only on `gavran_restore_drill`. RPO, RTO, backup schedule, off-site copy, and retention are null or `not_chosen`. | Decisions 12 and 15 are still open. |
 | T31 | A range area is a named place, not a shed, and has no capacity. Strain is optional text on a bird type. Rooster and hen counts are stored as typed integers and returned as those two numbers. | Decision 3 stays open. No breed list and no recommended ratio. |
 | T32 | Attendance stores a method label the farm types. The response count is a row count. Training stores a version label the farm types. A task link blocks completion until that person has a completion row. There is no score and no course catalog. | Blueprint WF-16. No performance formula was chosen. |
+| T33 | Parentage stores typed sire and dam text and optional batch ids on the same farm. `pairing.status` is `unset`. | Decision 3 stays open. No coefficient. |
 
 ## Still open (blueprint section 18)
 
