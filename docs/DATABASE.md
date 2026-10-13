@@ -115,4 +115,13 @@ There is no backup table. `npm run restore-drill -w @gavran/server` creates `gav
 - `batch_movements` gains `to_range` and `from_range`, plus optional range-area links. An exit may start from a range area.
 - `sex_counts` — rooster count and hen count the farm types. No ratio column and no recommended value.
 
+## 017 attendance and training
+
+- Permissions `000000000137` through `000000000141`: `attendance.read`, `attendance.record`, `training.read`, `training.manage`, `training.complete`. Owner and manager receive all five. A worker receives all except `training.manage`. Vet / advisor receives none.
+- `attendance_records` — date, optional clock time, method label, note. No unique day. No score.
+- `training_items` — title, body, version label. Unique per farm, title, and version.
+- `training_assignments` — one row per item and person. Due date may be null.
+- `training_completions` — one row per assignment.
+- `task_training_requirements` — optional link from a task to a training item.
+
 Queries use `mysql2` `execute()` (server-side prepared statements). Audit list `LIMIT` and `OFFSET` are interpolated only after the values are checked as integers, because the binary protocol rejects placeholders there.

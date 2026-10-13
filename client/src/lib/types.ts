@@ -428,6 +428,39 @@ export type IncubatorMaintenance = {
   notes: string | null;
 };
 
+export type AttendancePage = {
+  records: Array<{
+    id: string;
+    userId: string;
+    displayName: string;
+    attendedOn: string;
+    attendedTime: string | null;
+    methodLabel: string;
+    note: string;
+  }>;
+  metric: { kind: 'row_count'; rowCount: number };
+};
+
+export type TrainingItem = { id: string; title: string; body: string; versionLabel: string };
+
+export type TrainingAssignment = {
+  id: string;
+  itemId: string;
+  itemTitle: string;
+  versionLabel: string;
+  userId: string;
+  displayName: string;
+  dueOn: string | null;
+  completionId: string | null;
+  completionNote: string | null;
+};
+
+export type TrainingPage = {
+  items: TrainingItem[];
+  assignments: TrainingAssignment[];
+  requirements: Array<{ id: string; taskId: string; taskTitle: string; itemId: string; itemTitle: string }>;
+};
+
 export type EggCollection = {
   id: string;
   collectedOn: string;

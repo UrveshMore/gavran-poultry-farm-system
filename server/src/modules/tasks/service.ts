@@ -16,6 +16,7 @@ import type { AuthUser } from '../auth/types.js';
 import { todayInTimeZone } from '../batches/service.js';
 import type { FarmAccess } from '../farms/access.js';
 import { findFarmById } from '../farms/repository.js';
+import { actorMissingTraining } from '../workforce/repository.js';
 import {
   completeTask,
   findActiveMember,
@@ -244,6 +245,9 @@ export async function finishTask(actor: Actor, access: FarmAccess, taskId: strin
     if (visible.status === 'done') throw new AppError(409, 'TASK_ALREADY_DONE', 'That task is already complete.');
     if (visible.proofRequired && input.note === '') {
       throw new AppError(422, 'VALIDATION_ERROR', 'This task asks for a note.', { fields: { note: 'required' } });
+    }
+    if (await actorMissingTraining(conn, access.farmId, taskId, actor.user.id)) {
+      throw new AppError(409, 'TRAINING_REQUIRED', 'Finish the linked training before this task.');
     }
     const updated = await completeTask(conn, access.farmId, taskId, input.note === '' ? null : input.note, actor.user.id);
     if (!updated) throw new AppError(409, 'TASK_ALREADY_DONE', 'That task is already complete.');

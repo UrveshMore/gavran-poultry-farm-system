@@ -44,6 +44,11 @@ UI navigation inside a farm still shows Sheds, Batches, Eggs, People, and Activi
 | `expense.read` | View expense and income rows. |
 | `expense.record` | Add a category, an amount, or a reversing entry. |
 | `report.read` | View a date-range report of source rows. |
+| `attendance.read` | View attendance rows. A worker sees only their own. |
+| `attendance.record` | Add an attendance row. A worker adds a row only for themselves. |
+| `training.read` | View training items. A worker sees only their own assignments. |
+| `training.manage` | Add a training item, an assignment, or a task link. |
+| `training.complete` | Mark your own assignment finished. |
 
 `GET /api/v1/farms` lists farms the caller belongs to, including farms where they have zero permissions. It does not include contact details.
 
@@ -55,7 +60,7 @@ Pending owner confirmation. Seeded by the versioned migrations and mirrored in `
 |---|---|
 | Owner | All keys in the catalog. |
 | Manager | Farm operations in the catalog except `user.manage` and `farm.update`. |
-| Worker | `farm.read`, `shed.read`, `batch.read`, `egg.read`, `egg.record`, `incubator.read`, `incubator.record`, `incubation.read`, `incubation.record`, `hatch.record`, `task.read`, `task.complete`, `stock.read`, `stock.record`, `health.read`, `health.record`, `loss.read`, `loss.record`. A worker sees tasks assigned to them. |
+| Worker | `farm.read`, `shed.read`, `batch.read`, `egg.read`, `egg.record`, `incubator.read`, `incubator.record`, `incubation.read`, `incubation.record`, `hatch.record`, `task.read`, `task.complete`, `stock.read`, `stock.record`, `health.read`, `health.record`, `loss.read`, `loss.record`, `attendance.read`, `attendance.record`, `training.read`, `training.complete`. A worker sees tasks assigned to them, their own attendance, and their own training assignments. |
 | Vet / advisor | `farm.read`, `shed.read`, `batch.read`, `egg.read`, `incubator.read`, `incubation.read`, `task.read`, `stock.read`, `health.read`, `health.record`, `loss.read`. |
 | Family helper | None from the role. Optional grants on that membership only. |
 | System administrator | None. |

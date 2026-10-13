@@ -177,6 +177,20 @@ Sections:
 
 The restore drill is the server command `npm run restore-drill -w @gavran/server`. It is not an HTTP route.
 
+## Attendance and training
+
+`GET|POST /farms/:farmId/attendance` — `attendance.read` / `attendance.record`. `methodLabel` is required and typed. `attendedTime` may be blank. `attendedOn` is not in the future for the farm timezone. A worker may omit `userId` or send their own, and a row for someone else is 403. Owner and manager may name an active member. `metric` is `{ kind: "row_count", rowCount }`. There is no score. Rows are not edited or deleted.
+
+`GET /farms/:farmId/training` — `training.read`. Items, assignments, and task links. A worker sees only their own assignments.
+
+`POST /farms/:farmId/training-items` — `training.manage`. `versionLabel` is required. A repeated title and version is 409 `DUPLICATE_CODE`.
+
+`POST /farms/:farmId/training-assignments` — `training.manage`. `dueOn` may be blank or a future date. A second assignment of the same item to the same person is 409 `DUPLICATE_CODE`.
+
+`POST /farms/:farmId/training-assignments/:assignmentId/completion` — `training.complete`. Only the assigned person. A second completion is 409 `TRAINING_ALREADY_DONE`. The note is typed. There is no score.
+
+`POST /farms/:farmId/tasks/:taskId/training-requirements` — `training.manage`. Completing that task is 409 `TRAINING_REQUIRED` until the person finishing it has a completion for the item.
+
 ## Flock details
 
 `GET|POST /farms/:farmId/range-areas` — `batch.read` / `movement.create`. A name the farm types. None are seeded. This is not a shed.

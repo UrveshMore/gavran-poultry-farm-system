@@ -84,6 +84,10 @@ Done in this repository.
 - A bird type can carry a strain note the farm types. No breed catalog is seeded. Saying the flock is Desi/Gavran does not fill in strains.
 - Rooster and hen counts are numbers the farm types. The ratio is those two numbers. There is no recommended ratio.
 
+## Phase 15 — Attendance and training
+
+Done in this repository. WF-16. An attendance row stores the date, an optional clock time, the check method the farm types, and a note. A second row is a correction. Nothing is edited or deleted. The count of rows is not a score. A worker adds and reads only their own rows. A training item stores the title, the text, and a version label the farm types. An assignment may have a future due date. Finishing it once stores a note and no score. A task can require that item. The person finishing the task must have finished the item first. No course list is seeded.
+
 ## Explicitly later
 
-P1 and P2 in the blueprint (attendance, breeding beyond the counts above, invoices, offline sync, notifications, AI, IoT, portals) wait until P0 is accepted. Offline capture must not silently merge stock, finance, mortality, or treatment records. Medical and feeding standards stay owner-editable and sourced. Nothing in those standards is invented.
+P1 continues with breeding and parentage, supplier workflows, invoice documents and returns, advanced reports, in-app notifications, documents, PWA install, offline-safe capture, multilingual polish, search, and scheduled reports. P2 (AI image triage, weather, voice, sensors, forecasting, portals, farm map, route planning, a native app, custom model training) stays unstarted. Offline capture must not silently merge stock, finance, mortality, or treatment records. Medical and feeding standards stay owner-editable and sourced. Nothing in those standards is invented. Invoice posting stays off until the farm decides when a sale is posted.

@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.16.0 — 2026-10-13
+
+Phase 15 attendance and training.
+
+- An attendance row stores the method the farm types. The row count is not a score.
+- A worker reads and writes only their own attendance.
+- Training stores a version label the farm types. A task can wait until that training is finished. There is no score.
+
 ## 0.15.0 — 2026-10-13
 
 Desi flock details after P0.

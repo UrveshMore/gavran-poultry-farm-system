@@ -654,6 +654,45 @@ export const expenseEntryInputSchema = z.object({
   batchId: z.union([z.string().uuid('invalid_format'), z.literal('')]),
 });
 
+const clockTime = z
+  .string()
+  .trim()
+  .max(5, 'too_big')
+  .refine((value) => value === '' || /^([01]\d|2[0-3]):[0-5]\d$/.test(value), 'invalid_format');
+
+const optionalDay = z
+  .string()
+  .trim()
+  .refine((value) => value === '' || calendarDateSchema.safeParse(value).success, 'invalid_format');
+
+export const attendanceInputSchema = z.object({
+  userId: z.union([z.string().uuid('invalid_format'), z.literal('')]),
+  attendedOn: calendarDateSchema,
+  attendedTime: clockTime,
+  methodLabel: z.string().trim().min(1, 'required').max(80, 'too_big'),
+  note: z.string().trim().max(500, 'too_big'),
+});
+
+export const trainingItemInputSchema = z.object({
+  title: z.string().trim().min(2, 'too_small').max(160, 'too_big'),
+  body: z.string().trim().min(1, 'required').max(4000, 'too_big'),
+  versionLabel: z.string().trim().min(1, 'required').max(40, 'too_big'),
+});
+
+export const trainingAssignmentInputSchema = z.object({
+  itemId: z.string().uuid('invalid_format'),
+  userId: z.string().uuid('invalid_format'),
+  dueOn: optionalDay,
+});
+
+export const trainingCompletionSchema = z.object({
+  note: z.string().trim().max(500, 'too_big'),
+});
+
+export const taskTrainingRequirementSchema = z.object({
+  itemId: z.string().uuid('invalid_format'),
+});
+
 export const expenseReversalSchema = z.object({
   occurredOn: calendarDateSchema,
   note: z.string().trim().min(1, 'too_small').max(500, 'too_big'),
@@ -702,6 +741,11 @@ export type ReportRange = z.infer<typeof reportRangeSchema>;
 export type ExpenseCategoryInput = z.infer<typeof expenseCategoryInputSchema>;
 export type ExpenseEntryInput = z.infer<typeof expenseEntryInputSchema>;
 export type ExpenseReversalInput = z.infer<typeof expenseReversalSchema>;
+export type AttendanceInput = z.infer<typeof attendanceInputSchema>;
+export type TrainingItemInput = z.infer<typeof trainingItemInputSchema>;
+export type TrainingAssignmentInput = z.infer<typeof trainingAssignmentInputSchema>;
+export type TrainingCompletionInput = z.infer<typeof trainingCompletionSchema>;
+export type TaskTrainingRequirementInput = z.infer<typeof taskTrainingRequirementSchema>;
 export type CustomerInput = z.infer<typeof customerInputSchema>;
 export type MarketPriceInput = z.infer<typeof marketPriceInputSchema>;
 export type OrderInput = z.infer<typeof orderInputSchema>;

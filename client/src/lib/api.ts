@@ -104,6 +104,8 @@ export function errorKey(error: unknown): string | null {
     ENTRY_UNAPPROVED: 'health.unapproved',
     INVOICE_POSTING_DISABLED: 'sales.invoiceOff',
     ALREADY_REVERSED: 'expenses.alreadyReversed',
+    TRAINING_REQUIRED: 'workforce.required',
+    TRAINING_ALREADY_DONE: 'workforce.alreadyDone',
     FORBIDDEN: 'common.permissionDenied',
   };
   return keys[error.code] ?? null;

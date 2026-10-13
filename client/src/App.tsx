@@ -18,6 +18,7 @@ import { SalesPage } from '@/pages/SalesPages';
 import { HealthPage } from '@/pages/HealthPages';
 import { StockPage } from '@/pages/StockPages';
 import { TaskDetailPage, TasksPage } from '@/pages/TaskPages';
+import { WorkforcePage } from '@/pages/WorkforcePages';
 
 function RequireAuth() {
   const { t } = useTranslation();
@@ -56,6 +57,7 @@ export function App() {
         <Route path="farms/:farmId/incubation/:sittingId" element={<IncubationDetailPage />} />
         <Route path="farms/:farmId/batches/:batchId" element={<BatchDetailPage />} />
         <Route path="farms/:farmId/tasks" element={<TasksPage />} />
+        <Route path="farms/:farmId/workforce" element={<WorkforcePage />} />
         <Route path="farms/:farmId/tasks/:taskId" element={<TaskDetailPage />} />
         <Route path="farms/:farmId/stock" element={<StockPage />} />
         <Route path="farms/:farmId/health" element={<HealthPage />} />
