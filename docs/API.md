@@ -88,3 +88,5 @@ A random or foreign farm id is 404.
 `GET /farms/:farmId/incubation/:sittingId` — `incubation.read`.
 
 `POST /farms/:farmId/incubation/:sittingId/candling` — `incubation.record`. Outcome labels are text on that record. Their counts must equal `inspectedCount`. A second record does not replace the first.
+
+`POST /farms/:farmId/incubation/:sittingId/hatches` — `hatch.record`. Live chicks above zero open a chick batch. Counts that do not add up to eggs set need `differenceNote`. More eggs than the sitting still has is 409 `EGGS_ALREADY_SET`. The response includes `proposedHatchRate` with status `proposed`.

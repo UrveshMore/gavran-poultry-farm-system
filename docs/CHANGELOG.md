@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.6.0 — 2026-10-13
+
+Phase 6 hatch.
+
+- A hatch can open a chick batch from live chicks.
+- The hatch rate is labelled proposed: live chicks ÷ eggs set × 100.
+
 ## 0.5.0 — 2026-10-13
 
 Phase 5 incubation.

@@ -99,6 +99,7 @@ export function errorKey(error: unknown): string | null {
     BIRDS_REMAIN: 'batches.birdsRemain',
     INCUBATOR_OUT: 'incubation.outOfService',
     INCUBATOR_CAPACITY: 'incubation.capacity',
+    EGGS_ALREADY_SET: 'hatch.tooMany',
     FORBIDDEN: 'common.permissionDenied',
   };
   return keys[error.code] ?? null;

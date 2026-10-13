@@ -49,4 +49,9 @@ MySQL 8.4, `utf8mb4` / `utf8mb4_0900_ai_ci`, session time zone `+00:00`. Migrati
 - `candling_records` and `candling_lines` — each look is its own record. Line labels are text, not a seeded list.
 - Permissions `000000000117` and `000000000118`: `incubation.read`, `incubation.record`. Vet / advisor receives read only.
 
+## 008 hatch
+
+- `hatch_records` — eggs set, live chicks, losses, other, optional difference note, optional chick batch. No approved rate column.
+- Permission `000000000119`: `hatch.record` for owner, manager, and worker.
+
 Queries use `mysql2` `execute()` (server-side prepared statements). Audit list `LIMIT` and `OFFSET` are interpolated only after the values are checked as integers, because the binary protocol rejects placeholders there.

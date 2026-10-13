@@ -1,0 +1,5 @@
+DROP TABLE IF EXISTS hatch_records;
+
+DELETE FROM membership_permission_grants WHERE permission_id = '00000000-0000-4000-8000-000000000119';
+DELETE FROM role_permissions WHERE permission_id = '00000000-0000-4000-8000-000000000119';
+DELETE FROM permissions WHERE id = '00000000-0000-4000-8000-000000000119';

@@ -9,6 +9,7 @@ import type { AuthUser } from '../auth/types.js';
 import { todayInTimeZone } from '../batches/service.js';
 import type { FarmAccess } from '../farms/access.js';
 import { findFarmById } from '../farms/repository.js';
+import { listHatches } from '../hatch/repository.js';
 import { findIncubatorForLoad, findOpenSitting, insertCandling, insertSitting, listCandling, listSittings } from './repository.js';
 
 type Actor = { user: AuthUser; requestId: string };
@@ -27,7 +28,7 @@ export async function getSittings(farmId: string) {
 export async function getSitting(farmId: string, sittingId: string) {
   const sitting = (await listSittings(pool, farmId)).find((item) => item.id === sittingId);
   if (!sitting) throw new AppError(404, 'NOT_FOUND', 'Not found.');
-  return { sitting, candling: await listCandling(pool, farmId, sittingId) };
+  return { sitting, candling: await listCandling(pool, farmId, sittingId), hatches: await listHatches(pool, farmId, sittingId) };
 }
 
 export async function createSitting(actor: Actor, access: FarmAccess, body: unknown, idempotency: IdempotencyInput) {

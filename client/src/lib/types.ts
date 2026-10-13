@@ -123,6 +123,26 @@ export type Sitting = {
   status: 'open' | 'closed';
 };
 
+export type HatchRecord = {
+  id: string;
+  hatchedOn: string;
+  eggsSet: number;
+  liveChicks: number;
+  losses: number;
+  otherCount: number;
+  differenceNote: string | null;
+  chickBatchId: string | null;
+  chickBatchCode: string | null;
+};
+
+export type ProposedHatchRate = {
+  status: 'proposed';
+  formula: string;
+  liveChicks: number;
+  eggsSet: number;
+  percent: number | null;
+};
+
 export type CandlingRecord = {
   id: string;
   observedOn: string;

@@ -47,6 +47,7 @@ async function truncate(): Promise<void> {
     for (const table of [
       'idempotency_keys',
       'audit_logs',
+      'hatch_records',
       'candling_lines',
       'candling_records',
       'incubation_batches',
@@ -265,5 +266,79 @@ describe('incubation', () => {
       ).status,
     ).toBe(403);
     expect((await http.get('/api/v1/farms/00000000-0000-4000-8000-000000009999/incubation')).status).toBe(404);
+  });
+
+  it('opens a chick batch from live chicks and labels the hatch rate as proposed', async () => {
+    const { http, farmId, today } = await ownerFarm();
+    const shed = await send(http, 'post', `/api/v1/farms/${farmId}/sheds`, {
+      code: 'A1',
+      name: 'Brooder',
+      shedType: 'brooder',
+      usableCapacity: 20,
+      status: 'active',
+      notes: '',
+    });
+    expect(shed.status).toBe(201);
+    const type = await send(http, 'post', `/api/v1/farms/${farmId}/bird-types`, { name: 'Gavran desi' });
+    expect(type.status).toBe(201);
+    const sitting = await send(http, 'post', `/api/v1/farms/${farmId}/incubation`, {
+      code: 'S1',
+      mode: 'broody_hen',
+      incubatorId: '',
+      henName: 'Kaveri',
+      startedOn: today,
+      eggCount: 10,
+      notes: '',
+    });
+    expect(sitting.status).toBe(201);
+    const sittingId = sitting.body.data.id as string;
+    const uneven = await send(http, 'post', `/api/v1/farms/${farmId}/incubation/${sittingId}/hatches`, {
+      hatchedOn: today,
+      eggsSet: 10,
+      liveChicks: 6,
+      losses: 2,
+      otherCount: 0,
+      differenceNote: '',
+      batchCode: '',
+      birdTypeId: '',
+      shedId: '',
+    });
+    expect(uneven.status).toBe(422);
+    const hatched = await send(http, 'post', `/api/v1/farms/${farmId}/incubation/${sittingId}/hatches`, {
+      hatchedOn: today,
+      eggsSet: 10,
+      liveChicks: 6,
+      losses: 2,
+      otherCount: 2,
+      differenceNote: '',
+      batchCode: 'C1',
+      birdTypeId: type.body.data.id,
+      shedId: shed.body.data.id,
+    });
+    expect(hatched.status).toBe(201);
+    expect(hatched.body.data.hatch.chickBatchCode).toBe('C1');
+    expect(hatched.body.data.hatch.liveChicks).toBe(6);
+    expect(hatched.body.data.proposedHatchRate).toEqual({
+      status: 'proposed',
+      formula: 'live chicks ÷ eggs set × 100',
+      liveChicks: 6,
+      eggsSet: 10,
+      percent: 60,
+    });
+    const batch = await http.get(`/api/v1/farms/${farmId}/batches/${hatched.body.data.hatch.chickBatchId}`);
+    expect(batch.body.data.batch.liveCount).toBe(6);
+    const over = await send(http, 'post', `/api/v1/farms/${farmId}/incubation/${sittingId}/hatches`, {
+      hatchedOn: today,
+      eggsSet: 1,
+      liveChicks: 0,
+      losses: 1,
+      otherCount: 0,
+      differenceNote: '',
+      batchCode: '',
+      birdTypeId: '',
+      shedId: '',
+    });
+    expect(over.status).toBe(409);
+    expect(over.body.error.code).toBe('EGGS_ALREADY_SET');
   });
 });

@@ -14,6 +14,7 @@ import { requestContext, requestLogger } from './middleware/context.js';
 import { authRoutes } from './modules/auth/routes.js';
 import { batchRoutes } from './modules/batches/routes.js';
 import { eggRoutes } from './modules/eggs/routes.js';
+import { hatchRoutes } from './modules/hatch/routes.js';
 import { incubationRoutes } from './modules/incubation/routes.js';
 import { incubatorRoutes } from './modules/incubators/routes.js';
 import { farmRoutes } from './modules/farms/routes.js';
@@ -52,6 +53,7 @@ export function createApp() {
   app.use('/api/v1/farms', eggRoutes);
   app.use('/api/v1/farms', incubatorRoutes);
   app.use('/api/v1/farms', incubationRoutes);
+  app.use('/api/v1/farms', hatchRoutes);
   app.use(notFound);
   app.use(errorHandler);
   return app;

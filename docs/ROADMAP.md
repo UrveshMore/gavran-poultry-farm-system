@@ -42,7 +42,7 @@ Done in this repository. A sitting is either an in-service incubator or a named 
 
 ## Phase 6 — Hatch
 
-WF-06. A hatch from an incubator or from a broody hen links eggs to a new chick batch. Hatch-rate formula stays labelled proposed until decision 4 is answered.
+Done in this repository. A hatch from an open sitting records eggs set, live chicks, losses, and other. If those counts do not add up, a note is required. Live chicks open a chick batch. The rate live chicks ÷ eggs set × 100 is labelled proposed. It is not an approved formula.
 
 ## Phase 7 — Tasks and seasonal checklists
 

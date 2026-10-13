@@ -348,6 +348,42 @@ export const candlingInputSchema = z
     }
   });
 
+export const hatchInputSchema = z
+  .object({
+    hatchedOn: calendarDateSchema,
+    eggsSet: z.number({ invalid_type_error: 'invalid_format' }).int('invalid_format').min(0, 'too_small').max(1_000_000, 'too_big'),
+    liveChicks: z.number({ invalid_type_error: 'invalid_format' }).int('invalid_format').min(0, 'too_small').max(1_000_000, 'too_big'),
+    losses: z.number({ invalid_type_error: 'invalid_format' }).int('invalid_format').min(0, 'too_small').max(1_000_000, 'too_big'),
+    otherCount: z.number({ invalid_type_error: 'invalid_format' }).int('invalid_format').min(0, 'too_small').max(1_000_000, 'too_big'),
+    differenceNote: z.string().trim().max(500, 'too_big'),
+    batchCode: z.string().trim().max(32, 'too_big'),
+    birdTypeId: z.union([z.string().uuid('invalid_format'), z.literal('')]),
+    shedId: z.union([z.string().uuid('invalid_format'), z.literal('')]),
+  })
+  .superRefine((value, ctx) => {
+    const counted = value.liveChicks + value.losses + value.otherCount;
+    if (counted !== value.eggsSet && value.differenceNote === '') {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'required', path: ['differenceNote'] });
+    }
+    if (value.liveChicks > 0) {
+      if (!/^[A-Za-z0-9][A-Za-z0-9_-]*$/.test(value.batchCode)) {
+        ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'invalid_format', path: ['batchCode'] });
+      }
+      if (value.birdTypeId === '') ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'required', path: ['birdTypeId'] });
+      if (value.shedId === '') ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'required', path: ['shedId'] });
+    }
+  });
+
+export function proposedHatchRate(liveChicks: number, eggsSet: number) {
+  return {
+    status: 'proposed' as const,
+    formula: 'live chicks ÷ eggs set × 100',
+    liveChicks,
+    eggsSet,
+    percent: eggsSet === 0 ? null : Math.round((liveChicks * 1000) / eggsSet) / 10,
+  };
+}
+
 export const closeBatchSchema = z.object({
   version: z.number({ invalid_type_error: 'invalid_format' }).int('invalid_format').positive('too_small'),
 });
@@ -367,6 +403,7 @@ export type IncubatorInput = z.infer<typeof incubatorInputSchema>;
 export type IncubatorReadingInput = z.infer<typeof incubatorReadingInputSchema>;
 export type IncubatorMaintenanceInput = z.infer<typeof incubatorMaintenanceInputSchema>;
 export type IncubationInput = z.infer<typeof incubationInputSchema>;
+export type HatchInput = z.infer<typeof hatchInputSchema>;
 export type CandlingInput = z.infer<typeof candlingInputSchema>;
 export type RegisterInput = z.infer<typeof registerSchema>;
 export type LoginInput = z.infer<typeof loginSchema>;

@@ -1,4 +1,4 @@
-import { candlingInputSchema, incubationInputSchema } from '@gavran/shared';
+import { candlingInputSchema, hatchInputSchema, incubationInputSchema } from '@gavran/shared';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useState, type FormEvent } from 'react';
@@ -8,7 +8,7 @@ import { Link, useParams } from 'react-router-dom';
 import { z } from 'zod';
 import { Alert, Button, Card, Field, Input, TextArea } from '@/components/ui';
 import { ApiError, api, errorKey } from '@/lib/api';
-import type { CandlingRecord, FarmSummary, Incubator, Sitting } from '@/lib/types';
+import type { BirdType, CandlingRecord, FarmSummary, HatchRecord, Incubator, ProposedHatchRate, Shed, Sitting } from '@/lib/types';
 
 function text(t: (key: string, options?: { defaultValue?: string }) => string, code?: string) {
   if (!code) return undefined;
@@ -154,12 +154,13 @@ export function IncubationDetailPage() {
   const access = farms.data?.find((farm) => farm.id === farmId);
   const detail = useQuery({
     queryKey: ['incubation', farmId, sittingId],
-    queryFn: () => api<{ sitting: Sitting; candling: CandlingRecord[] }>(`/api/v1/farms/${farmId}/incubation/${sittingId}`),
+    queryFn: () => api<{ sitting: Sitting; candling: CandlingRecord[]; hatches: HatchRecord[] }>(`/api/v1/farms/${farmId}/incubation/${sittingId}`),
   });
   if (detail.isLoading) return <p>{t('common.loading')}</p>;
   if (detail.isError || !detail.data) return <Alert>{explain(detail.error, t)}</Alert>;
-  const { sitting, candling } = detail.data;
+  const { sitting, candling, hatches } = detail.data;
   const canRecord = Boolean(access?.permissions.includes('incubation.record') && sitting.status === 'open');
+  const canHatch = Boolean(access?.permissions.includes('hatch.record') && sitting.status === 'open');
   return (
     <div className="grid gap-4">
       <div>
@@ -170,6 +171,30 @@ export function IncubationDetailPage() {
         </p>
       </div>
       <p className="rounded-xl bg-gold/30 px-3 py-2 text-sm">{t('incubation.noDate')}</p>
+      {canHatch ? (
+        <HatchForm
+          farmId={farmId}
+          sittingId={sittingId}
+          onDone={() => void queryClient.invalidateQueries({ queryKey: ['incubation', farmId, sittingId] })}
+        />
+      ) : null}
+      <Card>
+        <h2 className="font-display text-2xl">{t('hatch.title')}</h2>
+        <p className="text-sm text-ink-soft">{t('hatch.proposedNote')}</p>
+        {hatches.length === 0 ? (
+          <p className="mt-1 text-ink-soft">{t('hatch.empty')}</p>
+        ) : (
+          <ul className="mt-2 grid gap-2 text-sm">
+            {hatches.map((item) => (
+              <li key={item.id}>
+                {item.hatchedOn} · {t('hatch.live', { count: item.liveChicks })} / {t('hatch.set', { count: item.eggsSet })}
+                {item.chickBatchCode ? ` · ${item.chickBatchCode}` : ''}
+                {item.differenceNote ? <span className="block text-ink-soft">{item.differenceNote}</span> : null}
+              </li>
+            ))}
+          </ul>
+        )}
+      </Card>
       {canRecord ? (
         <CandlingForm
           farmId={farmId}
@@ -201,6 +226,101 @@ export function IncubationDetailPage() {
         )}
       </Card>
     </div>
+  );
+}
+
+function HatchForm({ farmId, sittingId, onDone }: { farmId: string; sittingId: string; onDone: () => void }) {
+  const { t } = useTranslation();
+  const today = new Date().toISOString().slice(0, 10);
+  const types = useQuery({ queryKey: ['bird-types', farmId], queryFn: () => api<BirdType[]>(`/api/v1/farms/${farmId}/bird-types`) });
+  const sheds = useQuery({ queryKey: ['sheds', farmId], queryFn: () => api<Shed[]>(`/api/v1/farms/${farmId}/sheds`) });
+  const [rate, setRate] = useState<ProposedHatchRate | null>(null);
+  const form = useForm<z.infer<typeof hatchInputSchema>>({
+    resolver: zodResolver(hatchInputSchema),
+    defaultValues: {
+      hatchedOn: today,
+      eggsSet: 0,
+      liveChicks: 0,
+      losses: 0,
+      otherCount: 0,
+      differenceNote: '',
+      batchCode: '',
+      birdTypeId: '',
+      shedId: '',
+    },
+  });
+  const mutation = useMutation({
+    mutationFn: (values: z.infer<typeof hatchInputSchema>) =>
+      api<{ hatch: HatchRecord; proposedHatchRate: ProposedHatchRate }>(`/api/v1/farms/${farmId}/incubation/${sittingId}/hatches`, {
+        method: 'POST',
+        json: values,
+      }),
+    onSuccess: (data) => {
+      setRate(data.proposedHatchRate);
+      onDone();
+    },
+  });
+  const live = form.watch('liveChicks');
+  return (
+    <Card>
+      <form className="grid gap-3" noValidate onSubmit={form.handleSubmit((values) => mutation.mutate(values))}>
+        <h2 className="font-display text-2xl">{t('hatch.record')}</h2>
+        <Field id="hatch-date" label={t('hatch.date')}>
+          <Input id="hatch-date" type="date" {...form.register('hatchedOn')} />
+        </Field>
+        <Field id="hatch-set" label={t('hatch.eggsSet')} error={text(t, form.formState.errors.eggsSet?.message)}>
+          <Input id="hatch-set" type="number" min={0} {...form.register('eggsSet', { valueAsNumber: true })} />
+        </Field>
+        <Field id="hatch-live" label={t('hatch.liveChicks')} error={text(t, form.formState.errors.liveChicks?.message)}>
+          <Input id="hatch-live" type="number" min={0} {...form.register('liveChicks', { valueAsNumber: true })} />
+        </Field>
+        <Field id="hatch-losses" label={t('hatch.losses')}>
+          <Input id="hatch-losses" type="number" min={0} {...form.register('losses', { valueAsNumber: true })} />
+        </Field>
+        <Field id="hatch-other" label={t('hatch.other')}>
+          <Input id="hatch-other" type="number" min={0} {...form.register('otherCount', { valueAsNumber: true })} />
+        </Field>
+        <Field id="hatch-note" label={t('hatch.difference')} hint={t('hatch.differenceHint')} error={text(t, form.formState.errors.differenceNote?.message)}>
+          <TextArea id="hatch-note" {...form.register('differenceNote')} />
+        </Field>
+        {live > 0 ? (
+          <>
+            <Field id="hatch-code" label={t('batches.code')} error={text(t, form.formState.errors.batchCode?.message)}>
+              <Input id="hatch-code" {...form.register('batchCode')} />
+            </Field>
+            <Field id="hatch-type" label={t('batches.birdType')} error={text(t, form.formState.errors.birdTypeId?.message)}>
+              <select id="hatch-type" className={selectClass} {...form.register('birdTypeId')}>
+                <option value="">{t('hatch.chooseType')}</option>
+                {(types.data ?? []).filter((item) => item.status === 'active').map((item) => (
+                  <option key={item.id} value={item.id}>
+                    {item.name}
+                  </option>
+                ))}
+              </select>
+            </Field>
+            <Field id="hatch-shed" label={t('batches.shed')} error={text(t, form.formState.errors.shedId?.message)}>
+              <select id="hatch-shed" className={selectClass} {...form.register('shedId')}>
+                <option value="">{t('hatch.chooseShed')}</option>
+                {(sheds.data ?? []).filter((item) => item.status === 'active').map((item) => (
+                  <option key={item.id} value={item.id}>
+                    {item.code} · {item.name}
+                  </option>
+                ))}
+              </select>
+            </Field>
+          </>
+        ) : null}
+        {rate ? (
+          <p className="text-sm">
+            {t('hatch.proposed', { formula: rate.formula, percent: rate.percent === null ? '—' : String(rate.percent) })}
+          </p>
+        ) : null}
+        {mutation.isError ? <Alert>{explain(mutation.error, t)}</Alert> : null}
+        <Button type="submit" disabled={mutation.isPending}>
+          {t('hatch.save')}
+        </Button>
+      </form>
+    </Card>
   );
 }
 
