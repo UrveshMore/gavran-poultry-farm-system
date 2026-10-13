@@ -54,15 +54,7 @@ Done in this repository. WF-10, WF-11, WF-12. Quantities and user-entered item n
 
 ## Phase 9 — Health observations and the disease knowledge base
 
-WF-09, plus a Disease & Treatment Knowledge Base. Build that base only from the owner's Patil Poultry House Training PDFs in `docs/sources/` (saved 2026-10-13):
-
-- `patil-poultry-step-by-step-process.pdf` — shed preparation and the steps around receiving chicks (27 pages).
-- `patil-poultry-antibiotics.pdf` — named products, what they are used for, and how they are given (18 pages).
-- `patil-poultry-diseases-symptoms-medicines.pdf` — diseases, symptoms, prevention, and listed medicines or vaccines (18 pages).
-
-Extract diseases, symptoms, prevention, recommended treatments, and vaccination schedules faithfully from those pages. Do not add a disease, dose, day number, or product that is not in the PDFs. Every entry stores the source file and page. Every entry is labelled “owner/vet must verify before use” and starts unapproved. The owner can set an approval flag. Health observations may link to an entry. Vaccine tasks may be created from a schedule only after that entry is approved. Recording that a medicine was given stays blocked until the linked entry is approved. Do not invent withdrawal periods.
-
-Biosecurity is a separate owner-editable checklist. Steps may be copied from `patil-poultry-step-by-step-process.pdf` only with the source page and the same unapproved flag. Do not add a biosecurity step that is not on that page or typed by the owner.
+Done in this repository. WF-09, plus a Disease & Treatment Knowledge Base. The base is one row per page of the three Patil PDFs in `docs/sources/`. Each row stores the file, the page, and that page's text layer. Those files do not keep Marathi vowel signs in the text layer, so the app does not reconstruct a dose from it. Every row says “owner/vet must verify before use” and starts unapproved. Medicine records and vaccine tasks stay blocked until the owner writes a verification note and approves that page. The medicine record stores what the person typed, not a dose or a withdrawal date. Biosecurity steps are typed by the owner, or copied from `patil-poultry-step-by-step-process.pdf` with the page number and the unapproved flag. A copied step uses the text layer, not text the browser sends.
 
 ## Phase 10 — Mortality and predator losses
 

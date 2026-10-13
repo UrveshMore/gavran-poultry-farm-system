@@ -73,6 +73,11 @@ export {
   stockMovementInputSchema,
   waterInputSchema,
   weighingInputSchema,
+  biosecurityStepSchema,
+  healthObservationSchema,
+  knowledgeApprovalSchema,
+  medicineRecordSchema,
+  vaccineTaskSchema,
 } from './schemas.js';
 export type {
   BatchInput,
@@ -105,4 +110,9 @@ export type {
   StockMovementInput,
   WaterInput,
   WeighingInput,
+  BiosecurityStepInput,
+  HealthObservationInput,
+  KnowledgeApprovalInput,
+  MedicineRecordInput,
+  VaccineTaskInput,
 } from './schemas.js';

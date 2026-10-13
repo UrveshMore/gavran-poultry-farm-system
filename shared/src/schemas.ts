@@ -508,6 +508,59 @@ export const weighingInputSchema = z.object({
   notes: z.string().trim().max(500, 'too_big'),
 });
 
+export const knowledgeApprovalSchema = z
+  .object({
+    approved: z.boolean({ invalid_type_error: 'invalid_format' }),
+    verificationNote: z.string().trim().max(1000, 'too_big'),
+  })
+  .superRefine((value, ctx) => {
+    if (value.approved && value.verificationNote === '') {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'required', path: ['verificationNote'] });
+    }
+  });
+
+export const healthObservationSchema = z.object({
+  observedOn: calendarDateSchema,
+  batchId: z.union([z.string().uuid('invalid_format'), z.literal('')]),
+  birdCount: z.union([
+    z.number({ invalid_type_error: 'invalid_format' }).int('invalid_format').min(0, 'too_small').max(1_000_000, 'too_big'),
+    z.null(),
+  ]),
+  notes: z.string().trim().min(1, 'too_small').max(1000, 'too_big'),
+  entryId: z.union([z.string().uuid('invalid_format'), z.literal('')]),
+});
+
+export const medicineRecordSchema = z.object({
+  entryId: z.string().uuid('invalid_format'),
+  givenOn: calendarDateSchema,
+  batchId: z.union([z.string().uuid('invalid_format'), z.literal('')]),
+  notes: z.string().trim().min(1, 'too_small').max(1000, 'too_big'),
+});
+
+export const vaccineTaskSchema = z.object({
+  dueOn: calendarDateSchema,
+  assigneeUserId: z.union([z.string().uuid('invalid_format'), z.literal('')]),
+});
+
+export const biosecurityStepSchema = z
+  .object({
+    origin: z.enum(['owner', 'pdf']),
+    body: z.string().trim().max(1000, 'too_big'),
+    sourceFile: z.string().trim().max(180, 'too_big'),
+    sourcePage: z.union([
+      z.number({ invalid_type_error: 'invalid_format' }).int('invalid_format').min(1, 'too_small').max(500, 'too_big'),
+      z.null(),
+    ]),
+  })
+  .superRefine((value, ctx) => {
+    if (value.origin === 'owner' && value.body.length < 1) {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'required', path: ['body'] });
+    }
+    if (value.origin === 'pdf' && (value.sourceFile === '' || value.sourcePage === null)) {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'required', path: ['sourcePage'] });
+    }
+  });
+
 export const closeBatchSchema = z.object({
   version: z.number({ invalid_type_error: 'invalid_format' }).int('invalid_format').positive('too_small'),
 });
@@ -539,6 +592,11 @@ export type StockMovementInput = z.infer<typeof stockMovementInputSchema>;
 export type WaterInput = z.infer<typeof waterInputSchema>;
 export type GrowthTargetInput = z.infer<typeof growthTargetInputSchema>;
 export type WeighingInput = z.infer<typeof weighingInputSchema>;
+export type KnowledgeApprovalInput = z.infer<typeof knowledgeApprovalSchema>;
+export type HealthObservationInput = z.infer<typeof healthObservationSchema>;
+export type MedicineRecordInput = z.infer<typeof medicineRecordSchema>;
+export type VaccineTaskInput = z.infer<typeof vaccineTaskSchema>;
+export type BiosecurityStepInput = z.infer<typeof biosecurityStepSchema>;
 export type RegisterInput = z.infer<typeof registerSchema>;
 export type LoginInput = z.infer<typeof loginSchema>;
 export type FarmInput = z.infer<typeof farmInputSchema>;

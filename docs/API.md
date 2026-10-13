@@ -118,3 +118,19 @@ A random or foreign farm id is 404.
 `GET|POST /farms/:farmId/growth-targets` — `stock.read` / `stock.manage`. Age in days and target weight are numbers the farm types. A repeated age for the same bird type is 409 `DUPLICATE_CODE`.
 
 `GET|POST /farms/:farmId/weighings` — `stock.read` / `stock.record`. Age is optional and is not calculated from a hatch date. If that age has a target the farm typed, the response includes `ownerTarget`. There is no FCR field.
+
+## Health
+
+`GET /farms/:farmId/knowledge` — `health.read`. One row per page of the three training PDFs (63). Each row has `sourceFile`, `sourcePage`, `textLayer`, `mustVerify`, and `verifyLabel` “owner/vet must verify before use”. `approved` starts false.
+
+`POST /farms/:farmId/knowledge/:entryId/approval` — `health.approve`. Approving requires `verificationNote`.
+
+`POST /farms/:farmId/knowledge/:entryId/vaccine-task` — `health.treat`. 409 `ENTRY_UNAPPROVED` until that page is approved. The task instructions are the verification note. The due date is the one sent on the request.
+
+`GET|POST /farms/:farmId/health-observations` — `health.read` / `health.record`. Optional link to a page. A future date is 422.
+
+`GET|POST /farms/:farmId/medicine-records` — `health.read` / `health.treat`. 409 `ENTRY_UNAPPROVED` until the linked page is approved. `notes` is what the person typed. There is no dose or withdrawal column.
+
+`GET|POST /farms/:farmId/biosecurity-steps` — `health.read` / `health.record`. `origin` `owner` stores the typed step. `origin` `pdf` is allowed only for `patil-poultry-step-by-step-process.pdf` and stores that page's text layer, unapproved, ignoring any body the client sent.
+
+`POST /farms/:farmId/biosecurity-steps/:stepId/approve` — `health.approve`. Approves a copied PDF step.

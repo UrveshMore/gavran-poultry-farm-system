@@ -71,4 +71,13 @@ MySQL 8.4, `utf8mb4` / `utf8mb4_0900_ai_ci`, session time zone `+00:00`. Migrati
 - `growth_weighings` — a measured weight. `age_days` is nullable and is not derived from a hatch date.
 - Permissions `000000000123` through `000000000125`: `stock.read`, `stock.record`, `stock.manage`. Owner and manager receive all three. Worker receives read and record. Vet / advisor receives read only.
 
+## 011 health
+
+- `knowledge_entries` — one row per page of the three Patil PDFs. `text_layer` is the PDF text layer, not a reconstructed dose. 63 rows.
+- `knowledge_approvals` — per farm. Starts absent, which the API reports as unapproved. A note is required to approve.
+- `health_observations` — a date, notes, optional batch, optional bird count, optional page link.
+- `medicine_records` — the approved page and notes the person typed. No dose column and no withdrawal column.
+- `biosecurity_steps` — `owner` or `pdf`. A PDF step must name `patil-poultry-step-by-step-process.pdf` and a page, and starts unapproved.
+- Permissions `000000000126` through `000000000129`: `health.read`, `health.record`, `health.approve`, `health.treat`. Owner and manager receive all four. Worker and vet / advisor receive read and record.
+
 Queries use `mysql2` `execute()` (server-side prepared statements). Audit list `LIMIT` and `OFFSET` are interpolated only after the values are checked as integers, because the binary protocol rejects placeholders there.

@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.9.0 — 2026-10-13
+
+Phase 9 health pages.
+
+- All 63 training-PDF pages are listed with file, page, and the PDF text layer.
+- Each page starts unapproved. Medicine and vaccine tasks wait for a note the owner or vet writes.
+- No dose or withdrawal date is stored by the app.
+
 ## 0.8.0 — 2026-10-13
 
 Phase 8 feed, water, and growth.

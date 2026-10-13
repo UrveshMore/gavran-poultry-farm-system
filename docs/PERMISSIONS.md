@@ -33,6 +33,10 @@ UI navigation inside a farm still shows Sheds, Batches, Eggs, People, and Activi
 | `stock.read` | View items, quantities, water notes, targets, and weighings. |
 | `stock.record` | Record a quantity, a water note, or a weighing. |
 | `stock.manage` | Add an item and type a target weight. |
+| `health.read` | View training pages, observations, medicine notes, and biosecurity steps. |
+| `health.record` | Record an observation or a biosecurity step. |
+| `health.approve` | Approve a training page or a copied biosecurity step. |
+| `health.treat` | Record medicine given, or make a task, only after that page is approved. |
 
 `GET /api/v1/farms` lists farms the caller belongs to, including farms where they have zero permissions. It does not include contact details.
 
@@ -44,8 +48,8 @@ Pending owner confirmation. Seeded by the versioned migrations and mirrored in `
 |---|---|
 | Owner | All keys in the catalog. |
 | Manager | Farm operations in the catalog except `user.manage` and `farm.update`. |
-| Worker | `farm.read`, `shed.read`, `batch.read`, `egg.read`, `egg.record`, `incubator.read`, `incubator.record`, `incubation.read`, `incubation.record`, `hatch.record`, `task.read`, `task.complete`, `stock.read`, `stock.record`. A worker sees tasks assigned to them. |
-| Vet / advisor | `farm.read`, `shed.read`, `batch.read`, `egg.read`, `incubator.read`, `incubation.read`, `task.read`, `stock.read`. |
+| Worker | `farm.read`, `shed.read`, `batch.read`, `egg.read`, `egg.record`, `incubator.read`, `incubator.record`, `incubation.read`, `incubation.record`, `hatch.record`, `task.read`, `task.complete`, `stock.read`, `stock.record`, `health.read`, `health.record`. A worker sees tasks assigned to them. |
+| Vet / advisor | `farm.read`, `shed.read`, `batch.read`, `egg.read`, `incubator.read`, `incubation.read`, `task.read`, `stock.read`, `health.read`, `health.record`. |
 | Family helper | None from the role. Optional grants on that membership only. |
 | System administrator | None. |
 

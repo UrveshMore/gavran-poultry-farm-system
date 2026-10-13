@@ -243,6 +243,47 @@ export type Weighing = {
   ownerTarget: { ageDays: number; targetWeight: number; weightUnit: 'kg' | 'g' } | null;
 };
 
+export type KnowledgeEntry = {
+  id: string;
+  sourceFile: string;
+  sourcePage: number;
+  title: string;
+  textLayer: string;
+  mustVerify: true;
+  verifyLabel: string;
+  approved: boolean;
+  verificationNote: string | null;
+};
+
+export type HealthObservation = {
+  id: string;
+  observedOn: string;
+  batchId: string | null;
+  birdCount: number | null;
+  notes: string;
+  entryId: string | null;
+  entryTitle: string | null;
+};
+
+export type MedicineRecord = {
+  id: string;
+  entryId: string;
+  entryTitle: string;
+  givenOn: string;
+  batchId: string | null;
+  notes: string;
+};
+
+export type BiosecurityStep = {
+  id: string;
+  body: string;
+  origin: 'owner' | 'pdf';
+  sourceFile: string | null;
+  sourcePage: number | null;
+  approved: boolean;
+  mustVerify: boolean;
+};
+
 export type Incubator = {
   id: string;
   code: string;
