@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.25.0 — 2026-10-13
+
+Phase 24 languages.
+
+- The page language follows Hindi or Marathi when that locale is chosen.
+- The screen says those translations still need a fluent review.
+
 ## 0.24.0 — 2026-10-13
 
 Phase 23 offline capture.

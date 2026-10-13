@@ -120,6 +120,10 @@ Done in this repository. The install control appears when the browser offers a p
 
 Done in this repository. An attendance row can wait on the device and is sent later with the same idempotency key. A conflict stays on the device and does not replace the farm row. Stock, expenses, invoices, orders, losses, medicine, and supplier money are refused and are not stored on the device. Which workflows must work offline is still open (decision 10).
 
+## Phase 24 — Multilingual polish
+
+Done in this repository. The page language follows the chosen locale. Hindi and Marathi stay provisional, and the screen says a fluent review is still needed. The brand name Gavran stays in Latin letters.
+
 ## Explicitly later
 
-P1 continues with multilingual polish, search, and scheduled reports. P2 (AI image triage, weather, voice, sensors, forecasting, portals, farm map, route planning, a native app, custom model training) stays unstarted. Medical and feeding standards stay owner-editable and sourced. Nothing in those standards is invented. Invoice posting stays off until the farm decides when a sale is posted.
+P1 continues with search and scheduled reports. P2 (AI image triage, weather, voice, sensors, forecasting, portals, farm map, route planning, a native app, custom model training) stays unstarted. Medical and feeding standards stay owner-editable and sourced. Nothing in those standards is invented. Invoice posting stays off until the farm decides when a sale is posted.

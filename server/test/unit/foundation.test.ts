@@ -133,5 +133,13 @@ describe('translations', () => {
         expect(value.trim().length).toBeGreaterThan(0);
       }
     }
+    const englishUi = /\b(Download|Report|Save|Login|Password|Email|Submit|Welcome|Click|Dashboard|Settings|Delete|Search|Invoice|Phone|Bill|App)\b/;
+    for (const bundle of bundles.slice(1)) {
+      for (const [key, value] of Object.entries(bundle)) {
+        if (key === 'app.name') continue;
+        const visible = value.replace(/\{\{[^}]+\}\}/g, '');
+        expect(visible, key).not.toMatch(englishUi);
+      }
+    }
   });
 });

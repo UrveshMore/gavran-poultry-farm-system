@@ -390,6 +390,7 @@
   "invoices.unposted": "Posting stays off until the farm decides when a sale is posted. No balance is calculated.",
   "invoices.what": "What moved",
   "lang.label": "Language",
+  "lang.provisional": "Hindi and Marathi wording is provisional and still needs a fluent review.",
   "lang.reviewNote": "Hindi and Marathi wording is provisional and needs review by a fluent speaker.",
   "losses.add": "Write a loss note",
   "losses.birds": "Birds",

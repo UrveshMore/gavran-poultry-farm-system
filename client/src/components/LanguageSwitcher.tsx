@@ -39,6 +39,11 @@ export function LanguageSwitcher() {
           </option>
         ))}
       </select>
+      {current !== 'en' ? (
+        <p data-provisional="true" className="max-w-56 text-xs font-semibold text-ink-soft">
+          {t('lang.provisional')}
+        </p>
+      ) : null}
     </label>
   );
 }
