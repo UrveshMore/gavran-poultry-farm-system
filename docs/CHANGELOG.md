@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.18.0 — 2026-10-13
+
+Phase 17 suppliers.
+
+- A draft order stores a price only when someone types the amount and the money unit.
+- A receipt does not change stock. A bill and a payment are separate rows.
+- There is no tax column.
+
 ## 0.17.0 — 2026-10-13
 
 Phase 16 parentage.

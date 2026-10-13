@@ -129,4 +129,12 @@ There is no backup table. `npm run restore-drill -w @gavran/server` creates `gav
 - Permissions `000000000142` and `000000000143`: `breeding.read`, `breeding.record`. Owner, manager, and worker receive both. Vet / advisor receives `breeding.read`.
 - `parentage_records` — typed sire and dam text, optional batch links on the same farm. No coefficient column.
 
+## 019 suppliers
+
+- Permissions `000000000144` and `000000000145`: `supplier.read`, `supplier.record`. Owner and manager only.
+- `suppliers` — a name. None are seeded.
+- `purchase_orders` — status only `draft`. `purchase_order_lines.unit_price` and `price_unit` are null together unless typed.
+- `goods_receipts` — accepted and rejected quantities. No stock foreign key.
+- `supplier_bills` and `supplier_payments` — separate typed amounts. No tax column.
+
 Queries use `mysql2` `execute()` (server-side prepared statements). Audit list `LIMIT` and `OFFSET` are interpolated only after the values are checked as integers, because the binary protocol rejects placeholders there.

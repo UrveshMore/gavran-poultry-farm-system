@@ -693,6 +693,79 @@ export const taskTrainingRequirementSchema = z.object({
   itemId: z.string().uuid('invalid_format'),
 });
 
+const typedMoney = z.number({ invalid_type_error: 'invalid_format' }).positive('too_small').max(1_000_000_000, 'too_big');
+const typedQuantity = z.number({ invalid_type_error: 'invalid_format' }).positive('too_small').max(1_000_000, 'too_big');
+const unitLabelSchema = z.string().trim().min(1, 'required').max(32, 'too_big');
+
+export const supplierInputSchema = z.object({
+  name: z.string().trim().min(2, 'too_small').max(160, 'too_big'),
+  contactName: z.string().trim().max(120, 'too_big'),
+  phone: z.string().trim().max(32, 'too_big').refine((value) => value === '' || /^[0-9+\-().\s]{6,32}$/.test(value), 'invalid_format'),
+  notes: z.string().trim().max(500, 'too_big'),
+});
+
+export const purchaseOrderInputSchema = z.object({
+  supplierId: z.string().uuid('invalid_format'),
+  orderedOn: calendarDateSchema,
+  notes: z.string().trim().max(500, 'too_big'),
+  lines: z
+    .array(
+      z.object({
+        description: z.string().trim().min(1, 'too_small').max(160, 'too_big'),
+        quantity: typedQuantity,
+        unitLabel: unitLabelSchema,
+        unitPrice: z.union([
+          z.number({ invalid_type_error: 'invalid_format' }).min(0, 'too_small').max(1_000_000_000, 'too_big'),
+          z.null(),
+        ]),
+        priceUnit: z.string().trim().max(32, 'too_big'),
+      }).superRefine((line, ctx) => {
+        if (line.unitPrice !== null && line.priceUnit === '') {
+          ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'required', path: ['priceUnit'] });
+        }
+        if (line.unitPrice === null && line.priceUnit !== '') {
+          ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'invalid_format', path: ['priceUnit'] });
+        }
+      }),
+    )
+    .min(1, 'too_small')
+    .max(20, 'too_big'),
+});
+
+export const goodsReceiptInputSchema = z
+  .object({
+    supplierId: z.string().uuid('invalid_format'),
+    purchaseOrderId: z.union([z.string().uuid('invalid_format'), z.literal('')]),
+    receivedOn: calendarDateSchema,
+    acceptedQuantity: z.number({ invalid_type_error: 'invalid_format' }).min(0, 'too_small').max(1_000_000, 'too_big'),
+    rejectedQuantity: z.number({ invalid_type_error: 'invalid_format' }).min(0, 'too_small').max(1_000_000, 'too_big'),
+    unitLabel: unitLabelSchema,
+    note: z.string().trim().max(500, 'too_big'),
+  })
+  .superRefine((value, ctx) => {
+    if (value.acceptedQuantity === 0 && value.rejectedQuantity === 0) {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'too_small', path: ['acceptedQuantity'] });
+    }
+  });
+
+export const supplierBillInputSchema = z.object({
+  supplierId: z.string().uuid('invalid_format'),
+  billedOn: calendarDateSchema,
+  amount: typedMoney,
+  unitLabel: unitLabelSchema,
+  referenceNote: z.string().trim().max(160, 'too_big'),
+  notes: z.string().trim().max(500, 'too_big'),
+});
+
+export const supplierPaymentInputSchema = z.object({
+  supplierId: z.string().uuid('invalid_format'),
+  paidOn: calendarDateSchema,
+  amount: typedMoney,
+  unitLabel: unitLabelSchema,
+  referenceNote: z.string().trim().max(160, 'too_big'),
+  notes: z.string().trim().max(500, 'too_big'),
+});
+
 export const parentageInputSchema = z
   .object({
     recordedOn: calendarDateSchema,
@@ -763,6 +836,11 @@ export type TrainingAssignmentInput = z.infer<typeof trainingAssignmentInputSche
 export type TrainingCompletionInput = z.infer<typeof trainingCompletionSchema>;
 export type TaskTrainingRequirementInput = z.infer<typeof taskTrainingRequirementSchema>;
 export type ParentageInput = z.infer<typeof parentageInputSchema>;
+export type SupplierInput = z.infer<typeof supplierInputSchema>;
+export type PurchaseOrderInput = z.infer<typeof purchaseOrderInputSchema>;
+export type GoodsReceiptInput = z.infer<typeof goodsReceiptInputSchema>;
+export type SupplierBillInput = z.infer<typeof supplierBillInputSchema>;
+export type SupplierPaymentInput = z.infer<typeof supplierPaymentInputSchema>;
 export type CustomerInput = z.infer<typeof customerInputSchema>;
 export type MarketPriceInput = z.infer<typeof marketPriceInputSchema>;
 export type OrderInput = z.infer<typeof orderInputSchema>;

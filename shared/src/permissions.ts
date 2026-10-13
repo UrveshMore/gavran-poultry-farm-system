@@ -51,6 +51,8 @@ export const PERMISSIONS = [
   'training.complete',
   'breeding.read',
   'breeding.record',
+  'supplier.read',
+  'supplier.record',
 ] as const;
 export type PermissionCode = (typeof PERMISSIONS)[number];
 
@@ -91,7 +93,7 @@ export type MovementType = (typeof MOVEMENT_TYPES)[number];
  */
 export const ROLE_PERMISSIONS: Record<FarmRole | PlatformRole, readonly PermissionCode[]> = {
   owner: PERMISSIONS,
-  manager: ['farm.read', 'shed.read', 'shed.create', 'shed.update', 'user.read', 'audit.read', 'batch.read', 'batch.create', 'movement.create', 'egg.read', 'egg.record', 'incubator.read', 'incubator.record', 'incubator.manage', 'incubation.read', 'incubation.record', 'hatch.record', 'task.read', 'task.manage', 'task.complete', 'stock.read', 'stock.record', 'stock.manage', 'health.read', 'health.record', 'health.approve', 'health.treat', 'loss.read', 'loss.record', 'sale.read', 'sale.record', 'expense.read', 'expense.record', 'report.read', 'attendance.read', 'attendance.record', 'training.read', 'training.manage', 'training.complete', 'breeding.read', 'breeding.record'],
+  manager: ['farm.read', 'shed.read', 'shed.create', 'shed.update', 'user.read', 'audit.read', 'batch.read', 'batch.create', 'movement.create', 'egg.read', 'egg.record', 'incubator.read', 'incubator.record', 'incubator.manage', 'incubation.read', 'incubation.record', 'hatch.record', 'task.read', 'task.manage', 'task.complete', 'stock.read', 'stock.record', 'stock.manage', 'health.read', 'health.record', 'health.approve', 'health.treat', 'loss.read', 'loss.record', 'sale.read', 'sale.record', 'expense.read', 'expense.record', 'report.read', 'attendance.read', 'attendance.record', 'training.read', 'training.manage', 'training.complete', 'breeding.read', 'breeding.record', 'supplier.read', 'supplier.record'],
   worker: ['farm.read', 'shed.read', 'batch.read', 'egg.read', 'egg.record', 'incubator.read', 'incubator.record', 'incubation.read', 'incubation.record', 'hatch.record', 'task.read', 'task.complete', 'stock.read', 'stock.record', 'health.read', 'health.record', 'loss.read', 'loss.record', 'attendance.read', 'attendance.record', 'training.read', 'training.complete', 'breeding.read', 'breeding.record'],
   family_helper: [],
   vet_advisor: ['farm.read', 'shed.read', 'batch.read', 'egg.read', 'incubator.read', 'incubation.read', 'task.read', 'stock.read', 'health.read', 'health.record', 'loss.read', 'breeding.read'],

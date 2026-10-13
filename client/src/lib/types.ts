@@ -455,6 +455,32 @@ export type TrainingAssignment = {
   completionNote: string | null;
 };
 
+export type SupplierPage = {
+  suppliers: Array<{ id: string; name: string; contactName: string; phone: string; notes: string }>;
+  orders: Array<{
+    id: string;
+    supplierId: string;
+    supplierName: string;
+    orderedOn: string;
+    status: 'draft';
+    notes: string;
+    lines: Array<{ id: string; description: string; quantity: number; unitLabel: string; unitPrice: number | null; priceUnit: string | null }>;
+  }>;
+  receipts: Array<{
+    id: string;
+    supplierName: string;
+    receivedOn: string;
+    acceptedQuantity: number;
+    rejectedQuantity: number;
+    unitLabel: string;
+    note: string;
+  }>;
+  bills: Array<{ id: string; supplierName: string; occurredOn: string; amount: number; unitLabel: string; referenceNote: string; notes: string }>;
+  payments: Array<{ id: string; supplierName: string; occurredOn: string; amount: number; unitLabel: string; referenceNote: string; notes: string }>;
+  stockPosting: 'disabled';
+  valuation: { status: 'not_chosen'; reason: string };
+};
+
 export type ParentagePage = {
   records: Array<{
     id: string;

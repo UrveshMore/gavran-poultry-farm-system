@@ -51,6 +51,8 @@ UI navigation inside a farm still shows Sheds, Batches, Eggs, People, and Activi
 | `training.complete` | Mark your own assignment finished. |
 | `breeding.read` | View parentage notes. |
 | `breeding.record` | Add a parentage note. |
+| `supplier.read` | View suppliers, draft orders, receipts, bills, and payments. |
+| `supplier.record` | Add those rows. A receipt does not change stock. |
 
 `GET /api/v1/farms` lists farms the caller belongs to, including farms where they have zero permissions. It does not include contact details.
 

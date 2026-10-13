@@ -191,6 +191,18 @@ The restore drill is the server command `npm run restore-drill -w @gavran/server
 
 `POST /farms/:farmId/tasks/:taskId/training-requirements` — `training.manage`. Completing that task is 409 `TRAINING_REQUIRED` until the person finishing it has a completion for the item.
 
+## Suppliers
+
+`GET /farms/:farmId/suppliers` — `supplier.read`. Includes suppliers, draft orders, receipts, bills, and payments. `stockPosting` is `disabled`. `valuation.status` is `not_chosen` because decision 7 is open. Workers are refused.
+
+`POST /farms/:farmId/suppliers` — `supplier.record`. A repeated name is 409 `DUPLICATE_CODE`.
+
+`POST /farms/:farmId/purchase-orders` — `supplier.record`. Status is only `draft`. Each line needs a description, quantity, and unit. `unitPrice` is null unless typed, and then `priceUnit` is required.
+
+`POST /farms/:farmId/goods-receipts` — `supplier.record`. Stores accepted and rejected quantities. Does not write a stock row. `receivedOn` is not in the future.
+
+`POST /farms/:farmId/supplier-bills` and `POST /farms/:farmId/supplier-payments` — `supplier.record`. Each stores an amount and a money unit the farm types. A payment does not point at a bill. There is no tax column. Those dates are not in the future.
+
 ## Parentage
 
 `GET|POST /farms/:farmId/parentage` — `breeding.read` / `breeding.record`. At least one of `sireNote`, `damNote`, `sireBatchId`, or `damBatchId` is required. Batch ids must belong to the farm. `recordedOn` is not in the future. `pairing.status` is `unset`. There is no coefficient. Rows are not edited or deleted.

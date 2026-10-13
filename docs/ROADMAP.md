@@ -92,6 +92,10 @@ Done in this repository. WF-16. An attendance row stores the date, an optional c
 
 Done in this repository. A parentage note stores the sire and dam as text the farm types, and it may point at batches on the same farm. There is no pairing rule, no coefficient, and no catalog.
 
+## Phase 17 — Supplier workflows
+
+Done in this repository. WF-14. A supplier is a name the farm types. A purchase order stays a draft. A line price and its money unit exist only when someone types them. A goods receipt stores accepted and rejected quantities and does not change stock. A bill and a payment are separate typed amounts. There is no tax column and no stock value.
+
 ## Explicitly later
 
-P1 continues with supplier workflows, invoice documents and returns, advanced reports, in-app notifications, documents, PWA install, offline-safe capture, multilingual polish, search, and scheduled reports. P2 (AI image triage, weather, voice, sensors, forecasting, portals, farm map, route planning, a native app, custom model training) stays unstarted. Offline capture must not silently merge stock, finance, mortality, or treatment records. Medical and feeding standards stay owner-editable and sourced. Nothing in those standards is invented. Invoice posting stays off until the farm decides when a sale is posted.
+P1 continues with invoice documents and returns, advanced reports, in-app notifications, documents, PWA install, offline-safe capture, multilingual polish, search, and scheduled reports. P2 (AI image triage, weather, voice, sensors, forecasting, portals, farm map, route planning, a native app, custom model training) stays unstarted. Offline capture must not silently merge stock, finance, mortality, or treatment records. Medical and feeding standards stay owner-editable and sourced. Nothing in those standards is invented. Invoice posting stays off until the farm decides when a sale is posted.
