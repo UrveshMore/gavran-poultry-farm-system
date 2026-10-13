@@ -92,6 +92,11 @@ export function errorKey(error: unknown): string | null {
     LAST_OWNER: 'people.lastOwner',
     DUPLICATE_CODE: 'farm.duplicateCode',
     VERSION_CONFLICT: 'farm.conflict',
+    CAPACITY_EXCEEDED: 'batches.capacity',
+    INSUFFICIENT_BIRDS: 'batches.insufficient',
+    BATCH_CLOSED: 'batches.closedError',
+    SHED_INACTIVE: 'batches.inactiveShed',
+    BIRDS_REMAIN: 'batches.birdsRemain',
     FORBIDDEN: 'common.permissionDenied',
   };
   return keys[error.code] ?? null;

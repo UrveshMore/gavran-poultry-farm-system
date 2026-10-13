@@ -12,6 +12,7 @@ import { csrfProtection } from './middleware/csrf.js';
 import { errorHandler, notFound } from './middleware/errorHandler.js';
 import { requestContext, requestLogger } from './middleware/context.js';
 import { authRoutes } from './modules/auth/routes.js';
+import { batchRoutes } from './modules/batches/routes.js';
 import { farmRoutes } from './modules/farms/routes.js';
 
 export function createApp() {
@@ -44,6 +45,7 @@ export function createApp() {
   app.use('/api/v1', csrfProtection);
   app.use('/api/v1/auth', authRoutes);
   app.use('/api/v1/farms', farmRoutes);
+  app.use('/api/v1/farms', batchRoutes);
   app.use(notFound);
   app.use(errorHandler);
   return app;

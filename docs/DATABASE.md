@@ -22,4 +22,10 @@ MySQL 8.4, `utf8mb4` / `utf8mb4_0900_ai_ci`, session time zone `+00:00`. Migrati
 - `audit_logs` — `farm_id` nullable. No hard delete.
 - `idempotency_keys` — unique `(user_id, idempotency_key)`. Placeholder row uses `response_status` 0 until the transaction finishes.
 
+## 004 batches
+
+- `bird_types` — a name the farm enters. Unique per farm.
+- `batches` — code, optional hatch date, `open` or `closed`.
+- `batch_movements` — opening, transfer, sale, mortality, culling, or other exit. Live count is the sum of these rows. A sale does not store a price.
+
 Queries use `mysql2` `execute()` (server-side prepared statements). Audit list `LIMIT` and `OFFSET` are interpolated only after the values are checked as integers, because the binary protocol rejects placeholders there.

@@ -1,6 +1,6 @@
 # Gavran Poultry Farm Management System
 
-Phase 1 records the farm, its sheds, and the people who work there. Bird counts, eggs, medicines, prices, and taxes are later phases. Hindi and Marathi text is provisional and needs a fluent review.
+Phase 1 records the farm, its sheds, and the people who work there. Phase 2 records batches. The live bird count comes from movements, and a sale stores a count with no price. Eggs, medicines, and taxes are later phases. Hindi and Marathi text is provisional and needs a fluent review.
 
 The blueprint is `docs/blueprint.md`. The build order is `docs/ROADMAP.md`. The owner's training PDFs in `docs/sources/` are the later disease knowledge base. They are not approved doses.
 

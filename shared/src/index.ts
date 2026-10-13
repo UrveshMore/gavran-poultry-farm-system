@@ -1,6 +1,8 @@
 export {
+  BATCH_STATUSES,
   CAPACITY_UNIT,
   FARM_ROLES,
+  MOVEMENT_TYPES,
   LOCALES,
   PERMISSIONS,
   PLATFORM_ROLES,
@@ -14,7 +16,9 @@ export {
   isPermission,
 } from './permissions.js';
 export type {
+  BatchStatus,
   FarmRole,
+  MovementType,
   Locale,
   PermissionCode,
   PlatformRole,
@@ -25,13 +29,18 @@ export type {
 } from './permissions.js';
 export { isIanaTimeZone } from './time.js';
 export {
+  batchInputSchema,
+  birdTypeInputSchema,
+  calendarDateSchema,
   changePasswordSchema,
+  closeBatchSchema,
   emailSchema,
   farmInputSchema,
   farmUpdateSchema,
   inviteSchema,
   loginSchema,
   membershipUpdateSchema,
+  movementInputSchema,
   pageSchema,
   passwordSchema,
   profileSchema,
@@ -40,11 +49,15 @@ export {
   shedUpdateSchema,
 } from './schemas.js';
 export type {
+  BatchInput,
+  BirdTypeInput,
+  CloseBatchInput,
   FarmInput,
   FarmUpdateInput,
   InviteInput,
   LoginInput,
   MembershipUpdateInput,
+  MovementInput,
   RegisterInput,
   ShedInput,
   ShedUpdateInput,

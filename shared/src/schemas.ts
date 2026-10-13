@@ -2,6 +2,7 @@ import { z } from 'zod';
 import {
   FARM_ROLES,
   LOCALES,
+  MOVEMENT_TYPES,
   PERMISSIONS,
   SHED_STATUSES,
   SHED_TYPES,
@@ -161,11 +162,73 @@ export const membershipUpdateSchema = z
     { message: 'required', path: ['form'] },
   );
 
+function isRealDate(value: string): boolean {
+  const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(value);
+  if (!match) return false;
+  const year = Number(match[1]);
+  const month = Number(match[2]);
+  const day = Number(match[3]);
+  const date = new Date(Date.UTC(year, month - 1, day));
+  return date.getUTCFullYear() === year && date.getUTCMonth() === month - 1 && date.getUTCDate() === day;
+}
+
+export const calendarDateSchema = z.string().trim().regex(/^\d{4}-\d{2}-\d{2}$/, 'invalid_format').refine(isRealDate, 'invalid_format');
+
+export const birdTypeInputSchema = z.object({
+  name: z.string().trim().min(2, 'too_small').max(80, 'too_big'),
+});
+
+export const batchInputSchema = z
+  .object({
+    code: z
+      .string()
+      .trim()
+      .min(1, 'too_small')
+      .max(32, 'too_big')
+      .regex(/^[A-Za-z0-9][A-Za-z0-9_-]*$/, 'invalid_format'),
+    birdTypeId: z.string().uuid('invalid_format'),
+    sourceNote: z.string().trim().max(255, 'too_big'),
+    hatchDate: z.union([calendarDateSchema, z.literal('')]),
+    openedOn: calendarDateSchema,
+    shedId: z.string().uuid('invalid_format'),
+    birdCount: z.number({ invalid_type_error: 'invalid_format' }).int('invalid_format').min(1, 'too_small').max(1_000_000, 'too_big'),
+  })
+  .refine((value) => value.hatchDate === '' || value.hatchDate <= value.openedOn, {
+    message: 'invalid_format',
+    path: ['hatchDate'],
+  });
+
+export const movementInputSchema = z
+  .object({
+    movementType: z.enum(MOVEMENT_TYPES),
+    fromShedId: z.string().uuid('invalid_format'),
+    toShedId: z.union([z.string().uuid('invalid_format'), z.literal('')]),
+    birdCount: z.number({ invalid_type_error: 'invalid_format' }).int('invalid_format').min(1, 'too_small').max(1_000_000, 'too_big'),
+    occurredOn: calendarDateSchema,
+    reason: z.string().trim().max(255, 'too_big'),
+  })
+  .superRefine((value, ctx) => {
+    if (value.movementType !== 'transfer') return;
+    if (value.toShedId === '') {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'required', path: ['toShedId'] });
+    } else if (value.toShedId === value.fromShedId) {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'invalid_format', path: ['toShedId'] });
+    }
+  });
+
+export const closeBatchSchema = z.object({
+  version: z.number({ invalid_type_error: 'invalid_format' }).int('invalid_format').positive('too_small'),
+});
+
 export const pageSchema = z.object({
   limit: z.coerce.number().int().min(1).max(100).default(20),
   offset: z.coerce.number().int().min(0).max(1000).default(0),
 });
 
+export type BirdTypeInput = z.infer<typeof birdTypeInputSchema>;
+export type BatchInput = z.infer<typeof batchInputSchema>;
+export type MovementInput = z.infer<typeof movementInputSchema>;
+export type CloseBatchInput = z.infer<typeof closeBatchSchema>;
 export type RegisterInput = z.infer<typeof registerSchema>;
 export type LoginInput = z.infer<typeof loginSchema>;
 export type FarmInput = z.infer<typeof farmInputSchema>;

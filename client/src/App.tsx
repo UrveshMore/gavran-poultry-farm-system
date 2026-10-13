@@ -5,6 +5,7 @@ import { AppShell } from '@/components/Shell';
 import { Button } from '@/components/ui';
 import { ApiError, fetchMe } from '@/lib/api';
 import { AccountPage, LoginPage, RegisterPage } from '@/pages/AuthPages';
+import { BatchDetailPage, BatchesPage } from '@/pages/BatchPages';
 import { ActivityPage, FarmCreatePage, FarmProfilePage, FarmsPage, PeoplePage, ShedsPage } from '@/pages/FarmPages';
 
 function RequireAuth() {
@@ -36,6 +37,8 @@ export function App() {
         <Route path="farms/new" element={<FarmCreatePage />} />
         <Route path="farms/:farmId" element={<FarmProfilePage />} />
         <Route path="farms/:farmId/sheds" element={<ShedsPage />} />
+        <Route path="farms/:farmId/batches" element={<BatchesPage />} />
+        <Route path="farms/:farmId/batches/:batchId" element={<BatchDetailPage />} />
         <Route path="farms/:farmId/people" element={<PeoplePage />} />
         <Route path="farms/:farmId/activity" element={<ActivityPage />} />
       </Route>

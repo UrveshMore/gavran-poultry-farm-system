@@ -43,6 +43,9 @@ async function truncate(): Promise<void> {
       'farm_memberships',
       'sessions',
       'password_reset_tokens',
+      'batch_movements',
+      'batches',
+      'bird_types',
       'farms',
       'users',
     ]) {
@@ -115,7 +118,6 @@ afterAll(async () => {
   await new Promise<void>((resolve, reject) => {
     server.close((error) => (error ? reject(error) : resolve()));
   });
-  await pool.end();
 });
 
 describe('authentication', () => {

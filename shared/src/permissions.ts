@@ -16,6 +16,9 @@ export const PERMISSIONS = [
   'user.read',
   'user.manage',
   'audit.read',
+  'batch.read',
+  'batch.create',
+  'movement.create',
 ] as const;
 export type PermissionCode = (typeof PERMISSIONS)[number];
 
@@ -33,6 +36,13 @@ export type VolumeUnit = (typeof VOLUME_UNITS)[number];
 
 export const CAPACITY_UNIT = 'birds' as const;
 
+export const BATCH_STATUSES = ['open', 'closed'] as const;
+export type BatchStatus = (typeof BATCH_STATUSES)[number];
+
+/** User-posted movements. The opening placement is created with the batch. */
+export const MOVEMENT_TYPES = ['transfer', 'sale', 'mortality', 'culling', 'other_exit'] as const;
+export type MovementType = (typeof MOVEMENT_TYPES)[number];
+
 /**
  * Provisional Phase 1 matrix. Family helpers receive nothing from the role.
  * System administrators are not a farm role and receive no business permissions.
@@ -40,10 +50,10 @@ export const CAPACITY_UNIT = 'birds' as const;
  */
 export const ROLE_PERMISSIONS: Record<FarmRole | PlatformRole, readonly PermissionCode[]> = {
   owner: PERMISSIONS,
-  manager: ['farm.read', 'shed.read', 'shed.create', 'shed.update', 'user.read', 'audit.read'],
-  worker: ['farm.read', 'shed.read'],
+  manager: ['farm.read', 'shed.read', 'shed.create', 'shed.update', 'user.read', 'audit.read', 'batch.read', 'batch.create', 'movement.create'],
+  worker: ['farm.read', 'shed.read', 'batch.read'],
   family_helper: [],
-  vet_advisor: ['farm.read', 'shed.read'],
+  vet_advisor: ['farm.read', 'shed.read', 'batch.read'],
   system_administrator: [],
 };
 

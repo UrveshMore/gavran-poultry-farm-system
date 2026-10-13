@@ -51,4 +51,16 @@ Bodies never include the access or refresh token.
 
 `GET /farms/:farmId/audit` — `audit.read`. Query `limit` (1–100, default 20) and `offset` (0–1000, default 0).
 
+## Batches
+
+`GET|POST /farms/:farmId/bird-types` — `batch.read` / `batch.create`. The name is text the farm enters.
+
+`GET|POST /farms/:farmId/batches` — `batch.read` / `batch.create`. Create places the opening count in an active shed and accepts an idempotency key. 409 `CAPACITY_EXCEEDED`, `SHED_INACTIVE`, or `DUPLICATE_CODE`.
+
+`GET /farms/:farmId/batches/:batchId` — `batch.read`. Returns the batch, derived placements, and movements.
+
+`POST /farms/:farmId/batches/:batchId/movements` — `movement.create`. Types: `transfer`, `sale`, `mortality`, `culling`, `other_exit`. 409 `INSUFFICIENT_BIRDS`, `CAPACITY_EXCEEDED`, `BATCH_CLOSED`, or `SHED_INACTIVE`.
+
+`POST /farms/:farmId/batches/:batchId/close` — `movement.create`, body `{ version }`. 409 `BIRDS_REMAIN` when the live count is not zero.
+
 A random or foreign farm id is 404.

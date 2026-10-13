@@ -16,6 +16,9 @@ UI navigation inside a farm still shows Sheds, People, and Activity. Those scree
 | `user.read` | List members. |
 | `user.manage` | Invite, change role, revoke, deactivate, reactivate. |
 | `audit.read` | Read farm-scoped audit rows. |
+| `batch.read` | List batches, bird types, and the movement timeline. |
+| `batch.create` | Add a bird-type name and open a batch. |
+| `movement.create` | Record a movement and close a batch at zero birds. |
 
 `GET /api/v1/farms` lists farms the caller belongs to, including farms where they have zero permissions. It does not include contact details.
 
@@ -26,9 +29,9 @@ Pending owner confirmation. Seeded in `database/migrations/001_identity.sql` and
 | Role | Permissions |
 |---|---|
 | Owner | All Phase 1 keys. |
-| Manager | `farm.read`, `shed.read`, `shed.create`, `shed.update`, `user.read`, `audit.read`. |
-| Worker | `farm.read`, `shed.read`. |
-| Vet / advisor | `farm.read`, `shed.read`. |
+| Manager | `farm.read`, `shed.read`, `shed.create`, `shed.update`, `user.read`, `audit.read`, `batch.read`, `batch.create`, `movement.create`. |
+| Worker | `farm.read`, `shed.read`, `batch.read`. |
+| Vet / advisor | `farm.read`, `shed.read`, `batch.read`. |
 | Family helper | None from the role. Optional grants on that membership only. |
 | System administrator | None. |
 

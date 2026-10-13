@@ -5,6 +5,7 @@ export default defineConfig({
     environment: 'node',
     fileParallelism: false,
     globalSetup: ['./test/globalSetup.ts'],
+    globalTeardown: ['./test/globalTeardown.ts'],
     testTimeout: 30_000,
     hookTimeout: 30_000,
     env: {

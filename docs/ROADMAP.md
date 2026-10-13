@@ -18,16 +18,17 @@ Done in this repository.
 - Mobile-first login, farm, shed, people, and activity screens.
 - Backend unit tests and API tests for auth and authorization.
 
-## Phase 2 — Batch lifecycle and movements (recommended next)
+## Phase 2 — Batch lifecycle and movements
 
-Blueprint WF-07, using sheds from Phase 1.
+Done in this repository. Blueprint WF-07, without prices or medicine.
 
-- Batches with owner-confirmed bird types and statuses. Until decision 3 is answered, store only values the user enters from an explicit allowlist the owner approves. Do not invent species or statuses.
-- Movements between sheds. Live bird count is derived from movements, not typed as a free balance.
-- Capacity check uses the shed usable capacity already stored. Do not invent stocking density.
-- Audit every movement. No prices, feed, or medicine.
+- The farm types the bird-type name. Nothing is preloaded as a species or strain. Decision 3 is still open.
+- A batch opens with a placement movement. Live count is the sum of movements, not a typed balance.
+- Transfers, sales, mortality, culling, and other exits are movement types. A sale stores a count only.
+- A destination shed must be active, and the birds already there plus the movement cannot pass the shed's usable capacity.
+- A batch closes only when the live count is zero. The timeline stays.
 
-## Phase 3 — Egg collection
+## Phase 3 — Egg collection (recommended next)
 
 WF-02. Counts only. Egg categories stay unset until decision 2 is answered. No sale prices.
 

@@ -65,6 +65,34 @@ export type Member = {
   grants: string[];
 };
 
+export type BirdType = { id: string; name: string; status: 'active' | 'archived' };
+
+export type Placement = { shedId: string; shedCode: string; shedName: string; birdCount: number };
+
+export type Batch = {
+  id: string;
+  code: string;
+  birdTypeId: string;
+  birdTypeName: string;
+  sourceNote: string | null;
+  hatchDate: string | null;
+  openedOn: string;
+  status: 'open' | 'closed';
+  version: number;
+  liveCount: number;
+  placements: Placement[];
+};
+
+export type BatchMovement = {
+  id: string;
+  movementType: string;
+  fromShedCode: string | null;
+  toShedCode: string | null;
+  birdCount: number;
+  occurredOn: string;
+  reason: string | null;
+};
+
 export type AuditItem = {
   id: string;
   action: string;
