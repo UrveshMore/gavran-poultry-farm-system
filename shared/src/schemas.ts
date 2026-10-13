@@ -596,6 +596,27 @@ export const orderInputSchema = z.object({
     .max(20, 'too_big'),
 });
 
+export const expenseCategoryInputSchema = z.object({
+  name: z.string().trim().min(2, 'too_small').max(80, 'too_big'),
+});
+
+export const expenseEntryInputSchema = z.object({
+  occurredOn: calendarDateSchema,
+  direction: z.enum(['expense', 'income'], { errorMap: () => ({ message: 'invalid_format' }) }),
+  categoryId: z.string().uuid('invalid_format'),
+  amount: z.number({ invalid_type_error: 'invalid_format' }).positive('too_small').max(1_000_000_000, 'too_big'),
+  unitLabel: z.string().trim().min(1, 'too_small').max(32, 'too_big'),
+  counterparty: z.string().trim().max(160, 'too_big'),
+  referenceNote: z.string().trim().max(160, 'too_big'),
+  notes: z.string().trim().max(500, 'too_big'),
+  batchId: z.union([z.string().uuid('invalid_format'), z.literal('')]),
+});
+
+export const expenseReversalSchema = z.object({
+  occurredOn: calendarDateSchema,
+  note: z.string().trim().min(1, 'too_small').max(500, 'too_big'),
+});
+
 export const closeBatchSchema = z.object({
   version: z.number({ invalid_type_error: 'invalid_format' }).int('invalid_format').positive('too_small'),
 });
@@ -633,6 +654,9 @@ export type MedicineRecordInput = z.infer<typeof medicineRecordSchema>;
 export type VaccineTaskInput = z.infer<typeof vaccineTaskSchema>;
 export type BiosecurityStepInput = z.infer<typeof biosecurityStepSchema>;
 export type LossIncidentInput = z.infer<typeof lossIncidentSchema>;
+export type ExpenseCategoryInput = z.infer<typeof expenseCategoryInputSchema>;
+export type ExpenseEntryInput = z.infer<typeof expenseEntryInputSchema>;
+export type ExpenseReversalInput = z.infer<typeof expenseReversalSchema>;
 export type CustomerInput = z.infer<typeof customerInputSchema>;
 export type MarketPriceInput = z.infer<typeof marketPriceInputSchema>;
 export type OrderInput = z.infer<typeof orderInputSchema>;

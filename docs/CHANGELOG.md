@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.12.0 — 2026-10-13
+
+Phase 12 expenses.
+
+- An amount is stored only when someone types it, with a money unit they type.
+- A correction adds a reversing row. The first row stays.
+- There is no tax column and no profit figure.
+
 ## 0.11.0 — 2026-10-13
 
 Phase 11 customers, draft orders, and typed prices.

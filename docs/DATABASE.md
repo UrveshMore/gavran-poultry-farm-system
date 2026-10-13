@@ -93,4 +93,10 @@ MySQL 8.4, `utf8mb4` / `utf8mb4_0900_ai_ci`, session time zone `+00:00`. Migrati
 - `order_lines` — description, quantity above zero, unit price of zero or more. No tax column.
 - Permissions `000000000132` and `000000000133`: `sale.read`, `sale.record`. Owner and manager receive both. Worker and vet / advisor receive neither.
 
+## 014 expenses
+
+- `expense_categories` — a name the farm types. No category is seeded.
+- `expense_entries` — date, direction `expense` or `income`, amount, and a money unit the farm types. Optional counterparty, reference, notes, and batch. `reverses_entry_id` points at the row a correction undoes. That earlier row is not updated. No tax column.
+- Permissions `000000000134` and `000000000135`: `expense.read`, `expense.record`. Owner and manager receive both. Worker and vet / advisor receive neither.
+
 Queries use `mysql2` `execute()` (server-side prepared statements). Audit list `LIMIT` and `OFFSET` are interpolated only after the values are checked as integers, because the binary protocol rejects placeholders there.

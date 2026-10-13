@@ -148,3 +148,13 @@ A random or foreign farm id is 404.
 `GET|POST /farms/:farmId/orders` — `sale.read` / `sale.record`. Status is only `draft`. The list includes `invoicePosting: "disabled"`. A line needs a description, a quantity above zero, and a unit price of zero or more.
 
 `POST /farms/:farmId/invoices` — `sale.record`. Always 409 `INVOICE_POSTING_DISABLED`. No invoice row is created.
+
+## Expenses
+
+`GET /farms/:farmId/expenses` — `expense.read`. Categories and rows. `accountingBasis.status` is `not_chosen`. There is no profit field.
+
+`POST /farms/:farmId/expense-categories` — `expense.record`. A name the farm types. None are seeded.
+
+`POST /farms/:farmId/expenses` — `expense.record`. Direction is `expense` or `income`. Amount is above zero. `unitLabel` is the money unit the caller types. `batchId` may be blank. A future date is 422.
+
+`POST /farms/:farmId/expenses/:entryId/reversal` — `expense.record`. Adds a new row with the same amount that points at the earlier row. The earlier row is not changed. A second reversal of the same row is 409 `ALREADY_REVERSED`. There is no update and no delete.

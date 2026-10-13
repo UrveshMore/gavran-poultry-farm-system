@@ -41,6 +41,8 @@ UI navigation inside a farm still shows Sheds, Batches, Eggs, People, and Activi
 | `loss.record` | Write a loss note. |
 | `sale.read` | View customers, draft orders, and typed prices. |
 | `sale.record` | Add a customer, a typed price, or a draft order. Invoice posting is refused. |
+| `expense.read` | View expense and income rows. |
+| `expense.record` | Add a category, an amount, or a reversing entry. |
 
 `GET /api/v1/farms` lists farms the caller belongs to, including farms where they have zero permissions. It does not include contact details.
 

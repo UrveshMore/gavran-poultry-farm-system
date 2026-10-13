@@ -305,6 +305,29 @@ export type FarmOrder = {
 };
 export type OrdersPage = { orders: FarmOrder[]; invoicePosting: 'disabled' };
 
+export type ExpenseCategory = { id: string; name: string };
+export type ExpenseEntry = {
+  id: string;
+  occurredOn: string;
+  direction: 'expense' | 'income';
+  categoryId: string;
+  categoryName: string;
+  amount: number;
+  unitLabel: string;
+  counterparty: string | null;
+  referenceNote: string | null;
+  notes: string | null;
+  batchId: string | null;
+  batchCode: string | null;
+  reversesEntryId: string | null;
+  reversedById: string | null;
+};
+export type ExpensesPageData = {
+  categories: ExpenseCategory[];
+  entries: ExpenseEntry[];
+  accountingBasis: { status: 'not_chosen'; reason: string };
+};
+
 export type LossPage = {
   incidents: LossIncident[];
   mortalityMovements: Array<{ id: string; occurredOn: string; birdCount: number; batchCode: string; reason: string | null }>;

@@ -19,6 +19,7 @@ import { incubationRoutes } from './modules/incubation/routes.js';
 import { incubatorRoutes } from './modules/incubators/routes.js';
 import { farmRoutes } from './modules/farms/routes.js';
 import { saleRoutes } from './modules/sales/routes.js';
+import { expenseRoutes } from './modules/expenses/routes.js';
 import { lossRoutes } from './modules/losses/routes.js';
 import { healthRoutes } from './modules/health/routes.js';
 import { stockRoutes } from './modules/stock/routes.js';
@@ -64,6 +65,7 @@ export function createApp() {
   app.use('/api/v1/farms', healthRoutes);
   app.use('/api/v1/farms', lossRoutes);
   app.use('/api/v1/farms', saleRoutes);
+  app.use('/api/v1/farms', expenseRoutes);
   app.use(notFound);
   app.use(errorHandler);
   return app;

@@ -66,7 +66,7 @@ Done in this repository. WF-13 with prices the owner types. The local market pri
 
 ## Phase 12 — Expenses
 
-WF-15 expense capture without GST or other tax rules. Accounting basis stays open (decision 9).
+Done in this repository. WF-15 amounts the farm types. Categories start empty. A correction is a new reversing row; the first row is not edited or deleted. No GST or other tax column. No profit figure. Accounting basis stays open (decision 9).
 
 ## Phase 13 — Essential reports
 

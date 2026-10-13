@@ -39,6 +39,8 @@ beforeEach(async () => {
     for (const table of [
       'idempotency_keys',
       'audit_logs',
+      'expense_entries',
+      'expense_categories',
       'order_lines',
       'orders',
       'market_prices',

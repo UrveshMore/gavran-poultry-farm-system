@@ -10,6 +10,7 @@ import { EggsPage } from '@/pages/EggPages';
 import { IncubationDetailPage, IncubationPage } from '@/pages/IncubationPages';
 import { IncubatorDetailPage, IncubatorsPage } from '@/pages/IncubatorPages';
 import { ActivityPage, FarmCreatePage, FarmProfilePage, FarmsPage, PeoplePage, ShedsPage } from '@/pages/FarmPages';
+import { ExpensesPage } from '@/pages/ExpensePages';
 import { LossesPage } from '@/pages/LossPages';
 import { SalesPage } from '@/pages/SalesPages';
 import { HealthPage } from '@/pages/HealthPages';
@@ -58,6 +59,7 @@ export function App() {
         <Route path="farms/:farmId/health" element={<HealthPage />} />
         <Route path="farms/:farmId/losses" element={<LossesPage />} />
         <Route path="farms/:farmId/sales" element={<SalesPage />} />
+        <Route path="farms/:farmId/expenses" element={<ExpensesPage />} />
         <Route path="farms/:farmId/people" element={<PeoplePage />} />
         <Route path="farms/:farmId/activity" element={<ActivityPage />} />
       </Route>
