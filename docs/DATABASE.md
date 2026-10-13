@@ -144,4 +144,9 @@ There is no backup table. `npm run restore-drill -w @gavran/server` creates `gav
 - `invoice_lines` — quantity and unit. Price and money unit are null together unless typed.
 - `sale_returns` — a new row pointing at a document. The document is not removed. No balance column.
 
+## 021 notices
+
+- Permissions `000000000146` and `000000000147`: `notification.read`, `notification.write`. Owner and manager receive both. Worker and vet / advisor receive `notification.read`.
+- `notifications` — title, body, and an optional read time. No delivery column.
+
 Queries use `mysql2` `execute()` (server-side prepared statements). Audit list `LIMIT` and `OFFSET` are interpolated only after the values are checked as integers, because the binary protocol rejects placeholders there.

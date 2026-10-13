@@ -104,6 +104,10 @@ Done in this repository. An invoice document is text and lines the farm types. I
 
 Done in this repository. The same date range can also name a shed, a batch, or a category. The download uses those same filters. Extra sections list attendance rows, parentage notes, goods receipts, unposted invoice documents, and returns. The hatch figure stays proposed. Mortality stays uncalculated. There is no feed conversion and no profit.
 
+## Phase 20 — Notifications
+
+Done in this repository. A notice is a title and a message for one person on the farm. It stays in the app. The recipient can mark it read. `urgent.status` is `not_chosen` because decision 14 is open. Nothing is sent out.
+
 ## Explicitly later
 
-P1 continues with in-app notifications, documents, PWA install, offline-safe capture, multilingual polish, search, and scheduled reports. P2 (AI image triage, weather, voice, sensors, forecasting, portals, farm map, route planning, a native app, custom model training) stays unstarted. Offline capture must not silently merge stock, finance, mortality, or treatment records. Medical and feeding standards stay owner-editable and sourced. Nothing in those standards is invented. Invoice posting stays off until the farm decides when a sale is posted.
+P1 continues with documents, PWA install, offline-safe capture, multilingual polish, search, and scheduled reports. P2 (AI image triage, weather, voice, sensors, forecasting, portals, farm map, route planning, a native app, custom model training) stays unstarted. Offline capture must not silently merge stock, finance, mortality, or treatment records. Medical and feeding standards stay owner-editable and sourced. Nothing in those standards is invented. Invoice posting stays off until the farm decides when a sale is posted.

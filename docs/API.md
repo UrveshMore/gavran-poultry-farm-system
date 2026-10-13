@@ -198,6 +198,12 @@ The restore drill is the server command `npm run restore-drill -w @gavran/server
 
 `POST /farms/:farmId/tasks/:taskId/training-requirements` — `training.manage`. Completing that task is 409 `TRAINING_REQUIRED` until the person finishing it has a completion for the item.
 
+## Notices
+
+`GET|POST /farms/:farmId/notifications` — `notification.read` / `notification.write`. A writer sees every notice on the farm. Anyone else sees only notices addressed to them. `delivery` is `in_app`. `urgent.status` is `not_chosen`.
+
+`POST /farms/:farmId/notifications/:noticeId/read` — `notification.read`. Only the recipient. A second call keeps the first read time.
+
 ## Invoice documents
 
 `POST /farms/:farmId/invoices` — `sale.record`. Still 409 `INVOICE_POSTING_DISABLED`.

@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.21.0 — 2026-10-13
+
+Phase 20 notices.
+
+- A notice stays in the app. The recipient can mark it read.
+- No urgent rule is stored.
+
 ## 0.20.0 — 2026-10-13
 
 Phase 19 reports.

@@ -702,6 +702,12 @@ const typedMoney = z.number({ invalid_type_error: 'invalid_format' }).positive('
 const typedQuantity = z.number({ invalid_type_error: 'invalid_format' }).positive('too_small').max(1_000_000, 'too_big');
 const unitLabelSchema = z.string().trim().min(1, 'required').max(32, 'too_big');
 
+export const notificationInputSchema = z.object({
+  userId: z.string().uuid('invalid_format'),
+  title: z.string().trim().min(2, 'too_small').max(160, 'too_big'),
+  body: z.string().trim().min(1, 'required').max(2000, 'too_big'),
+});
+
 export const invoiceDocumentInputSchema = z.object({
   customerId: z.string().uuid('invalid_format'),
   orderId: z.union([z.string().uuid('invalid_format'), z.literal('')]),
@@ -895,6 +901,7 @@ export type TaskTrainingRequirementInput = z.infer<typeof taskTrainingRequiremen
 export type ParentageInput = z.infer<typeof parentageInputSchema>;
 export type SupplierInput = z.infer<typeof supplierInputSchema>;
 export type InvoiceDocumentInput = z.infer<typeof invoiceDocumentInputSchema>;
+export type NotificationInput = z.infer<typeof notificationInputSchema>;
 export type SaleReturnInput = z.infer<typeof saleReturnInputSchema>;
 export type PurchaseOrderInput = z.infer<typeof purchaseOrderInputSchema>;
 export type GoodsReceiptInput = z.infer<typeof goodsReceiptInputSchema>;

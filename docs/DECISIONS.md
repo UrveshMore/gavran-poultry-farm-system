@@ -42,6 +42,7 @@ Dated 2026-10-13. Technical choices below are provisional engineering defaults f
 | T34 | Supplier orders stay `draft`. A line price is null unless an amount and a money unit are typed. Receipts do not insert stock rows. Bills and payments are separate tables. `stockPosting` is `disabled`. Valuation stays `not_chosen`. | Decisions 7 and 8 stay open. No tax column. |
 | T35 | Invoice documents use status `unposted` only. `POST /invoices` stays 409. A return row references the document and does not delete it. `balance.status` is `not_calculated`. | Decision 8 stays open. No tax column. |
 | T36 | Report filters are optional shed, batch, and category ids. A section without that column is left on the date range, except hatch, loss, expense, movement, egg, and parentage rows, which narrow when the column exists. Export is the same payload. | Decisions 4 and 9 stay open. |
+| T37 | Notices are rows for one farm member. `delivery` is `in_app`. `urgent.status` is `not_chosen`. | Decision 14 stays open. |
 
 ## Still open (blueprint section 18)
 

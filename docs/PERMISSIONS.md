@@ -53,6 +53,8 @@ UI navigation inside a farm still shows Sheds, Batches, Eggs, People, and Activi
 | `breeding.record` | Add a parentage note. |
 | `supplier.read` | View suppliers, draft orders, receipts, bills, and payments. |
 | `supplier.record` | Add those rows. A receipt does not change stock. |
+| `notification.read` | View in-app notices. A person without `notification.write` sees only their own. |
+| `notification.write` | Write an in-app notice for a farm member. |
 
 `GET /api/v1/farms` lists farms the caller belongs to, including farms where they have zero permissions. It does not include contact details.
 
@@ -64,8 +66,8 @@ Pending owner confirmation. Seeded by the versioned migrations and mirrored in `
 |---|---|
 | Owner | All keys in the catalog. |
 | Manager | Farm operations in the catalog except `user.manage` and `farm.update`. |
-| Worker | `farm.read`, `shed.read`, `batch.read`, `egg.read`, `egg.record`, `incubator.read`, `incubator.record`, `incubation.read`, `incubation.record`, `hatch.record`, `task.read`, `task.complete`, `stock.read`, `stock.record`, `health.read`, `health.record`, `loss.read`, `loss.record`, `attendance.read`, `attendance.record`, `training.read`, `training.complete`, `breeding.read`, `breeding.record`. A worker sees tasks assigned to them, their own attendance, and their own training assignments. |
-| Vet / advisor | `farm.read`, `shed.read`, `batch.read`, `egg.read`, `incubator.read`, `incubation.read`, `task.read`, `stock.read`, `health.read`, `health.record`, `loss.read`, `breeding.read`. |
+| Worker | `farm.read`, `shed.read`, `batch.read`, `egg.read`, `egg.record`, `incubator.read`, `incubator.record`, `incubation.read`, `incubation.record`, `hatch.record`, `task.read`, `task.complete`, `stock.read`, `stock.record`, `health.read`, `health.record`, `loss.read`, `loss.record`, `attendance.read`, `attendance.record`, `training.read`, `training.complete`, `breeding.read`, `breeding.record`, `notification.read`. A worker sees tasks assigned to them, their own attendance, their own training assignments, and notices addressed to them. |
+| Vet / advisor | `farm.read`, `shed.read`, `batch.read`, `egg.read`, `incubator.read`, `incubation.read`, `task.read`, `stock.read`, `health.read`, `health.record`, `loss.read`, `breeding.read`, `notification.read`. |
 | Family helper | None from the role. Optional grants on that membership only. |
 | System administrator | None. |
 
