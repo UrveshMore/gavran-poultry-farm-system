@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.24.0 — 2026-10-13
+
+Phase 23 offline capture.
+
+- An attendance row can wait on the device and is sent with the same key.
+- Stock, money, losses, and medicine are not stored on the device.
+- A conflict does not replace the farm row.
+
 ## 0.23.0 — 2026-10-13
 
 Phase 22 install.

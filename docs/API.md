@@ -186,7 +186,7 @@ The restore drill is the server command `npm run restore-drill -w @gavran/server
 
 ## Attendance and training
 
-`GET|POST /farms/:farmId/attendance` — `attendance.read` / `attendance.record`. `methodLabel` is required and typed. `attendedTime` may be blank. `attendedOn` is not in the future for the farm timezone. A worker may omit `userId` or send their own, and a row for someone else is 403. Owner and manager may name an active member. `metric` is `{ kind: "row_count", rowCount }`. There is no score. Rows are not edited or deleted.
+`GET|POST /farms/:farmId/attendance` — `attendance.read` / `attendance.record`. `methodLabel` is required and typed. `attendedTime` may be blank. `attendedOn` is not in the future for the farm timezone. A worker may omit `userId` or send their own, and a row for someone else is 403. Owner and manager may name an active member. `metric` is `{ kind: "row_count", rowCount }`. There is no score. Rows are not edited or deleted. The device may hold one attendance post and send it later with `Idempotency-Key`. Other writes are not queued. Decision 10 stays open.
 
 `GET /farms/:farmId/training` — `training.read`. Items, assignments, and task links. A worker sees only their own assignments.
 

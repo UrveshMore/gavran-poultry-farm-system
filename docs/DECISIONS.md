@@ -45,6 +45,7 @@ Dated 2026-10-13. Technical choices below are provisional engineering defaults f
 | T37 | Notices are rows for one farm member. `delivery` is `in_app`. `urgent.status` is `not_chosen`. | Decision 14 stays open. |
 | T38 | Farm files stay on local disk under `uploads/`. Kind is taken from magic bytes: JPEG, PNG, WebP, or PDF, at most 5 MB. `scan.status` is `not_claimed`. There is no delete. | Decision 15 stays open. |
 | T39 | Install uses the browser prompt, or a share-menu note on iPhone. `/api` stays `NetworkOnly`. | No offline record cache. |
+| T40 | The device queue accepts only `POST .../attendance`. Stock, expenses, invoices, orders, market prices, losses, medicine, and supplier money return `refused` and are not stored. Replay uses the same idempotency key. Status 409 becomes `conflict` and is not written again. | Decision 10 stays open. |
 
 ## Still open (blueprint section 18)
 

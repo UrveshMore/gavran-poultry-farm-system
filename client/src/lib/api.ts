@@ -14,7 +14,7 @@ export class ApiError extends Error {
   }
 }
 
-type Options = { method?: string; json?: unknown; form?: FormData; retry?: boolean };
+type Options = { method?: string; json?: unknown; form?: FormData; retry?: boolean; idempotencyKey?: string };
 
 let refreshPromise: Promise<boolean> | null = null;
 
@@ -47,6 +47,7 @@ export async function api<T>(path: string, options: Options = {}): Promise<T> {
   const method = options.method ?? 'GET';
   const headers = new Headers();
   if (options.json !== undefined) headers.set('content-type', 'application/json');
+  if (options.idempotencyKey) headers.set('Idempotency-Key', options.idempotencyKey);
   if (method !== 'GET' && method !== 'HEAD') headers.set('X-CSRF-Token', await csrfToken());
   const res = await fetch(path, {
     method,

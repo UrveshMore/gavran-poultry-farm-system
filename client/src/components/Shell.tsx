@@ -1,4 +1,4 @@
-import { BarChart3, Bell, Bird, ClipboardList, Egg, Feather, FileText, FolderOpen, GitBranch, GraduationCap, Home, ListTodo, LogOut, Package, Receipt, Shield, ShieldAlert, ShoppingBasket, Stethoscope, Thermometer, Users, Warehouse, Wheat } from 'lucide-react';
+import { BarChart3, Bell, Bird, ClipboardList, CloudOff, Egg, Feather, FileText, FolderOpen, GitBranch, GraduationCap, Home, ListTodo, LogOut, Package, Receipt, Shield, ShieldAlert, ShoppingBasket, Stethoscope, Thermometer, Users, Warehouse, Wheat } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom';
@@ -62,6 +62,7 @@ export function AppShell() {
         { to: `/farms/${farmId}/safeguards`, label: t('nav.safeguards'), icon: Shield, end: false },
         { to: `/farms/${farmId}/notices`, label: t('nav.notices'), icon: Bell, end: false },
         { to: `/farms/${farmId}/documents`, label: t('nav.documents'), icon: FolderOpen, end: false },
+        { to: `/farms/${farmId}/offline`, label: t('nav.offline'), icon: CloudOff, end: false },
         { to: `/farms/${farmId}/people`, label: t('nav.people'), icon: Users, end: false },
         { to: `/farms/${farmId}/activity`, label: t('nav.activity'), icon: ClipboardList, end: false },
       ]

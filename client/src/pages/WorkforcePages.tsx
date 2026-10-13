@@ -1,12 +1,14 @@
 import { attendanceInputSchema, trainingAssignmentInputSchema, trainingCompletionSchema, trainingItemInputSchema } from '@gavran/shared';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
 import { z } from 'zod';
 import { Alert, Button, Card, Field, Input, TextArea } from '@/components/ui';
 import { ApiError, api, errorKey, fetchMe } from '@/lib/api';
+import { queueAttendance } from '@/lib/offlineQueue';
 import type { AttendancePage, FarmSummary, Member, TrainingPage } from '@/lib/types';
 
 const selectClass = 'min-h-11 w-full rounded-xl border border-line bg-white px-3';
@@ -44,6 +46,7 @@ export function WorkforcePage() {
     enabled: Boolean(access?.permissions.includes('user.read')),
   });
   const canRecord = Boolean(access?.permissions.includes('attendance.record'));
+  const [held, setHeld] = useState(false);
   const canManage = Boolean(access?.permissions.includes('training.manage'));
   const canComplete = Boolean(access?.permissions.includes('training.complete'));
 
@@ -134,7 +137,21 @@ export function WorkforcePage() {
         ))}
         {canRecord ? (
           <Card>
-            <form className="grid gap-3" onSubmit={attendanceForm.handleSubmit((values) => saveAttendance.mutate(values))}>
+            <form
+              className="grid gap-3"
+              onSubmit={attendanceForm.handleSubmit((values) => {
+                if (!navigator.onLine) {
+                  const outcome = queueAttendance(farmId, values);
+                  if (outcome === 'queued') {
+                    setHeld(true);
+                    attendanceForm.reset({ userId: '', attendedOn: '', attendedTime: '', methodLabel: '', note: '' });
+                  }
+                  return;
+                }
+                setHeld(false);
+                saveAttendance.mutate(values);
+              })}
+            >
               <h3 className="font-display text-xl">{t('workforce.saveAttendance')}</h3>
               {people.length > 0 ? (
                 <Field id="att-person" label={t('workforce.person')}>
@@ -160,6 +177,7 @@ export function WorkforcePage() {
               <Field id="att-note" label={`${t('workforce.note')} (${t('common.optional')})`}>
                 <TextArea id="att-note" {...attendanceForm.register('note')} />
               </Field>
+              {held ? <Alert tone="ok">{t('offline.held')}</Alert> : null}
               {saveAttendance.isError ? <Alert>{explain(saveAttendance.error, t)}</Alert> : null}
               <Button type="submit">{saveAttendance.isPending ? t('workforce.saving') : t('workforce.saveAttendance')}</Button>
             </form>
