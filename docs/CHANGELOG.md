@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.3.0 — 2026-10-13
+
+Phase 3 egg collection.
+
+- Owner-named egg sorts. Fertile and table are a button, not a required seed.
+- A collection can omit batch and shed. Counts are whole eggs. No price is stored.
+
 ## 0.2.0 — 2026-10-13
 
 Phase 2 batch ledger.

@@ -40,6 +40,9 @@ async function truncate(): Promise<void> {
     for (const table of [
       'idempotency_keys',
       'audit_logs',
+      'egg_collection_lines',
+      'egg_collections',
+      'egg_categories',
       'batch_movements',
       'batches',
       'bird_types',

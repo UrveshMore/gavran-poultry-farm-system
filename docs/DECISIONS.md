@@ -24,14 +24,15 @@ Dated 2026-10-13. Technical choices below are provisional engineering defaults f
 | T16 | The dev client is `http://127.0.0.1:4317` and proxies `/api` to `127.0.0.1:4318` so cookies stay same-origin. | Uncommon ports, away from 3000, 5173, and 8080. |
 | T17 | Canonical Git history remote is https://github.com/UrveshMore/gavran-poultry-farm-system on `main`. | Owner request, 2026-10-13. |
 | T18 | Bird types are names the farm types. Batch status is only `open` or `closed`. Movement types are opening, transfer, sale, mortality, culling, and other exit. A sale has no price field. | Decision 3 is still open, so no species catalog was seeded. |
+| T19 | Egg sorts are names the farm types. Fertile and table are optional labels the screen can create; they are not required rows. A collection may omit batch and shed. Counts are whole eggs. There is no price column. | Owner answer on 2026-10-13, decision 2. |
 
 ## Still open (blueprint section 18)
 
 Do not implement policy for these until the owner answers. Date the answer in this file.
 
 1. Single farm or multiple farms? The schema allows multiple farms. That is not a business confirmation.
-2. Egg categories and inventory units actually used on the farm.
-3. Bird types, species, strains, and batch statuses.
+2. Egg categories and inventory units actually used on the farm. On 2026-10-13 the owner said eggs are sorted into fertile eggs and table eggs. Those names are optional starter labels the owner can rename or skip. Any other sort exists only after the owner adds it. Counts are eggs, not weight. No price is stored on a collection.
+3. Bird types, species, strains, and batch statuses. On 2026-10-13 the owner said the flock is Desi/Gavran: indigenous, free-range or backyard. That does not seed a strain list. Strain, rooster count, and hen count stay owner-entered (see the roadmap section after P0). Batch status remains only open or closed until a further answer.
 4. Official hatch-rate, mortality-rate, and FCR formulas.
 5. Authoritative source documents for vaccines, medicine, feed, water, and incubation SOPs. On 2026-10-13 the owner supplied three Patil Poultry House Training PDFs, stored under `docs/sources/`, as the only extraction source for the Disease & Treatment Knowledge Base (see Phase 9 in `docs/ROADMAP.md`). That does not approve any dose. Each entry stays unverified until the owner sets its approval flag. Feed, water, and incubation SOPs are still unanswered.
 6. Who can approve and publish SOP changes.

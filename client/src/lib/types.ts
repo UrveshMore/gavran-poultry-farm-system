@@ -109,3 +109,18 @@ export type AuditPage = {
   items: AuditItem[];
   total: number;
 };
+
+export type EggCategory = { id: string; name: string; status: 'active' | 'archived' };
+
+export type EggCollection = {
+  id: string;
+  collectedOn: string;
+  batchId: string | null;
+  batchCode: string | null;
+  shedId: string | null;
+  shedCode: string | null;
+  shiftLabel: string | null;
+  notes: string | null;
+  total: number;
+  lines: Array<{ categoryId: string; categoryName: string; eggCount: number }>;
+};

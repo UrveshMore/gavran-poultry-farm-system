@@ -64,3 +64,9 @@ Bodies never include the access or refresh token.
 `POST /farms/:farmId/batches/:batchId/close` — `movement.create`, body `{ version }`. 409 `BIRDS_REMAIN` when the live count is not zero.
 
 A random or foreign farm id is 404.
+
+## Eggs
+
+`GET|POST /farms/:farmId/egg-categories` — `egg.read` / `egg.record`. The name is text the farm enters. Nothing is seeded. 409 `DUPLICATE_CODE`.
+
+`GET|POST /farms/:farmId/eggs` — `egg.read` / `egg.record`. A collection stores a date, optional batch, optional shed, optional shift label, notes, and whole-egg counts by sort. At least one count must be greater than zero. Create accepts an idempotency key. There is no price field. A future date is 422. A closed or foreign batch, a shed from another farm, or an unknown sort is 422.

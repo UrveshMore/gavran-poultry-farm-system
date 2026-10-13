@@ -27,5 +27,13 @@ MySQL 8.4, `utf8mb4` / `utf8mb4_0900_ai_ci`, session time zone `+00:00`. Migrati
 - `bird_types` — a name the farm enters. Unique per farm.
 - `batches` — code, optional hatch date, `open` or `closed`.
 - `batch_movements` — opening, transfer, sale, mortality, culling, or other exit. Live count is the sum of these rows. A sale does not store a price.
+- Permissions `000000000109` through `000000000111`: `batch.read`, `batch.create`, `movement.create`.
+
+## 005 eggs
+
+- `egg_categories` — a sort name the farm enters. Unique per farm. No rows are seeded.
+- `egg_collections` — date, optional batch, optional shed, optional shift label, notes. No price column.
+- `egg_collection_lines` — whole-egg count, `egg_count >= 0`. A line with zero is not inserted.
+- Permissions `000000000112` and `000000000113`: `egg.read`, `egg.record`. Owner, manager, and worker receive both. Vet / advisor receives read only.
 
 Queries use `mysql2` `execute()` (server-side prepared statements). Audit list `LIMIT` and `OFFSET` are interpolated only after the values are checked as integers, because the binary protocol rejects placeholders there.

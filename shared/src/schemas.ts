@@ -216,6 +216,40 @@ export const movementInputSchema = z
     }
   });
 
+export const eggCategoryInputSchema = z.object({
+  name: z.string().trim().min(2, 'too_small').max(80, 'too_big'),
+});
+
+export const eggCollectionInputSchema = z
+  .object({
+    collectedOn: calendarDateSchema,
+    batchId: z.union([z.string().uuid('invalid_format'), z.literal('')]),
+    shedId: z.union([z.string().uuid('invalid_format'), z.literal('')]),
+    shiftLabel: z.string().trim().max(40, 'too_big'),
+    notes: z.string().trim().max(500, 'too_big'),
+    lines: z
+      .array(
+        z.object({
+          categoryId: z.string().uuid('invalid_format'),
+          eggCount: z.number({ invalid_type_error: 'invalid_format' }).int('invalid_format').min(0, 'too_small').max(1_000_000, 'too_big'),
+        }),
+      )
+      .min(1, 'too_small')
+      .max(30, 'too_big'),
+  })
+  .superRefine((value, ctx) => {
+    const seen = new Set<string>();
+    for (const line of value.lines) {
+      if (seen.has(line.categoryId)) {
+        ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'invalid_format', path: ['lines'] });
+      }
+      seen.add(line.categoryId);
+    }
+    if (!value.lines.some((line) => line.eggCount > 0)) {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'too_small', path: ['lines'] });
+    }
+  });
+
 export const closeBatchSchema = z.object({
   version: z.number({ invalid_type_error: 'invalid_format' }).int('invalid_format').positive('too_small'),
 });
@@ -229,6 +263,8 @@ export type BirdTypeInput = z.infer<typeof birdTypeInputSchema>;
 export type BatchInput = z.infer<typeof batchInputSchema>;
 export type MovementInput = z.infer<typeof movementInputSchema>;
 export type CloseBatchInput = z.infer<typeof closeBatchSchema>;
+export type EggCategoryInput = z.infer<typeof eggCategoryInputSchema>;
+export type EggCollectionInput = z.infer<typeof eggCollectionInputSchema>;
 export type RegisterInput = z.infer<typeof registerSchema>;
 export type LoginInput = z.infer<typeof loginSchema>;
 export type FarmInput = z.infer<typeof farmInputSchema>;

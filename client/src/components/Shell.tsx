@@ -1,4 +1,4 @@
-import { Bird, ClipboardList, Home, LogOut, Users, Warehouse } from 'lucide-react';
+import { Bird, ClipboardList, Egg, Home, LogOut, Users, Warehouse } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom';
@@ -44,6 +44,7 @@ export function AppShell() {
         { to: `/farms/${farmId}`, label: t('nav.farm'), icon: Home, end: true },
         { to: `/farms/${farmId}/sheds`, label: t('nav.sheds'), icon: Warehouse, end: false },
         { to: `/farms/${farmId}/batches`, label: t('nav.batches'), icon: Bird, end: false },
+        { to: `/farms/${farmId}/eggs`, label: t('nav.eggs'), icon: Egg, end: false },
         { to: `/farms/${farmId}/people`, label: t('nav.people'), icon: Users, end: false },
         { to: `/farms/${farmId}/activity`, label: t('nav.activity'), icon: ClipboardList, end: false },
       ]
@@ -89,9 +90,9 @@ export function AppShell() {
         </main>
       </div>
       {farmId ? (
-        <nav className="fixed inset-x-0 bottom-0 z-20 grid grid-cols-5 border-t border-line bg-white/95 pb-[env(safe-area-inset-bottom)] md:hidden">
+        <nav className="fixed inset-x-0 bottom-0 z-20 flex overflow-x-auto border-t border-line bg-white/95 pb-[env(safe-area-inset-bottom)] md:hidden">
           {items.map((item) => (
-            <NavLink key={item.to} to={item.to} end={item.end} className={({ isActive }) => `flex min-h-14 flex-col items-center justify-center gap-1 text-xs font-semibold ${isActive ? 'text-grove' : 'text-ink-soft'}`}>
+            <NavLink key={item.to} to={item.to} end={item.end} className={({ isActive }) => `flex min-h-14 min-w-[4.5rem] flex-1 flex-col items-center justify-center gap-1 px-1 text-xs font-semibold ${isActive ? 'text-grove' : 'text-ink-soft'}`}>
               <item.icon aria-hidden="true" size={18} />
               {item.label}
             </NavLink>
