@@ -65,12 +65,15 @@ export async function createEntry(actor: Actor, access: FarmAccess, body: unknow
     if (input.batchId !== '' && !(await batchOnFarm(conn, access.farmId, input.batchId))) {
       throw new AppError(422, 'VALIDATION_ERROR', 'Choose a batch on this farm.', { fields: { batchId: 'invalid_format' } });
     }
+    const amount = input.quantity != null && input.rate != null ? Math.round(input.quantity * input.rate * 100) / 100 : input.amount;
     const id = await insertEntry(conn, {
       farmId: access.farmId,
       occurredOn: input.occurredOn,
       direction: input.direction,
       categoryId: input.categoryId,
-      amount: input.amount,
+      amount,
+      quantity: input.quantity ?? null,
+      rate: input.rate ?? null,
       unitLabel: input.unitLabel,
       counterparty: blank(input.counterparty),
       referenceNote: blank(input.referenceNote),

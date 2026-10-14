@@ -29,6 +29,7 @@ import { OfflinePage } from '@/pages/OfflinePages';
 import { SearchPageView } from '@/pages/SearchPages';
 import { SchedulesPage } from '@/pages/SchedulePages';
 import { FarmHomePage, GroupPage, HelpPage, TodayPage } from '@/pages/GuidePages';
+import { BirdsBookPage, EggLotsPage, IncomePage, TraysPage } from '@/pages/DesiPages';
 import { SaathiPage } from '@/pages/SaathiPage';
 import { ServerAddressPage } from '@/pages/ServerAddressPage';
 import { YardPageView } from '@/pages/YardPages';
@@ -73,6 +74,10 @@ export function App() {
         <Route path="farms/:farmId/sheds" element={<ShedsPage />} />
         <Route path="farms/:farmId/batches" element={<BatchesPage />} />
         <Route path="farms/:farmId/eggs" element={<EggsPage />} />
+        <Route path="farms/:farmId/egg-lots" element={<EggLotsPage />} />
+        <Route path="farms/:farmId/trays" element={<TraysPage />} />
+        <Route path="farms/:farmId/birds" element={<BirdsBookPage />} />
+        <Route path="farms/:farmId/income" element={<IncomePage />} />
         <Route path="farms/:farmId/incubators" element={<IncubatorsPage />} />
         <Route path="farms/:farmId/incubators/:incubatorId" element={<IncubatorDetailPage />} />
         <Route path="farms/:farmId/incubation" element={<IncubationPage />} />

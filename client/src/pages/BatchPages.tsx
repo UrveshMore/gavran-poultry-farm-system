@@ -13,6 +13,9 @@ import { ApiError, api, errorKey } from '@/lib/api';
 import type { Batch, BatchMovement, BirdType, FarmSummary, RangeArea, SexCount, Shed } from '@/lib/types';
 import { localToday } from '@/lib/today';
 
+/** new-flow keeps range areas, the full movement form, rooster and hen counts, and bird types in this file. They are not shown. */
+const SHOW_LEGACY_BIRD_FORMS = false;
+
 function text(t: (key: string, options?: { defaultValue?: string }) => string, code?: string) {
   if (!code) return undefined;
   return t(`validation.${code}`, { defaultValue: t('validation.invalid') });
@@ -65,7 +68,7 @@ export function BatchesPage() {
         ) : null}
       </div>
       <p className="rounded-xl bg-gold/30 px-3 py-2 text-sm">{t('batches.ledgerNote')}</p>
-      {canCreate ? <BirdTypeForm farmId={farmId} onDone={() => void queryClient.invalidateQueries({ queryKey: ['bird-types', farmId] })} /> : null}
+      {SHOW_LEGACY_BIRD_FORMS && canCreate ? <BirdTypeForm farmId={farmId} onDone={() => void queryClient.invalidateQueries({ queryKey: ['bird-types', farmId] })} /> : null}
       {open ? (
         <BatchForm
           farmId={farmId}
@@ -190,22 +193,42 @@ function BatchForm({
   const errors = form.formState.errors;
   const openedOn = form.watch('openedOn');
   const shedId = form.watch('shedId');
-  const blockReason = types.length === 0 ? t('batches.needType') : sheds.length === 0 ? t('batches.needShed') : !shedId ? t('batches.pickShed') : null;
+  const blockReason = (SHOW_LEGACY_BIRD_FORMS && types.length === 0) ? t('batches.needType') : sheds.length === 0 ? t('batches.needShed') : !shedId ? t('batches.pickShed') : null;
   return (
     <Card>
-      <form className="grid gap-3" onSubmit={form.handleSubmit((values) => mutation.mutate(values))} noValidate>
+      <form
+        className="grid gap-3"
+        noValidate
+        onSubmit={(event) => {
+          event.preventDefault();
+          void (async () => {
+            if (!SHOW_LEGACY_BIRD_FORMS) {
+              const gavran = types.find((type) => type.name.toLowerCase() === 'gavran');
+              const id = gavran
+                ? gavran.id
+                : (await api<{ id: string }>(`/api/v1/farms/${farmId}/bird-types`, { method: 'POST', json: { name: 'Gavran', strainNote: '' } })).id;
+              form.setValue('birdTypeId', id);
+            }
+            await form.handleSubmit((values) => mutation.mutate(values))();
+          })();
+        }}
+      >
         <Field id="batch-code" label={t('batches.code')} error={text(t, errors.code?.message)} hint={t('fieldHint.batch-code')}>
           <Input id="batch-code" {...form.register('code')}  placeholder={t('fieldPh.batch-code')}/>
         </Field>
-        <Field id="batch-type" label={t('batches.birdType')} error={text(t, errors.birdTypeId?.message)} hint={t('fieldHint.batch-type')}>
-          <select id="batch-type" className={selectClass} {...form.register('birdTypeId')}>
-            {types.map((type) => (
-              <option key={type.id} value={type.id}>
-                {type.name}{type.strainNote ? ` · ${type.strainNote}` : ''}
-              </option>
-            ))}
-          </select>
-        </Field>
+        {SHOW_LEGACY_BIRD_FORMS ? (
+          <Field id="batch-type" label={t('batches.birdType')} error={text(t, errors.birdTypeId?.message)} hint={t('fieldHint.batch-type')}>
+            <select id="batch-type" className={selectClass} {...form.register('birdTypeId')}>
+              {types.map((type) => (
+                <option key={type.id} value={type.id}>
+                  {type.name}{type.strainNote ? ` · ${type.strainNote}` : ''}
+                </option>
+              ))}
+            </select>
+          </Field>
+        ) : (
+          <p className="text-sm text-ink-soft">{t('desi.gavranNote')}</p>
+        )}
         <Field id="batch-shed" label={t('batches.shed')} error={text(t, errors.shedId?.message)} hint={t('fieldHint.batch-shed')}>
           {sheds.length === 0 ? (
             <div className="grid gap-2">
@@ -293,6 +316,14 @@ export function BatchDetailPage() {
           <p className="text-sm font-semibold">{t('batches.broodingEnds', { count: stage.broodingDaysLeft })}</p>
         ) : null}
         {stage.stage === 'brooding' ? <p className="text-sm text-ink-soft">{t('batches.chickGuard')}</p> : null}
+        {stage.stage === 'brooding' && stage.daysInStage === 0 ? (
+          <ul className="mt-2 grid gap-1 text-sm">
+            <li>{t('desi.checkHours')}</li>
+            <li>{t('desi.checkGuard')}</li>
+            <li>{t('desi.checkWater')}</li>
+            <li>{t('desi.checkPaper')}</li>
+          </ul>
+        ) : null}
       </Card>
       <BatchDosePanel
         farmId={farmId}
@@ -324,10 +355,10 @@ export function BatchDetailPage() {
           </ul>
         ) : null}
       </Card>
-      {canMove ? (
+      {SHOW_LEGACY_BIRD_FORMS && canMove ? (
         <RangeAreaForm farmId={farmId} onDone={() => void queryClient.invalidateQueries({ queryKey: ['range-areas', farmId] })} />
       ) : null}
-      {canMove && sheds.data ? (
+      {SHOW_LEGACY_BIRD_FORMS && canMove && sheds.data ? (
         <MovementForm
           farmId={farmId}
           batchId={batchId}
@@ -336,6 +367,16 @@ export function BatchDetailPage() {
           onDone={() => void queryClient.invalidateQueries({ queryKey: ['batch', farmId, batchId] })}
         />
       ) : null}
+      {canMove && sheds.data ? (
+        <ShiftForm
+          farmId={farmId}
+          batchId={batchId}
+          fromShedId={batch.placements[0]?.shedId ?? ''}
+          sheds={sheds.data}
+          onDone={() => void queryClient.invalidateQueries({ queryKey: ['batch', farmId, batchId] })}
+        />
+      ) : null}
+      {SHOW_LEGACY_BIRD_FORMS ? (
       <SexCounts
         farmId={farmId}
         batchId={batchId}
@@ -344,6 +385,7 @@ export function BatchDetailPage() {
         rows={(sexes.data ?? []).filter((row) => row.batchId === batchId || row.batchId === null)}
         onDone={() => void queryClient.invalidateQueries({ queryKey: ['sex-counts', farmId] })}
       />
+      ) : null}
       {canMove && batch.liveCount === 0 ? (
         <CloseBatch
           farmId={farmId}
@@ -513,6 +555,74 @@ function RangeAreaForm({ farmId, onDone }: { farmId: string; onDone: () => void 
         </Field>
         {mutation.isError ? <Alert>{explain(mutation.error, t)}</Alert> : null}
         <Button type="submit" variant="outline">{mutation.isPending ? t('batches.saving') : t('batches.saveRange')}</Button>
+      </form>
+    </Card>
+  );
+}
+
+function ShiftForm({
+  farmId,
+  batchId,
+  fromShedId,
+  sheds,
+  onDone,
+}: {
+  farmId: string;
+  batchId: string;
+  fromShedId: string;
+  sheds: Shed[];
+  onDone: () => void;
+}) {
+  const { t } = useTranslation();
+  const [toShedId, setToShedId] = useState('');
+  const [birdCount, setBirdCount] = useState('1');
+  const [occurredOn, setOccurredOn] = useState(localToday());
+  const mutation = useMutation({
+    mutationFn: () =>
+      api(`/api/v1/farms/${farmId}/batches/${batchId}/movements`, {
+        method: 'POST',
+        json: {
+          movementType: 'transfer',
+          fromShedId,
+          toShedId,
+          fromRangeAreaId: '',
+          toRangeAreaId: '',
+          birdCount: Number(birdCount),
+          occurredOn,
+          reason: 'Moved to the bigger shed',
+        },
+      }),
+    onSuccess: onDone,
+  });
+  if (!fromShedId) return null;
+  return (
+    <Card>
+      <h2 className="font-display text-2xl">{t('desi.shiftTitle')}</h2>
+      <p className="text-sm text-ink-soft">{t('desi.shiftBody')}</p>
+      <form
+        className="mt-3 grid gap-3"
+        onSubmit={(event) => {
+          event.preventDefault();
+          mutation.mutate();
+        }}
+      >
+        <Field id="shift-shed" label={t('desi.shiftShed')} hint={t('desi.shiftHint')}>
+          <select id="shift-shed" className={selectClass} value={toShedId} onChange={(event) => setToShedId(event.target.value)}>
+            <option value="">{t('batches.pickShed')}</option>
+            {sheds.filter((shed) => shed.id !== fromShedId).map((shed) => (
+              <option key={shed.id} value={shed.id}>{shed.code} · {shed.name}</option>
+            ))}
+          </select>
+        </Field>
+        <Field id="shift-count" label={t('batches.count')} hint={t('desi.shiftHint')}>
+          <Input id="shift-count" inputMode="numeric" value={birdCount} placeholder="10" onChange={(event) => setBirdCount(event.target.value)} />
+        </Field>
+        <Field id="shift-date" label={t('batches.openedOn')}>
+          <Input id="shift-date" type="date" value={occurredOn} onChange={(event) => setOccurredOn(event.target.value)} />
+        </Field>
+        {!toShedId ? <p className="text-sm font-semibold">{t('batches.pickShed')}</p> : null}
+        {mutation.isError ? <Alert>{explain(mutation.error, t)}</Alert> : null}
+        <Button type="submit" disabled={mutation.isPending || !toShedId}>{t('desi.shiftSave')}</Button>
       </form>
     </Card>
   );

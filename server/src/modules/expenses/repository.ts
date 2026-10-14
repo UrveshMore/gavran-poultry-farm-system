@@ -11,6 +11,8 @@ export type ExpenseEntry = {
   categoryId: string;
   categoryName: string;
   amount: number;
+  quantity: number | null;
+  rate: number | null;
   unitLabel: string;
   counterparty: string | null;
   referenceNote: string | null;
@@ -54,6 +56,8 @@ type EntryRow = RowDataPacket & {
   category_id: string;
   category_name: string;
   amount: number | string;
+  quantity: number | string | null;
+  rate: number | string | null;
   unit_label: string;
   counterparty: string | null;
   reference_note: string | null;
@@ -72,6 +76,8 @@ function mapEntry(row: EntryRow): ExpenseEntry {
     categoryId: row.category_id,
     categoryName: row.category_name,
     amount: asNumber(row.amount),
+    quantity: row.quantity === null ? null : asNumber(row.quantity),
+    rate: row.rate === null ? null : asNumber(row.rate),
     unitLabel: row.unit_label,
     counterparty: row.counterparty,
     referenceNote: row.reference_note,
@@ -85,7 +91,7 @@ function mapEntry(row: EntryRow): ExpenseEntry {
 
 const ENTRY_SELECT = `
   SELECT e.id, e.occurred_on, e.direction, e.category_id, c.name AS category_name,
-         e.amount, e.unit_label, e.counterparty, e.reference_note, e.notes,
+         e.amount, e.quantity, e.rate, e.unit_label, e.counterparty, e.reference_note, e.notes,
          e.batch_id, b.code AS batch_code, e.reverses_entry_id, rev.id AS reversed_by_id
   FROM expense_entries e
   JOIN expense_categories c ON c.id = e.category_id
@@ -111,6 +117,8 @@ export async function insertEntry(
     direction: ExpenseDirection;
     categoryId: string;
     amount: number;
+    quantity?: number | null;
+    rate?: number | null;
     unitLabel: string;
     counterparty: string | null;
     referenceNote: string | null;
@@ -125,8 +133,8 @@ export async function insertEntry(
     db,
     `INSERT INTO expense_entries (
       id, farm_id, occurred_on, direction, category_id, amount, unit_label,
-      counterparty, reference_note, notes, batch_id, reverses_entry_id, created_by
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      counterparty, reference_note, notes, batch_id, reverses_entry_id, created_by, quantity, rate
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
     [
       id,
       input.farmId,
@@ -141,6 +149,8 @@ export async function insertEntry(
       input.batchId,
       input.reversesEntryId,
       input.createdBy,
+      input.quantity ?? null,
+      input.rate ?? null,
     ],
   );
   return id;

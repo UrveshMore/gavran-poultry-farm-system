@@ -136,6 +136,8 @@ function EntryBlock({
       direction: 'expense',
       categoryId: '',
       amount: '' as unknown as number,
+      quantity: null,
+      rate: null,
       unitLabel: '',
       counterparty: '',
       referenceNote: '',
@@ -151,6 +153,8 @@ function EntryBlock({
         direction: 'expense',
         categoryId: '',
         amount: '' as unknown as number,
+        quantity: null,
+        rate: null,
         unitLabel: '',
         counterparty: '',
         referenceNote: '',
@@ -169,7 +173,15 @@ function EntryBlock({
       {canRecord && page.categories.length === 0 ? <p className="text-sm text-ink-soft">{t('expenses.needCategory')}</p> : null}
       {canRecord && page.categories.length > 0 ? (
         <Card>
-          <form className="grid gap-3" onSubmit={form.handleSubmit((values) => mutation.mutate({ ...values, amount: Number(values.amount) }))}>
+          <form
+            className="grid gap-3"
+            onSubmit={(event) => {
+              const quantity = form.getValues('quantity');
+              const rate = form.getValues('rate');
+              if (quantity != null && rate != null) form.setValue('amount', Math.round(quantity * rate * 100) / 100);
+              void form.handleSubmit((values) => mutation.mutate({ ...values, quantity: values.quantity ?? null, rate: values.rate ?? null, amount: Number(values.amount) }))(event);
+            }}
+          >
             <h3 className="font-display text-xl">{t('expenses.saveEntry')}</h3>
             <Field id="expense-date" label={t('expenses.date')} error={text(t, form.formState.errors.occurredOn?.message)} hint={t('fieldHint.expense-date')}>
               <Input id="expense-date" type="date" {...form.register('occurredOn')} />
@@ -187,6 +199,12 @@ function EntryBlock({
                   <option key={category.id} value={category.id}>{category.name}</option>
                 ))}
               </select>
+            </Field>
+            <Field id="expense-qty" label={`${t('expenses.quantity')} (${t('common.optional')})`} hint={t('expenses.qtyRateHint')}>
+              <Input id="expense-qty" type="number" min={0} step="0.001" placeholder={t('fieldPh.expense-qty')} {...form.register('quantity', { setValueAs: (value) => (value === '' || value == null ? null : Number(value)) })} />
+            </Field>
+            <Field id="expense-rate" label={`${t('expenses.rate')} (${t('common.optional')})`} hint={t('fieldHint.expense-rate')}>
+              <Input id="expense-rate" type="number" min={0} step="0.01" placeholder={t('fieldPh.expense-rate')} {...form.register('rate', { setValueAs: (value) => (value === '' || value == null ? null : Number(value)) })} />
             </Field>
             <Field id="expense-amount" label={t('expenses.amount')} error={text(t, form.formState.errors.amount?.message)} hint={t('fieldHint.expense-amount')}>
               <Input id="expense-amount" type="number" min={0} step="0.01" {...form.register('amount', { valueAsNumber: true })}  placeholder={t('fieldPh.expense-amount')}/>
@@ -240,6 +258,7 @@ function EntryCard({ farmId, entry, canRecord, onSaved }: { farmId: string; entr
       </p>
       <p>
         {entry.amount} {entry.unitLabel}
+        {entry.quantity != null && entry.rate != null ? ` · ${entry.quantity} × ${entry.rate}` : ''}
       </p>
       {entry.counterparty ? <p className="text-sm text-ink-soft">{entry.counterparty}</p> : null}
       {entry.notes ? <p>{entry.notes}</p> : null}

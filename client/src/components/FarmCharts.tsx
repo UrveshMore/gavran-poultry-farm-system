@@ -1,4 +1,5 @@
 import type { DashboardData } from '@/components/DashboardCards';
+import { SeasonCard } from '@/pages/DesiPages';
 import { Button, Card } from '@/components/ui';
 import { api } from '@/lib/api';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
@@ -111,6 +112,7 @@ export function FarmCharts({ farmId, data }: { farmId: string; data: DashboardDa
         </ul>
         {charts.money.length === 0 ? <p className="text-sm">{notSet}</p> : null}
       </Card>
+      <SeasonCard farmId={farmId} />
       {data.phone ? <PhoneSettings farmId={farmId} phone={data.phone} /> : null}
     </div>
   );

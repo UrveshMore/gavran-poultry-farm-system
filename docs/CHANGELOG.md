@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.36.0 — 2026-10-14
+
+The owner's desi flow, on the new-flow branch.
+
+- Egg lots store where the eggs came from. Each incubator can have trays. Each tray has its own set date.
+- A hatch can be written over more than one day. Each day with live chicks opens its own Gavran flock. The page shows live chicks, eggs set minus live, and live divided by eggs set. That ratio is not an official hatch percent.
+- After hatch, the flock page lists the first day: 4 to 5 hours in the incubator, then a chick guard and paper, jaggery or sugar water for 2 hours, then the day-wise medicine paper. Brooding stays 28 days.
+- Birds that left can be died, sold, or eaten. A sale asks for an amount and a unit.
+- Kharch can take a quantity and a rate. When both are typed, the stored amount is quantity times rate. Income and kharch stay side by side for the same typed unit.
+- The home page asks you to pick summer, winter, or rainy. It does not decide the months. The daily routine uses the words that were asked for.
+- The bird-type form, range form, rooster and hen counts, the full movement form, and the parentage menu stay in the program and are not on the menu. Vaccination, medicines, and Gavran Saathi stay.
+
 ## 0.35.0 — 2026-10-14
 
 Home fixes. Charts, a chat button, and phone alarms that repeat.

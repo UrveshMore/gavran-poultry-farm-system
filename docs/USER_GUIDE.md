@@ -168,9 +168,9 @@ These are not 4317, 4318, or 3307, because Cursor on the owner's Windows PC alre
 
 **How to use it.**
 
-1. Save a bird name first.
-2. Then add a flock: a short code, the shed, how many birds, the day it opened, the hatch day, and the egg set date if you know them. If there is no shed yet, the form says so and you can add one there. A grey button says why it is waiting.
-3. The flock page shows Incubator, Brooding, or Grow-out. Brooding runs 28 days from the hatch day because that is the length that was asked for. It is not an official formula. Near the end it says brooding ends in a few days, and it reminds you about the chick guard and paper.
+1. Add a flock: a short code, the shed, how many birds, the day it opened, the hatch day, and the egg set date if you know them. The bird name is saved as Gavran. If there is no shed yet, the form says so and you can add one there. A grey button says why it is waiting.
+2. The flock page shows Incubator, Brooding, or Grow-out. Brooding runs 28 days from the hatch day because that is the length that was asked for. It is not an official formula. Near the end it says brooding ends in a few days, and it reminds you about the chick guard and paper. On the hatch day it also lists 4 to 5 hours in the incubator, then the chick guard and paper, jaggery or sugar water for the first 2 hours, then the day-wise medicine paper.
+3. To move birds into a bigger shed, open the flock and use Shift to a bigger shed. The older range form, rooster and hen counts, and the full movement form stay in the program and are not on this screen.
 4. The hatch day cannot be after the opened day. On the medicine paper, that date is day 1.
 5. Open the flock. Medicine days lists today, tomorrow, and this week. Tick **Mark given** after you give that line. If a line has no day, the button says so. The words and amounts are copied from the chick-day paper. One line has no day and no amount; it says to check with the vet.
 6. The first time, write a short note that you checked the paper. Until then, a tick is refused. The sample farm is already marked checked, and the note starts with Sample.
@@ -190,6 +190,42 @@ These are not 4317, 4318, or 3307, because Cursor on the owner's Windows PC alre
 
 1. Add the sort names you use, or tap Add egg lines for For incubator, For sale, Eaten at home, and Broken. Total is those four added together.
 2. Then record a day, optional flock and shed, and a count for each line. Days are typed as dd/mm/yyyy.
+
+## Egg lots
+
+**What it is.** A group of eggs from one place, such as a market, or later from your own hens.
+
+**Where it is.** Birds and eggs, then Egg lots.
+
+**Why it is used.** So you know which eggs went into which tray.
+
+**How to use it.** Write the place, the day, and how many eggs.
+
+## Trays
+
+**What it is.** Trays inside an incubator. Each tray has its own set date. Each hatch day with live chicks becomes its own flock.
+
+**Where it is.** Machines and eggs you are hatching, then Trays.
+
+**Why it is used.** A hatch can finish over more than one day.
+
+**How to use it.** Add a machine first if you have none. Add a tray. Set eggs on that tray. For each hatch day, write the live chicks, the brooder shed, and a short flock code. The page shows live chicks, eggs set minus live, and live divided by eggs set. That ratio is not an official hatch percent.
+
+## Birds that left
+
+**What it is.** Birds that died, birds you sold, and birds eaten at home.
+
+**Where it is.** Birds and eggs, then Birds that left.
+
+**How to use it.** Pick died, sold, or eaten. Write the day and the count. For a sale, write the amount and the money unit, such as Rs.
+
+## Income and kharch
+
+**What it is.** Income you typed next to kharch, for the same money unit.
+
+**Where it is.** Sales and money, then Income and kharch. Kharch is Sales and money, then Kharch.
+
+**How to use it.** On Kharch, a category comes first. Quantity and rate are optional. When you type both, the amount stored is quantity times rate. Home also shows the same lines, and it asks you to pick summer, winter, or rainy. The page does not decide which months are which season.
 
 ## Birds lost
 

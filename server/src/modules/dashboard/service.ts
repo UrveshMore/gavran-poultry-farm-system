@@ -577,6 +577,18 @@ async function moneyBars(access: FarmAccess, monthStart: string, today: string) 
       else current.kharch = money(asNumber(row.amount));
       byUnit.set(row.unit_label, current);
     }
+    const sold = await many<RowDataPacket & { unit_label: string; amount: number | string }>(
+      pool,
+      `SELECT unit_label, SUM(amount) AS amount FROM bird_events
+       WHERE farm_id = ? AND kind = 'sold' AND occurred_on >= ? AND occurred_on <= ? AND unit_label IS NOT NULL
+       GROUP BY unit_label`,
+      [access.farmId, monthStart, today],
+    );
+    for (const row of sold) {
+      const current = byUnit.get(row.unit_label) ?? { income: null, kharch: null };
+      current.income = money((current.income ?? 0) + asNumber(row.amount));
+      byUnit.set(row.unit_label, current);
+    }
     for (const [unitLabel, side] of byUnit) {
       const difference = side.income !== null && side.kharch !== null ? money(side.income - side.kharch) : null;
       bars.push({ unitLabel, income: side.income, kharch: side.kharch, difference });

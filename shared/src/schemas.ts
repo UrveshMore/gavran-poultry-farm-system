@@ -700,11 +700,55 @@ export const expenseCategoryInputSchema = z.object({
   name: z.string().trim().min(2, 'too_small').max(80, 'too_big'),
 });
 
+export const eggLotInputSchema = z.object({
+  sourceName: z.string().trim().min(2, 'too_small').max(120, 'too_big'),
+  receivedOn: calendarDateSchema,
+  eggCount: z.number({ invalid_type_error: 'invalid_format' }).int('invalid_format').positive('too_small').max(1_000_000, 'too_big'),
+  notes: z.string().trim().max(500, 'too_big').default(''),
+});
+
+export const trayInputSchema = z.object({
+  incubatorId: z.string().uuid('invalid_format'),
+  name: z.string().trim().min(1, 'too_small').max(40, 'too_big'),
+});
+
+export const traySetInputSchema = z.object({
+  trayId: z.string().uuid('invalid_format'),
+  lotId: z.union([z.string().uuid('invalid_format'), z.literal('')]),
+  setOn: calendarDateSchema,
+  eggCount: z.number({ invalid_type_error: 'invalid_format' }).int('invalid_format').positive('too_small').max(1_000_000, 'too_big'),
+});
+
+export const trayHatchInputSchema = z.object({
+  hatchedOn: calendarDateSchema,
+  liveCount: z.number({ invalid_type_error: 'invalid_format' }).int('invalid_format').min(0, 'too_small').max(1_000_000, 'too_big'),
+  shedId: z.string().uuid('invalid_format'),
+  batchCode: z.string().trim().min(1, 'too_small').max(32, 'too_big').regex(/^[A-Za-z0-9][A-Za-z0-9_-]*$/, 'invalid_format'),
+});
+
+export const birdEventInputSchema = z
+  .object({
+    occurredOn: calendarDateSchema,
+    kind: z.enum(['died', 'sold', 'eaten']),
+    birdCount: z.number({ invalid_type_error: 'invalid_format' }).int('invalid_format').positive('too_small').max(1_000_000, 'too_big'),
+    amount: z.number({ invalid_type_error: 'invalid_format' }).positive('too_small').max(1_000_000_000, 'too_big').nullable().optional(),
+    unitLabel: z.string().trim().max(32, 'too_big').optional().default(''),
+    notes: z.string().trim().max(500, 'too_big').default(''),
+    batchId: z.union([z.string().uuid('invalid_format'), z.literal('')]),
+  })
+  .superRefine((value, ctx) => {
+    if (value.kind === 'sold' && (value.amount == null || value.unitLabel.trim() === '')) {
+      ctx.addIssue({ code: 'custom', message: 'required', path: ['amount'] });
+    }
+  });
+
 export const expenseEntryInputSchema = z.object({
   occurredOn: calendarDateSchema,
   direction: z.enum(['expense', 'income'], { errorMap: () => ({ message: 'invalid_format' }) }),
   categoryId: z.string().uuid('invalid_format'),
   amount: z.number({ invalid_type_error: 'invalid_format' }).positive('too_small').max(1_000_000_000, 'too_big'),
+  quantity: z.number({ invalid_type_error: 'invalid_format' }).positive('too_small').max(1_000_000_000, 'too_big').nullable().optional(),
+  rate: z.number({ invalid_type_error: 'invalid_format' }).positive('too_small').max(1_000_000_000, 'too_big').nullable().optional(),
   unitLabel: z.string().trim().min(1, 'too_small').max(32, 'too_big'),
   counterparty: z.string().trim().max(160, 'too_big'),
   referenceNote: z.string().trim().max(160, 'too_big'),

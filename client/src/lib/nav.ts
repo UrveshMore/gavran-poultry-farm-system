@@ -11,6 +11,9 @@ export type ScreenId =
   | 'notices'
   | 'batches'
   | 'eggs'
+  | 'lots'
+  | 'trays'
+  | 'birdsBook'
   | 'losses'
   | 'parentage'
   | 'incubators'
@@ -20,6 +23,7 @@ export type ScreenId =
   | 'stock'
   | 'sales'
   | 'expenses'
+  | 'income'
   | 'suppliers'
   | 'invoices'
   | 'reports'
@@ -51,8 +55,12 @@ export const SCREENS: ScreenDef[] = [
   { id: 'notices', group: 'daily', path: 'notices', anyPermission: ['notification.read'] },
   { id: 'batches', group: 'birds', path: 'batches', anyPermission: ['batch.read'] },
   { id: 'eggs', group: 'birds', path: 'eggs', anyPermission: ['egg.read'] },
+  { id: 'lots', group: 'birds', path: 'egg-lots', anyPermission: ['egg.read'] },
+  { id: 'birdsBook', group: 'birds', path: 'birds', anyPermission: ['loss.read'] },
   { id: 'losses', group: 'birds', path: 'losses', anyPermission: ['loss.read'] },
-  { id: 'parentage', group: 'birds', path: 'parentage', anyPermission: ['breeding.read'] },
+  // new-flow: parentage stays in the app and the route. It is not in the menu.
+  // { id: 'parentage', group: 'birds', path: 'parentage', anyPermission: ['breeding.read'] },
+  { id: 'trays', group: 'incubator', path: 'trays', anyPermission: ['incubator.read'] },
   { id: 'incubators', group: 'incubator', path: 'incubators', anyPermission: ['incubator.read'] },
   { id: 'incubation', group: 'incubator', path: 'incubation', anyPermission: ['incubation.read'] },
   { id: 'health', group: 'health', path: 'health', anyPermission: ['health.read'] },
@@ -60,6 +68,7 @@ export const SCREENS: ScreenDef[] = [
   { id: 'stock', group: 'feed', path: 'stock', anyPermission: ['stock.read'] },
   { id: 'sales', group: 'money', path: 'sales', anyPermission: ['sale.read'] },
   { id: 'expenses', group: 'money', path: 'expenses', anyPermission: ['expense.read'] },
+  { id: 'income', group: 'money', path: 'income', anyPermission: ['expense.read', 'sale.read'] },
   { id: 'suppliers', group: 'money', path: 'suppliers', anyPermission: ['supplier.read'] },
   { id: 'invoices', group: 'money', path: 'invoice-documents', anyPermission: ['sale.read'] },
   { id: 'reports', group: 'reports', path: 'reports', anyPermission: ['report.read'] },

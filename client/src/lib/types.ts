@@ -346,6 +346,8 @@ export type ExpenseEntry = {
   categoryId: string;
   categoryName: string;
   amount: number;
+  quantity: number | null;
+  rate: number | null;
   unitLabel: string;
   counterparty: string | null;
   referenceNote: string | null;

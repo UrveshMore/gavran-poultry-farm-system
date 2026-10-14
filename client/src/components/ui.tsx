@@ -1,7 +1,7 @@
 import { Slot } from '@radix-ui/react-slot';
 import { Label as RadixLabel } from '@radix-ui/react-label';
 import { cva, type VariantProps } from 'class-variance-authority';
-import { useLayoutEffect, useRef, useState, type ButtonHTMLAttributes, type ChangeEvent, type ComponentProps, type InputHTMLAttributes, type ReactNode, type Ref, type TextareaHTMLAttributes } from 'react';
+import { useCallback, useLayoutEffect, useRef, useState, type ButtonHTMLAttributes, type ChangeEvent, type ComponentProps, type InputHTMLAttributes, type ReactNode, type Ref, type TextareaHTMLAttributes } from 'react';
 import { useTranslation } from 'react-i18next';
 import { localToday } from '@/lib/today';
 import { cn } from '@/lib/utils';
@@ -73,6 +73,8 @@ function DmyDate({
 }: InputHTMLAttributes<HTMLInputElement> & { ref?: Ref<HTMLInputElement> }) {
   const { t } = useTranslation();
   const hidden = useRef<HTMLInputElement | null>(null);
+  const outerRef = useRef(ref);
+  outerRef.current = ref;
   const controlled = value !== undefined;
   const [text, setText] = useState(() => isoToDmy(String(value ?? defaultValue ?? '')));
 
@@ -80,11 +82,13 @@ function DmyDate({
     if (controlled) setText(isoToDmy(String(value ?? '')));
   }, [controlled, value]);
 
-  function assign(node: HTMLInputElement | null) {
+  const assign = useCallback((node: HTMLInputElement | null) => {
     hidden.current = node;
-    if (typeof ref === 'function') ref(node);
-    else if (ref) ref.current = node;
-    if (!node) return;
+    const current = outerRef.current;
+    if (typeof current === 'function') current(node);
+    else if (current) current.current = node;
+    if (!node || node.dataset.dmyBound === '1') return;
+    node.dataset.dmyBound = '1';
     setText(isoToDmy(node.value));
     const desc = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value');
     if (!desc?.get || !desc.set) return;
@@ -100,7 +104,7 @@ function DmyDate({
         setText(isoToDmy(String(next ?? '')));
       },
     });
-  }
+  }, []);
 
   function commit(next: string) {
     setText(next);
