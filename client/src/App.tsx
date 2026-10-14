@@ -28,6 +28,7 @@ import { OfflinePage } from '@/pages/OfflinePages';
 import { SearchPageView } from '@/pages/SearchPages';
 import { SchedulesPage } from '@/pages/SchedulePages';
 import { FarmHomePage, GroupPage, HelpPage, TodayPage } from '@/pages/GuidePages';
+import { SaathiPage } from '@/pages/SaathiPage';
 import { ServerAddressPage } from '@/pages/ServerAddressPage';
 import { YardPageView } from '@/pages/YardPages';
 import { isNativeApp, savedServer } from '@/lib/serverAddress';
@@ -64,6 +65,7 @@ export function App() {
         <Route path="farms/:farmId/go/:groupId" element={<GroupPage />} />
         <Route path="farms/:farmId/help" element={<HelpPage />} />
         <Route path="farms/:farmId/today" element={<TodayPage />} />
+        <Route path="farms/:farmId/saathi" element={<SaathiPage />} />
         <Route path="farms/:farmId/yard" element={<YardPageView />} />
         <Route path="farms/:farmId/profile" element={<FarmProfilePage />} />
         <Route path="farms/:farmId/sheds" element={<ShedsPage />} />

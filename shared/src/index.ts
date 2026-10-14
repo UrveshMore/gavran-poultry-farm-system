@@ -42,6 +42,22 @@ export { OFFLINE_DECISION, applySyncResult, captureClass, enqueueCapture, pathLe
 export type { CaptureClass, QueueItem, QueueState } from './offline.js';
 export { planPhoneAlerts } from './phoneAlerts.js';
 export type { PhoneAlertKind, PhoneAlertPlan } from './phoneAlerts.js';
+export {
+  SAATHI_MIN_CONFIDENCE,
+  SAATHI_VET_LABEL,
+  blankIntent,
+  countAccuracy,
+  fieldValue,
+  interpret,
+  matchKnowledge,
+  parsePhotoAi,
+  parseUtterance,
+  photoAiSchema,
+  resolveIntent,
+  stripInventedCare,
+  withField,
+} from './saathi.js';
+export type { DueDose, Intent, KbEntry, KbMatch, PhotoAi, SaathiAction, SaathiCard, SaathiContext, SaathiReply } from './saathi.js';
 export { likePattern } from './search.js';
 export {
   batchInputSchema,

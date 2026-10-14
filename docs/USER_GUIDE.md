@@ -71,6 +71,24 @@ These are not 4317, 4318, or 3307, because Cursor on the owner's Windows PC alre
 1. Read the jobs that are due.
 2. Tap a shortcut to write eggs, a loss, feed, who came, health, or the yard book.
 
+## Gavran Saathi
+
+![Gavran Saathi](../client/public/guide/saathi.png)
+
+**What it is.** A helper that turns speech, typed words, or a photo into a card you can correct. Nothing is written until you tap Save.
+
+**Where it is.** Daily work, then Gavran Saathi. The key is under Farm details.
+
+**Why it is used.** So a count can be spoken in English, Hindi, or Marathi, and still checked before it is written.
+
+**How to use it.**
+
+1. Type or tap Speak. The reply is shown and spoken.
+2. Read the card. Change the flock, the number, or the day. If the flock or the day is missing, Saathi asks.
+3. Tap Save only when it is right.
+4. An egg or chick photo shows a count and boxes. Type your count, then confirm. That opens the same card. A bird photo is an age guess, not a hatch date. A sick bird is matched only to the farm papers, with the page. The line says possible - confirm with vet. If the paper has no amount, the page says so.
+5. The Gemini key stays on this computer. The full key is not sent back to the phone.
+
 ## Yard book
 
 ![Yard book](../client/public/guide/yard.png)

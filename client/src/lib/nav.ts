@@ -30,6 +30,7 @@ export type ScreenId =
   | 'safeguards'
   | 'offline'
   | 'search'
+  | 'saathi'
   | 'activity';
 
 export type ScreenDef = {
@@ -42,6 +43,7 @@ export type ScreenDef = {
 
 export const SCREENS: ScreenDef[] = [
   { id: 'today', group: 'daily', path: 'today', anyPermission: ['task.read', 'egg.read', 'attendance.read', 'yard.read'] },
+  { id: 'saathi', group: 'daily', path: 'saathi', anyPermission: ['farm.read'] },
   { id: 'yard', group: 'daily', path: 'yard', anyPermission: ['yard.read'] },
   { id: 'tasks', group: 'daily', path: 'tasks', anyPermission: ['task.read'] },
   { id: 'workforce', group: 'daily', path: 'workforce', anyPermission: ['attendance.read', 'training.read'] },

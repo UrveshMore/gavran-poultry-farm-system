@@ -11,6 +11,7 @@ import {
   GitBranch,
   GraduationCap,
   Home,
+  MessageCircle,
   ListTodo,
   NotebookPen,
   Package,
@@ -53,6 +54,7 @@ const groupIcons: Record<GroupId | 'help', LucideIcon> = {
 
 const screenIcons: Record<ScreenId, LucideIcon> = {
   today: Sun,
+  saathi: MessageCircle,
   yard: NotebookPen,
   tasks: ListTodo,
   workforce: GraduationCap,
@@ -122,9 +124,14 @@ export function FarmHomePage() {
           <h1 className="font-display text-3xl font-semibold">{farm.name}</h1>
           <p className="mt-1 text-ink-soft">{t('home.body')}</p>
         </div>
-        <button type="button" className="min-h-11 shrink-0 rounded-xl px-3 text-sm font-semibold text-grove underline" onClick={() => startHomeTour(farm.role, t, false)}>
-          {t('tour.replay')}
-        </button>
+        <div className="flex shrink-0 gap-2">
+          <Link data-tour="saathi" to={`/farms/${farmId}/saathi`} className="min-h-11 rounded-xl bg-grove px-3 py-2 text-sm font-semibold text-white">
+            {t('saathi.title')}
+          </Link>
+          <button type="button" className="min-h-11 rounded-xl px-3 text-sm font-semibold text-grove underline" onClick={() => startHomeTour(farm.role, t, false)}>
+            {t('tour.replay')}
+          </button>
+        </div>
       </div>
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
         {groups.map((group) => {
@@ -226,6 +233,7 @@ export function TodayPage() {
 const HELP_IDS: Array<ScreenId | 'home'> = [
   'home',
   'today',
+  'saathi',
   'yard',
   'tasks',
   'workforce',

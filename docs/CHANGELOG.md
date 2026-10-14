@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.33.0 — 2026-10-14
+
+Gavran Saathi. Speak or type, then tap Save.
+
+- English, Hindi, and Marathi. The mic uses the phone's speech tool. A recording is sent to Gemini only when that tool is missing and a key is stored. The reply is written and spoken.
+- Eggs, losses, hatch results, a dose tick, a job, feed used, and a sale or an expense become a card. The card shows the flock, the number, and the day. Nothing is written until Save. A missing flock or day asks again.
+- An egg or chick photo shows a count and boxes. You type the real count, then the same card appears. A bird photo is an age guess and visible signs. A sick bird is matched only to the farm papers, with the page, and labelled possible - confirm with vet. A dose is not invented. The photo, the model result, and your correction are kept.
+- The Gemini key is typed in farm details and stored locked on the computer. The full key is not sent back.
+- The local parser matched 45 of 45 sample lines. Gemini photo counts were not measured: no key was set for this run. Drawn pictures with known counts 3 and 4 are in `server/test/fixtures/saathi/`.
+
 ## 0.32.0 — 2026-10-14
 
 A phone app, rows that wait on the device, and one process for a laptop that stays on.

@@ -1,0 +1,7 @@
+{
+  "note": "Drawn fixtures with a known count. Gemini vision is scored only when GEMINI_API_KEY is set. These drawings are not a measured vision score.",
+  "photos": [
+    { "file": "eggs-3.png", "kind": "eggs", "knownCount": 3 },
+    { "file": "chicks-4.png", "kind": "chicks", "knownCount": 4 }
+  ]
+}

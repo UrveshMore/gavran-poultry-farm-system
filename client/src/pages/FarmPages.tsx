@@ -205,6 +205,7 @@ function ProfileEditor({ farm, onSaved }: { farm: FarmDetail; onSaved: () => voi
         readOnly={!canEdit}
         onSubmit={(values) => mutation.mutate(values)}
       />
+      {canEdit ? <SaathiKeyForm farmId={farm.id} /> : null}
       <Card>
         <h2 className="font-display text-2xl">{t('farms.title')}</h2>
         <ul className="mt-2 grid gap-2 text-sm">
@@ -213,6 +214,47 @@ function ProfileEditor({ farm, onSaved }: { farm: FarmDetail; onSaved: () => voi
         </ul>
       </Card>
     </div>
+  );
+}
+
+function SaathiKeyForm({ farmId }: { farmId: string }) {
+  const { t } = useTranslation();
+  const [apiKey, setApiKey] = useState('');
+  const [hint, setHint] = useState('');
+  const current = useQuery({ queryKey: ['saathi-key', farmId], queryFn: () => api<{ configured: boolean; hint: string }>(`/api/v1/farms/${farmId}/saathi/key`) });
+  const save = useMutation({
+    mutationFn: () => api<{ hint: string }>(`/api/v1/farms/${farmId}/saathi/key`, { method: 'PUT', json: { apiKey } }),
+    onSuccess: (row) => {
+      setApiKey('');
+      setHint(row.hint);
+    },
+  });
+  const clear = useMutation({
+    mutationFn: () => api(`/api/v1/farms/${farmId}/saathi/key`, { method: 'DELETE' }),
+    onSuccess: () => setHint(''),
+  });
+  const shown = hint || current.data?.hint || '';
+  return (
+    <Card>
+      <h2 className="font-display text-2xl">{t('saathi.keyTitle')}</h2>
+      <p className="mt-1 text-ink-soft">{t('saathi.keyBody')}</p>
+      {shown ? <p className="mt-2 text-sm">{t('saathi.keySaved', { hint: shown })}</p> : null}
+      <form
+        className="mt-3 grid gap-3"
+        onSubmit={(event) => {
+          event.preventDefault();
+          save.mutate();
+        }}
+      >
+        <Field id="saathi-key" label={t('saathi.keyLabel')}>
+          <Input id="saathi-key" type="password" autoComplete="off" value={apiKey} onChange={(event) => setApiKey(event.target.value)} />
+        </Field>
+        <div className="flex gap-2">
+          <Button type="submit" disabled={apiKey.trim().length < 20 || save.isPending}>{t('saathi.keyUse')}</Button>
+          <Button type="button" onClick={() => clear.mutate()}>{t('saathi.keyClear')}</Button>
+        </div>
+      </form>
+    </Card>
   );
 }
 

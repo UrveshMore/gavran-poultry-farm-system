@@ -29,6 +29,8 @@ Those sample ports are in `.env.example`. They are not 4317, 4318, or 3307, beca
 
 The farmer guide is `docs/USER_GUIDE.md` and `docs/USER_GUIDE.pdf`. The same words, with a picture of each screen, are on Help inside the program. The first visit starts a short tour. Help can play it again.
 
+Gavran Saathi is under Daily work. Speak or type in English, Hindi, or Marathi. A card shows the flock, the number, and the day. Nothing is written until Save. The Gemini key is typed in farm details and stored on the computer. A sick-bird photo is matched only to the farm papers and labelled possible - confirm with vet.
+
 The first visit can create the owner account with a mail address and a long secret phrase. After that, People can add a worker with a name, a mobile number, and a PIN of four to six digits. The worker signs in with that number and PIN. Nothing is sent. Tell them the PIN yourself. A mail address is still there for a manager who uses one.
 
 `npm run db:seed` creates a local owner only when `SEED_DEV=true` (the script sets that). Default seed email is `owner@gavran.local` and the password is `change-me-local-only`. The command does not print the password and does not create a farm. Do not enable seeding in production.

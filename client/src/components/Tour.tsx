@@ -28,6 +28,7 @@ export function startHomeTour(role: string, t: Translate, markSeen = true) {
       element: `[data-tour="group-${group}"]`,
       popover: { title: t(`nav.group.${group}`), description: t(`tour.group.${group}`) },
     })),
+    { element: '[data-tour="saathi"]', popover: { title: t('saathi.title'), description: t('tour.saathi') } },
     { element: '[data-tour="group-help"]', popover: { title: t('nav.group.help'), description: t('tour.group.help') } },
     { element: '[data-tour="language"]', popover: { title: t('tour.languageTitle'), description: t('tour.languageBody') } },
   ];
