@@ -14,6 +14,7 @@ import {
   findOpenBatch,
   findShed,
   insertCollection,
+  ensureEggPurposes,
   insertEggCategory,
   listCollections,
   listEggCategories,
@@ -24,6 +25,10 @@ type IdempotencyInput = { key: string | null; method: string; path: string };
 
 export async function getEggCategories(farmId: string) {
   return listEggCategories(pool, farmId);
+}
+
+export async function ensurePurposes(actor: Actor, access: FarmAccess) {
+  return ensureEggPurposes(pool, access.farmId, actor.user.id);
 }
 
 export async function createEggCategory(actor: Actor, access: FarmAccess, body: unknown) {

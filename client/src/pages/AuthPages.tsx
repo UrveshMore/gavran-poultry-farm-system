@@ -4,7 +4,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useState, type ReactNode } from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
-import { Link, Navigate } from 'react-router-dom';
+import { Link, Navigate, useSearchParams } from 'react-router-dom';
 import { z } from 'zod';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import { PinPad } from '@/components/PinPad';
@@ -27,6 +27,7 @@ function describe(error: unknown, t: (key: string) => string) {
 
 export function LoginPage() {
   const { t, i18n } = useTranslation();
+  const [params] = useSearchParams();
   const queryClient = useQueryClient();
   const [ownerMode, setOwnerMode] = useState(false);
   const me = useQuery({ queryKey: ['me'], queryFn: fetchMe, retry: false });
@@ -59,6 +60,7 @@ export function LoginPage() {
           <h1 className="font-display text-3xl font-semibold">{t('auth.signInTitle')}</h1>
           <p className="mt-1 text-ink-soft">{ownerMode ? t('auth.ownerBody') : t('auth.workerBody')}</p>
         </div>
+        {params.get('expired') === '1' ? <Alert>{t('auth.signInAgain')}</Alert> : null}
         {ownerMode ? (
           <form className="grid gap-3" onSubmit={form.handleSubmit((values) => mutation.mutate(values))} noValidate>
             <Field id="email" label={t('auth.email')} error={message(t, form.formState.errors.email?.message)} hint={t('fieldHint.email')}>

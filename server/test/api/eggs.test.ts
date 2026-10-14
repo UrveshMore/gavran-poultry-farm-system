@@ -244,7 +244,7 @@ describe('egg collections', () => {
     });
     expect(withShed.status).toBe(201);
     expect(withShed.body.data.shedCode).toBe('A1');
-    expect(withShed.body.data.lines).toEqual([{ categoryId: table.body.data.id, categoryName: 'Table', eggCount: 2 }]);
+    expect(withShed.body.data.lines).toEqual([{ categoryId: table.body.data.id, categoryName: 'Table', eggCount: 2, purpose: null }]);
 
     const listed = await http.get(`/api/v1/farms/${farmId}/eggs`);
     expect(listed.status).toBe(200);

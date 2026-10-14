@@ -2,7 +2,7 @@ import { Router, type Request } from 'express';
 import { asyncHandler } from '../../http/asyncHandler.js';
 import { sendData } from '../../http/respond.js';
 import { currentFarm, currentUser, requireFarmPermission } from '../../middleware/requirePermission.js';
-import { createEggCategory, createEggCollection, getEggCategories, getEggCollections } from './service.js';
+import { createEggCategory, createEggCollection, ensurePurposes, getEggCategories, getEggCollections } from './service.js';
 
 export const eggRoutes = Router();
 
@@ -20,6 +20,14 @@ eggRoutes.get(
   ...requireFarmPermission('egg.read'),
   asyncHandler(async (req, res) => {
     sendData(res, 200, await getEggCategories(currentFarm(req).farmId), req.requestId);
+  }),
+);
+
+eggRoutes.post(
+  '/:farmId/egg-purposes',
+  ...requireFarmPermission('egg.record'),
+  asyncHandler(async (req, res) => {
+    sendData(res, 200, await ensurePurposes(actor(req), currentFarm(req)), req.requestId);
   }),
 );
 

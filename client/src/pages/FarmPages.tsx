@@ -19,7 +19,7 @@ import { useTranslation } from 'react-i18next';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { z } from 'zod';
 import { PinPad } from '@/components/PinPad';
-import { Alert, Button, Card, Field, Input, TextArea } from '@/components/ui';
+import { Alert, Button, Card, Field, Input, Splash, TextArea } from '@/components/ui';
 import { ApiError, api, errorKey } from '@/lib/api';
 import type { AuditPage, FarmDetail, FarmSummary, Member, Shed } from '@/lib/types';
 
@@ -50,7 +50,7 @@ export function FarmsPage() {
   const farms = useQuery({ queryKey: ['farms'], queryFn: () => api<FarmSummary[]>('/api/v1/farms') });
   const canCreate = !farms.data || farms.data.length === 0 || farms.data.some((farm) => farm.role === 'owner');
 
-  if (farms.isLoading) return <p>{t('common.loading')}</p>;
+  if (farms.isLoading) return <Splash />;
   if (farms.isError || !farms.data) {
     return (
       <Alert>
@@ -221,12 +221,14 @@ function SaathiKeyForm({ farmId }: { farmId: string }) {
   const { t } = useTranslation();
   const [apiKey, setApiKey] = useState('');
   const [hint, setHint] = useState('');
+  const [tested, setTested] = useState<boolean | null>(null);
   const current = useQuery({ queryKey: ['saathi-key', farmId], queryFn: () => api<{ configured: boolean; hint: string }>(`/api/v1/farms/${farmId}/saathi/key`) });
   const save = useMutation({
-    mutationFn: () => api<{ hint: string }>(`/api/v1/farms/${farmId}/saathi/key`, { method: 'PUT', json: { apiKey } }),
+    mutationFn: () => api<{ hint: string; tested: boolean }>(`/api/v1/farms/${farmId}/saathi/key`, { method: 'PUT', json: { apiKey } }),
     onSuccess: (row) => {
       setApiKey('');
       setHint(row.hint);
+      setTested(row.tested);
     },
   });
   const clear = useMutation({
@@ -239,6 +241,9 @@ function SaathiKeyForm({ farmId }: { farmId: string }) {
       <h2 className="font-display text-2xl">{t('saathi.keyTitle')}</h2>
       <p className="mt-1 text-ink-soft">{t('saathi.keyBody')}</p>
       {shown ? <p className="mt-2 text-sm">{t('saathi.keySaved', { hint: shown })}</p> : null}
+      {save.isSuccess && tested ? <p role="status" className="mt-2 font-semibold">{t('saathi.keyTested')}</p> : null}
+      {save.isSuccess && tested === false ? <p role="status" className="mt-2 text-sm">{t('saathi.keySkipped')}</p> : null}
+      {save.isError ? <Alert>{explain(save.error, t)}</Alert> : null}
       <form
         className="mt-3 grid gap-3"
         onSubmit={(event) => {
@@ -246,9 +251,10 @@ function SaathiKeyForm({ farmId }: { farmId: string }) {
           save.mutate();
         }}
       >
-        <Field id="saathi-key" label={t('saathi.keyLabel')}>
-          <Input id="saathi-key" type="password" autoComplete="off" value={apiKey} onChange={(event) => setApiKey(event.target.value)} />
+        <Field id="saathi-key" label={t('saathi.keyLabel')} hint={t('saathi.keyShort')}>
+          <Input id="saathi-key" type="password" autoComplete="off" placeholder={t('saathi.keyEmpty')} value={apiKey} onChange={(event) => setApiKey(event.target.value)} />
         </Field>
+        {apiKey.trim().length < 20 ? <p className="text-sm text-ink-soft">{apiKey.trim().length === 0 ? t('saathi.keyEmpty') : t('saathi.keyShort')}</p> : null}
         <div className="flex gap-2">
           <Button type="submit" disabled={apiKey.trim().length < 20 || save.isPending}>{t('saathi.keyUse')}</Button>
           <Button type="button" onClick={() => clear.mutate()}>{t('saathi.keyClear')}</Button>
@@ -510,6 +516,7 @@ export function PeoplePage() {
   const members = useQuery({ queryKey: ['members', farmId], queryFn: () => api<Member[]>(`/api/v1/farms/${farmId}/members`) });
   const access = farms.data?.find((farm) => farm.id === farmId);
   const [open, setOpen] = useState(false);
+  const [inviteRole, setInviteRole] = useState<'owner' | 'worker'>('worker');
   const [confirm, setConfirm] = useState<{ id: string; kind: 'revoke' | 'deactivate' } | null>(null);
 
   if (members.isLoading || farms.isLoading) return <p>{t('common.loading')}</p>;
@@ -530,15 +537,23 @@ export function PeoplePage() {
           <p className="mt-1 text-ink-soft">{t('people.body')}</p>
         </div>
         {access?.permissions.includes('user.manage') ? (
-          <Button type="button" className="min-h-14" data-add="people" onClick={() => setOpen((value) => !value)}>
-            {open ? t('people.hideForm') : t('people.invite')}
-          </Button>
+          <div className="flex flex-col items-end gap-2">
+            <Button type="button" className="min-h-14" data-add="people" onClick={() => { setInviteRole('worker'); setOpen((value) => !value); }}>
+              {open ? t('people.hideForm') : t('people.invite')}
+            </Button>
+            {access.role === 'owner' ? (
+              <Button type="button" variant="outline" className="min-h-14" onClick={() => { setInviteRole('owner'); setOpen(true); }}>
+                {t('people.addOwner')}
+              </Button>
+            ) : null}
+          </div>
         ) : null}
       </div>
+      {access?.role === 'owner' ? <p className="text-sm text-ink-soft">{t('people.addOwnerHint')}</p> : null}
       {open ? (
         <div className="grid gap-3">
           <PinPersonForm farmId={farmId} onDone={() => { setOpen(false); void queryClient.invalidateQueries({ queryKey: ['members', farmId] }); }} />
-          <InviteForm farmId={farmId} onDone={() => { setOpen(false); void queryClient.invalidateQueries({ queryKey: ['members', farmId] }); }} />
+          <InviteForm key={inviteRole} farmId={farmId} initialRole={inviteRole} onDone={() => { setOpen(false); void queryClient.invalidateQueries({ queryKey: ['members', farmId] }); }} />
         </div>
       ) : null}
       {members.data.length === 0 ? (
@@ -739,13 +754,13 @@ function PinResetForm({ farmId, membershipId, onDone }: { farmId: string; member
   );
 }
 
-function InviteForm({ farmId, onDone }: { farmId: string; onDone: () => void }) {
+function InviteForm({ farmId, onDone, initialRole = 'worker' }: { farmId: string; onDone: () => void; initialRole?: 'owner' | 'worker' }) {
   const { t } = useTranslation();
   const [showMail, setShowMail] = useState(false);
   const [notice, setNotice] = useState<string | null>(null);
   const form = useForm<z.infer<typeof inviteSchema>>({
     resolver: zodResolver(inviteSchema),
-    defaultValues: { email: '', displayName: '', password: '', role: 'worker', permissionGrants: [] },
+    defaultValues: { email: '', displayName: '', password: '', role: initialRole, permissionGrants: [] },
   });
   const role = form.watch('role');
   const mutation = useMutation({

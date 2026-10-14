@@ -109,7 +109,7 @@ export function EggsPage() {
               <ul className="mt-2 grid gap-1 text-sm">
                 {item.lines.map((line) => (
                   <li key={line.categoryId}>
-                    {line.categoryName}: {line.eggCount}
+                    {line.purpose ? t(`eggs.purpose.${line.purpose}`) : line.categoryName}: {line.eggCount}
                   </li>
                 ))}
               </ul>
@@ -165,6 +165,20 @@ function SortTools({ farmId, categories, onDone }: { farmId: string; categories:
         <Button type="button" variant="outline" disabled={pending} onClick={() => void addNamedSorts()}>
           {t('eggs.addSorts')}
         </Button>
+        <Button
+          type="button"
+          disabled={pending}
+          onClick={() => {
+            setPending(true);
+            setError(null);
+            void api(`/api/v1/farms/${farmId}/egg-purposes`, { method: 'POST' })
+              .then(() => onDone())
+              .catch((caught: unknown) => setError(explain(caught, t)))
+              .finally(() => setPending(false));
+          }}
+        >
+          {t('eggs.addPurposes')}
+        </Button>
         <form className="grid gap-3" onSubmit={form.handleSubmit((values) => mutation.mutate(values))} noValidate>
           <Field id="egg-sort" label={t('eggs.sortName')} error={text(t, form.formState.errors.name?.message)} hint={t('fieldHint.egg-sort')}>
             <Input id="egg-sort" {...form.register('name')}  placeholder={t('fieldPh.egg-sort')}/>
@@ -197,11 +211,20 @@ function CollectionForm({ farmId, categories, onDone }: { farmId: string; catego
     onSuccess: onDone,
   });
   const openBatches = (batches.data ?? []).filter((batch) => batch.status === 'open');
+  const purposeOrder = ['incubator', 'sale', 'eaten', 'broken'] as const;
+  const ordered = [
+    ...purposeOrder.flatMap((purpose) => categories.filter((category) => category.purpose === purpose)),
+    ...categories.filter((category) => !category.purpose),
+  ];
+  const purposeTotal = purposeOrder.reduce((sum, purpose) => {
+    const category = categories.find((item) => item.purpose === purpose);
+    return sum + Number(category ? counts[category.id] || 0 : 0);
+  }, 0);
 
   function submit(event: FormEvent) {
     event.preventDefault();
     setFieldError(null);
-    const lines = categories
+    const lines = ordered
       .map((category) => ({ categoryId: category.id, eggCount: Number(counts[category.id] || 0) }))
       .filter((line) => line.eggCount > 0);
     const parsed = eggCollectionInputSchema.safeParse({
@@ -250,8 +273,8 @@ function CollectionForm({ farmId, categories, onDone }: { farmId: string; catego
         <Field id="egg-shift" label={`${t('eggs.shift')} (${t('common.optional')})`} hint={t('fieldHint.egg-shift')}>
           <Input id="egg-shift" value={shiftLabel} maxLength={40} placeholder={t('fieldPh.egg-shift')} onChange={(event) => setShiftLabel(event.target.value)} />
         </Field>
-        {categories.map((category) => (
-          <Field key={category.id} id={`egg-count-${category.id}`} label={category.name} hint={t('fieldHint.egg-count')}>
+        {ordered.map((category) => (
+          <Field key={category.id} id={`egg-count-${category.id}`} label={category.purpose ? t(`eggs.purpose.${category.purpose}`) : category.name} hint={t('fieldHint.egg-count')}>
             <Input
               id={`egg-count-${category.id}`}
               type="number"
@@ -263,6 +286,9 @@ function CollectionForm({ farmId, categories, onDone }: { farmId: string; catego
             />
           </Field>
         ))}
+        <Field id="egg-total" label={t('eggs.purposeTotal')} hint={t('eggs.totalHint')}>
+          <Input id="egg-total" readOnly value={String(purposeTotal)} />
+        </Field>
         <Field id="egg-notes" label={`${t('eggs.notes')} (${t('common.optional')})`} hint={t('fieldHint.egg-notes')}>
           <TextArea id="egg-notes" value={notes} maxLength={500} placeholder={t('fieldPh.egg-notes')} onChange={(event) => setNotes(event.target.value)} />
         </Field>

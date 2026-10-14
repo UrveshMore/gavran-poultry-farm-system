@@ -2,9 +2,11 @@ import { randomUUID } from 'node:crypto';
 import type { RowDataPacket } from 'mysql2/promise';
 import { asNumber, exec, many, one, type Db } from '../../db/sql.js';
 
-export type EggCategory = { id: string; name: string; status: 'active' | 'archived' };
+export type EggPurpose = 'incubator' | 'sale' | 'eaten' | 'broken';
 
-export type EggLine = { categoryId: string; categoryName: string; eggCount: number };
+export type EggCategory = { id: string; name: string; status: 'active' | 'archived'; purpose: EggPurpose | null };
+
+export type EggLine = { categoryId: string; categoryName: string; eggCount: number; purpose: EggPurpose | null };
 
 export type EggCollection = {
   id: string;
@@ -27,16 +29,46 @@ function asDate(value: Date | string): string {
 export async function listEggCategories(db: Db, farmId: string): Promise<EggCategory[]> {
   const rows = await many<RowDataPacket & EggCategory>(
     db,
-    `SELECT id, name, status FROM egg_categories WHERE farm_id = ? ORDER BY name`,
+    `SELECT id, name, status, purpose FROM egg_categories WHERE farm_id = ? ORDER BY name`,
     [farmId],
   );
-  return rows.map((row) => ({ id: row.id, name: row.name, status: row.status }));
+  return rows.map((row) => ({ id: row.id, name: row.name, status: row.status, purpose: row.purpose ?? null }));
+}
+
+const EGG_PURPOSES: Array<{ purpose: EggPurpose; name: string }> = [
+  { purpose: 'incubator', name: 'For incubator' },
+  { purpose: 'sale', name: 'For sale' },
+  { purpose: 'eaten', name: 'Eaten at home' },
+  { purpose: 'broken', name: 'Broken' },
+];
+
+export async function ensureEggPurposes(db: Db, farmId: string, createdBy: string): Promise<EggCategory[]> {
+  const existing = await listEggCategories(db, farmId);
+  for (const item of EGG_PURPOSES) {
+    if (existing.some((row) => row.purpose === item.purpose)) continue;
+    const named = existing.find((row) => row.name.localeCompare(item.name, undefined, { sensitivity: 'accent' }) === 0);
+    if (named) {
+      await exec(db, `UPDATE egg_categories SET purpose = ? WHERE id = ? AND purpose IS NULL`, [item.purpose, named.id]);
+      named.purpose = item.purpose;
+      continue;
+    }
+    const id = randomUUID();
+    await exec(db, `INSERT INTO egg_categories (id, farm_id, name, created_by, purpose) VALUES (?, ?, ?, ?, ?)`, [
+      id,
+      farmId,
+      item.name,
+      createdBy,
+      item.purpose,
+    ]);
+    existing.push({ id, name: item.name, status: 'active', purpose: item.purpose });
+  }
+  return listEggCategories(db, farmId);
 }
 
 export async function insertEggCategory(db: Db, farmId: string, name: string, createdBy: string): Promise<EggCategory> {
   const id = randomUUID();
   await exec(db, `INSERT INTO egg_categories (id, farm_id, name, created_by) VALUES (?, ?, ?, ?)`, [id, farmId, name, createdBy]);
-  return { id, name, status: 'active' };
+  return { id, name, status: 'active', purpose: null };
 }
 
 export async function findOpenBatch(db: Db, farmId: string, batchId: string): Promise<boolean> {
@@ -107,9 +139,9 @@ export async function listCollections(db: Db, farmId: string): Promise<EggCollec
   if (rows.length === 0) return [];
   const ids = rows.map((row) => row.id);
   const placeholders = ids.map(() => '?').join(', ');
-  const lines = await many<RowDataPacket & { collection_id: string; category_id: string; name: string; egg_count: number }>(
+  const lines = await many<RowDataPacket & { collection_id: string; category_id: string; name: string; egg_count: number; purpose: EggPurpose | null }>(
     db,
-    `SELECT l.collection_id, l.category_id, g.name, l.egg_count
+    `SELECT l.collection_id, l.category_id, g.name, l.egg_count, g.purpose
      FROM egg_collection_lines l
      JOIN egg_categories g ON g.id = l.category_id
      WHERE l.collection_id IN (${placeholders})
@@ -119,7 +151,7 @@ export async function listCollections(db: Db, farmId: string): Promise<EggCollec
   return rows.map((row) => {
     const own = lines
       .filter((line) => line.collection_id === row.id)
-      .map((line) => ({ categoryId: line.category_id, categoryName: line.name, eggCount: asNumber(line.egg_count) }));
+      .map((line) => ({ categoryId: line.category_id, categoryName: line.name, eggCount: asNumber(line.egg_count), purpose: line.purpose ?? null }));
     return {
       id: row.id,
       collectedOn: asDate(row.collected_on),

@@ -1,4 +1,4 @@
-import { planPhoneAlerts } from '@gavran/shared';
+import { dailyPhoneNotices, planPhoneAlerts } from '@gavran/shared';
 import { describe, expect, it } from 'vitest';
 
 describe('phone alerts', () => {
@@ -21,5 +21,17 @@ describe('phone alerts', () => {
     expect(plans).toHaveLength(1);
     expect(plans[0]!.id).toBe(800);
     expect(new Date(plans[0]!.at).getTime()).toBe(now.getTime() + 60_000);
+    expect(plans[0]!.hour).toBe(8);
+    expect(plans[0]!.minute).toBe(0);
+  });
+
+  it('keeps daily alarms at 8:00 and 17:00 even when nothing is due', () => {
+    const notices = dailyPhoneNotices({ morningDue: 0, eveningDue: 0, lowStock: 0, eggsMissing: false });
+    expect(notices.map((row) => [row.id, row.kind, row.hour, row.minute])).toEqual([
+      [800, 'morning', 8, 0],
+      [801, 'low_stock', 8, 0],
+      [1700, 'evening', 17, 0],
+      [1701, 'eggs', 17, 0],
+    ]);
   });
 });

@@ -1,9 +1,26 @@
 import { Slot } from '@radix-ui/react-slot';
 import { Label as RadixLabel } from '@radix-ui/react-label';
 import { cva, type VariantProps } from 'class-variance-authority';
-import { type ButtonHTMLAttributes, type ComponentProps, type InputHTMLAttributes, type ReactNode, type TextareaHTMLAttributes } from 'react';
+import { useLayoutEffect, useRef, useState, type ButtonHTMLAttributes, type ChangeEvent, type ComponentProps, type InputHTMLAttributes, type ReactNode, type Ref, type TextareaHTMLAttributes } from 'react';
+import { useTranslation } from 'react-i18next';
 import { localToday } from '@/lib/today';
 import { cn } from '@/lib/utils';
+
+export function isoToDmy(iso: string): string {
+  const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(iso);
+  return match ? `${match[3]}/${match[2]}/${match[1]}` : '';
+}
+
+export function dmyToIso(text: string): string | null {
+  const match = /^(\d{2})\/(\d{2})\/(\d{4})$/.exec(text.trim());
+  if (!match) return null;
+  const day = Number(match[1]);
+  const month = Number(match[2]);
+  const year = Number(match[3]);
+  const date = new Date(Date.UTC(year, month - 1, day));
+  if (date.getUTCFullYear() !== year || date.getUTCMonth() !== month - 1 || date.getUTCDate() !== day) return null;
+  return `${match[3]}-${match[2]}-${match[1]}`;
+}
 
 const buttonVariants = cva(
   'inline-flex min-h-11 items-center justify-center gap-2 rounded-xl px-4 text-base font-semibold transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-grove disabled:pointer-events-none disabled:opacity-50',
@@ -30,20 +47,107 @@ export function Button({
   return <Comp className={cn(buttonVariants({ variant }), className)} {...props} />;
 }
 
-export function Input({ className, type, max, min, allowFuture = false, ...props }: InputHTMLAttributes<HTMLInputElement> & { allowFuture?: boolean }) {
+const fieldClass =
+  'min-h-11 w-full rounded-xl border border-line bg-white px-3 text-base text-ink outline-none focus-visible:border-grove focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-grove';
+
+export function Input({ className, type, max, min, allowFuture = false, ...props }: InputHTMLAttributes<HTMLInputElement> & { allowFuture?: boolean; ref?: Ref<HTMLInputElement> }) {
   const dateMax = type === 'date' && max === undefined && !allowFuture ? localToday() : max;
   const dateMin = type === 'date' && min === undefined ? '2000-01-01' : min;
+  if (type === 'date') {
+    return <DmyDate className={className} max={typeof dateMax === 'string' ? dateMax : undefined} min={typeof dateMin === 'string' ? dateMin : undefined} {...props} />;
+  }
+  return <input type={type} className={cn(fieldClass, className)} {...props} max={dateMax} min={dateMin} />;
+}
+
+function DmyDate({
+  className,
+  max,
+  min,
+  ref,
+  name,
+  value,
+  defaultValue,
+  onChange,
+  onBlur,
+  ...props
+}: InputHTMLAttributes<HTMLInputElement> & { ref?: Ref<HTMLInputElement> }) {
+  const { t } = useTranslation();
+  const hidden = useRef<HTMLInputElement | null>(null);
+  const controlled = value !== undefined;
+  const [text, setText] = useState(() => isoToDmy(String(value ?? defaultValue ?? '')));
+
+  useLayoutEffect(() => {
+    if (controlled) setText(isoToDmy(String(value ?? '')));
+  }, [controlled, value]);
+
+  function assign(node: HTMLInputElement | null) {
+    hidden.current = node;
+    if (typeof ref === 'function') ref(node);
+    else if (ref) ref.current = node;
+    if (!node) return;
+    setText(isoToDmy(node.value));
+    const desc = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value');
+    if (!desc?.get || !desc.set) return;
+    const get = desc.get;
+    const set = desc.set;
+    Object.defineProperty(node, 'value', {
+      configurable: true,
+      get() {
+        return get.call(this);
+      },
+      set(next: string) {
+        set.call(this, next);
+        setText(isoToDmy(String(next ?? '')));
+      },
+    });
+  }
+
+  function commit(next: string) {
+    setText(next);
+    const iso = next.trim() === '' ? '' : dmyToIso(next);
+    if (iso === null) return;
+    if (iso && max && iso > max) return;
+    if (iso && min && iso < min) return;
+    const node = hidden.current;
+    if (node) {
+      const desc = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value');
+      desc?.set?.call(node, iso);
+      node.dispatchEvent(new Event('input', { bubbles: true }));
+      node.dispatchEvent(new Event('change', { bubbles: true }));
+    }
+    onChange?.({ target: { value: iso, name: name ?? '' }, currentTarget: { value: iso, name: name ?? '' } } as ChangeEvent<HTMLInputElement>);
+  }
+
   return (
-    <input
-      type={type}
-      className={cn(
-        'min-h-11 w-full rounded-xl border border-line bg-white px-3 text-base text-ink outline-none focus-visible:border-grove focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-grove',
-        className,
-      )}
-      {...props}
-      max={dateMax}
-      min={dateMin}
-    />
+    <div className="grid gap-1">
+      <input
+        type="text"
+        inputMode="numeric"
+        autoComplete="off"
+        placeholder="dd/mm/yyyy"
+        className={cn(fieldClass, className)}
+        value={text}
+        aria-label={props['aria-label']}
+        id={props.id}
+        onBlur={onBlur}
+        onChange={(event) => commit(event.target.value)}
+      />
+      <p className="text-xs text-ink-soft">{t('dates.example')}</p>
+      <input type="hidden" name={name} ref={assign} onChange={() => undefined} defaultValue={controlled ? undefined : String(defaultValue ?? '')} value={controlled ? String(value ?? '') : undefined} />
+    </div>
+  );
+}
+
+export function Splash({ message }: { message?: string }) {
+  const { t } = useTranslation();
+  return (
+    <div className="grid min-h-dvh place-items-center bg-paper px-6">
+      <div className="grid justify-items-center gap-4">
+        <Logo className="h-20 w-20" />
+        <div className="h-8 w-8 animate-spin rounded-full border-4 border-grove border-t-transparent" role="status" aria-label={t('common.loading')} />
+        {message ? <p className="max-w-sm text-center text-ink-soft">{message}</p> : null}
+      </div>
+    </div>
   );
 }
 

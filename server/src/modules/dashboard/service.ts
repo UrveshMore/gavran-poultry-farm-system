@@ -1,5 +1,6 @@
 import type { PermissionCode } from '@gavran/shared';
-import { asNumber, many, one, type Db } from '../../db/sql.js';
+import { z } from 'zod';
+import { asNumber, exec, many, one, type Db } from '../../db/sql.js';
 import { pool } from '../../db/pool.js';
 import { AppError } from '../../http/errors.js';
 import { todayInTimeZone } from '../batches/service.js';
@@ -112,6 +113,9 @@ export async function getDashboard(access: FarmAccess, userId: string) {
     attention.push({ code: 'payments_not_set', count: money.pending.billCount, path: 'suppliers' });
   }
 
+  const charts = await chartSection(access, today, weekStart, monthStart, eggs, birds);
+  const phone = await readPhoneSettings(access.farmId, userId);
+
   return {
     today,
     weekStart,
@@ -126,6 +130,8 @@ export async function getDashboard(access: FarmAccess, userId: string) {
     attention,
     doses,
     alerts: alertRows({ eggs, birds, tasks, health, stock, doses }),
+    charts,
+    phone,
   };
 }
 
@@ -413,6 +419,176 @@ async function expensesThisMonth(farmId: string, monthStart: string, today: stri
     [farmId, monthStart, today],
   );
   return rows.map((row) => ({ unitLabel: row.unit_label, amount: money(asNumber(row.amount)) }));
+}
+
+const phoneSchema = z.object({
+  morningOn: z.boolean(),
+  eveningOn: z.boolean(),
+  lowStockOn: z.boolean(),
+  eggsOn: z.boolean(),
+  morningMinute: z.number().int().min(0).max(1439),
+  eveningMinute: z.number().int().min(0).max(1439),
+});
+
+const phoneDefaults = {
+  morningOn: true,
+  eveningOn: true,
+  lowStockOn: true,
+  eggsOn: true,
+  morningMinute: 480,
+  eveningMinute: 1020,
+};
+
+export async function readPhoneSettings(farmId: string, userId: string) {
+  const row = await one<
+    RowDataPacket & {
+      morning_on: number;
+      evening_on: number;
+      low_stock_on: number;
+      eggs_on: number;
+      morning_minute: number;
+      evening_minute: number;
+    }
+  >(
+    pool,
+    `SELECT morning_on, evening_on, low_stock_on, eggs_on, morning_minute, evening_minute
+     FROM notification_settings WHERE farm_id = ? AND user_id = ?`,
+    [farmId, userId],
+  );
+  if (!row) return phoneDefaults;
+  return {
+    morningOn: Boolean(row.morning_on),
+    eveningOn: Boolean(row.evening_on),
+    lowStockOn: Boolean(row.low_stock_on),
+    eggsOn: Boolean(row.eggs_on),
+    morningMinute: Number(row.morning_minute),
+    eveningMinute: Number(row.evening_minute),
+  };
+}
+
+export async function savePhoneSettings(farmId: string, userId: string, body: unknown) {
+  const input = phoneSchema.parse(body);
+  await exec(
+    pool,
+    `INSERT INTO notification_settings
+      (user_id, farm_id, morning_on, evening_on, low_stock_on, eggs_on, morning_minute, evening_minute)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+     ON DUPLICATE KEY UPDATE
+      morning_on = VALUES(morning_on), evening_on = VALUES(evening_on), low_stock_on = VALUES(low_stock_on),
+      eggs_on = VALUES(eggs_on), morning_minute = VALUES(morning_minute), evening_minute = VALUES(evening_minute)`,
+    [userId, farmId, input.morningOn ? 1 : 0, input.eveningOn ? 1 : 0, input.lowStockOn ? 1 : 0, input.eggsOn ? 1 : 0, input.morningMinute, input.eveningMinute],
+  );
+  return input;
+}
+
+function fillDays(today: string, weekStart: string, byDay: Map<string, number>): Array<{ date: string; count: number }> {
+  const days: Array<{ date: string; count: number }> = [];
+  for (let offset = 0; offset < 7; offset += 1) {
+    const date = shiftDate(weekStart, offset);
+    if (date > today) break;
+    days.push({ date, count: byDay.get(date) ?? 0 });
+  }
+  return days;
+}
+
+async function chartSection(
+  access: FarmAccess,
+  today: string,
+  weekStart: string,
+  monthStart: string,
+  eggs: { days: Array<{ date: string; count: number }> } | null,
+  birds: { flocks: Array<{ code: string; sex: { roosters: number; hens: number } | null }> } | null,
+) {
+  const losses = can(access, 'loss.read') ? await lossDays(access.farmId, today, weekStart) : [];
+  const feed = can(access, 'stock.read') ? await feedDays(access.farmId, today, weekStart) : { unitLabel: null, days: [] };
+  const money = await moneyBars(access, monthStart, today);
+  return {
+    eggs: eggs?.days ?? [],
+    losses,
+    lossRate: 'not_set' as const,
+    feed,
+    flocks: (birds?.flocks ?? []).map((flock) => ({
+      code: flock.code,
+      roosters: flock.sex?.roosters ?? null,
+      hens: flock.sex?.hens ?? null,
+    })),
+    money,
+    moneyBasis: 'not_set' as const,
+  };
+}
+
+async function lossDays(farmId: string, today: string, weekStart: string) {
+  const rows = await many<RowDataPacket & { day: Date | string; n: number | string }>(
+    pool,
+    `SELECT occurred_on AS day, COALESCE(SUM(bird_count), 0) AS n
+     FROM loss_incidents
+     WHERE farm_id = ? AND occurred_on >= ? AND occurred_on <= ?
+     GROUP BY occurred_on`,
+    [farmId, weekStart, today],
+  );
+  const byDay = new Map(rows.map((row) => [asDay(row.day), asNumber(row.n)]));
+  return fillDays(today, weekStart, byDay);
+}
+
+async function feedDays(farmId: string, today: string, weekStart: string) {
+  const rows = await many<RowDataPacket & { day: Date | string; unit_label: string; qty: number | string; n: number | string }>(
+    pool,
+    `SELECT m.occurred_on AS day, i.unit_label, SUM(m.quantity) AS qty, COUNT(*) AS n
+     FROM stock_movements m
+     JOIN stock_items i ON i.id = m.item_id
+     WHERE m.farm_id = ? AND m.direction = 'out' AND m.occurred_on >= ? AND m.occurred_on <= ?
+     GROUP BY i.unit_label, m.occurred_on`,
+    [farmId, weekStart, today],
+  );
+  const totals = new Map<string, number>();
+  for (const row of rows) totals.set(row.unit_label, (totals.get(row.unit_label) ?? 0) + asNumber(row.n));
+  let unitLabel: string | null = null;
+  let best = 0;
+  for (const [label, count] of totals) {
+    if (count > best) {
+      best = count;
+      unitLabel = label;
+    }
+  }
+  if (!unitLabel) return { unitLabel: null, days: [] as Array<{ date: string; quantity: number }> };
+  const byDay = new Map(rows.filter((row) => row.unit_label === unitLabel).map((row) => [asDay(row.day), asNumber(row.qty)]));
+  const days = fillDays(today, weekStart, byDay).map((day) => ({ date: day.date, quantity: day.count }));
+  return { unitLabel, days };
+}
+
+async function moneyBars(access: FarmAccess, monthStart: string, today: string) {
+  const bars: Array<{ unitLabel: string | null; income: number | null; kharch: number | null; difference: number | null }> = [];
+  if (can(access, 'expense.read')) {
+    const rows = await many<RowDataPacket & { unit_label: string; direction: 'expense' | 'income'; amount: number | string }>(
+      pool,
+      `SELECT e.unit_label, e.direction, SUM(e.amount) AS amount
+       FROM expense_entries e
+       LEFT JOIN expense_entries r ON r.reverses_entry_id = e.id
+       WHERE e.farm_id = ? AND e.occurred_on >= ? AND e.occurred_on <= ?
+         AND e.reverses_entry_id IS NULL AND r.id IS NULL
+       GROUP BY e.unit_label, e.direction
+       ORDER BY e.unit_label`,
+      [access.farmId, monthStart, today],
+    );
+    const byUnit = new Map<string, { income: number | null; kharch: number | null }>();
+    for (const row of rows) {
+      const current = byUnit.get(row.unit_label) ?? { income: null, kharch: null };
+      if (row.direction === 'income') current.income = money(asNumber(row.amount));
+      else current.kharch = money(asNumber(row.amount));
+      byUnit.set(row.unit_label, current);
+    }
+    for (const [unitLabel, side] of byUnit) {
+      const difference = side.income !== null && side.kharch !== null ? money(side.income - side.kharch) : null;
+      bars.push({ unitLabel, income: side.income, kharch: side.kharch, difference });
+    }
+  }
+  if (can(access, 'sale.read')) {
+    const sales = await salesThisMonth(access.farmId, monthStart, today);
+    if (sales.status === 'typed' && sales.amount !== null) {
+      bars.push({ unitLabel: null, income: sales.amount, kharch: null, difference: null });
+    }
+  }
+  return bars;
 }
 
 async function pendingPayments(farmId: string) {

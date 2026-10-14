@@ -15,7 +15,7 @@ export class ApiError extends Error {
   }
 }
 
-type Options = { method?: string; json?: unknown; form?: FormData; retry?: boolean; idempotencyKey?: string };
+type Options = { method?: string; json?: unknown; form?: FormData; retry?: boolean; csrfRetry?: boolean; idempotencyKey?: string };
 
 let refreshPromise: Promise<boolean> | null = null;
 
@@ -44,18 +44,34 @@ async function refreshSession(): Promise<boolean> {
   return res.ok;
 }
 
+function signInAgain(): void {
+  if (typeof window === 'undefined') return;
+  if (window.location.pathname.startsWith('/login')) return;
+  window.location.assign('/login?expired=1');
+}
+
 export async function api<T>(path: string, options: Options = {}): Promise<T> {
   const method = options.method ?? 'GET';
   const headers = new Headers();
   if (options.json !== undefined) headers.set('content-type', 'application/json');
   if (options.idempotencyKey) headers.set('Idempotency-Key', options.idempotencyKey);
-  if (method !== 'GET' && method !== 'HEAD') headers.set('X-CSRF-Token', await csrfToken());
-  const res = await fetch(withServer(path), {
-    method,
-    headers,
-    credentials: 'include',
-    body: options.form ?? (options.json !== undefined ? JSON.stringify(options.json) : undefined),
-  });
+  let res: Response;
+  try {
+    if (method !== 'GET' && method !== 'HEAD') headers.set('X-CSRF-Token', await csrfToken());
+    res = await fetch(withServer(path), {
+      method,
+      headers,
+      credentials: 'include',
+      body: options.form ?? (options.json !== undefined ? JSON.stringify(options.json) : undefined),
+    });
+  } catch (error) {
+    if (error instanceof ApiError) throw error;
+    throw new ApiError(0, 'NETWORK', 'The computer did not answer.');
+  }
+  if (res.status === 403 && !options.csrfRetry && method !== 'GET' && method !== 'HEAD') {
+    document.cookie = 'gavran_csrf=; Max-Age=0; path=/';
+    return api<T>(path, { ...options, csrfRetry: true });
+  }
   if (
     res.status === 401 &&
     !options.retry &&
@@ -67,6 +83,8 @@ export async function api<T>(path: string, options: Options = {}): Promise<T> {
       refreshPromise = null;
     });
     if (await refreshPromise) return api<T>(path, { ...options, retry: true });
+    signInAgain();
+    throw new ApiError(401, 'SESSION', 'Please sign in again');
   }
   const body = (await res.json().catch(() => null)) as {
     ok?: boolean;
@@ -109,6 +127,10 @@ export function errorKey(error: unknown): string | null {
     TRAINING_REQUIRED: 'workforce.required',
     TRAINING_ALREADY_DONE: 'workforce.alreadyDone',
     FILE_TOO_LARGE: 'documents.tooLarge',
+    PAYLOAD_TOO_LARGE: 'documents.tooLarge',
+    SAATHI_KEY_INVALID: 'saathi.keyInvalid',
+    SESSION: 'auth.signInAgain',
+    NETWORK: 'common.network',
     FORBIDDEN: 'common.permissionDenied',
   };
   return keys[error.code] ?? null;

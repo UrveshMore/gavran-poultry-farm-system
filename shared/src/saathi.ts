@@ -8,7 +8,7 @@ export const SAATHI_MIN_CONFIDENCE = 0.6;
 export const SAATHI_ACTIONS = ['eggs', 'loss', 'hatch', 'dose', 'task', 'feed', 'sale', 'expense'] as const;
 export type SaathiAction = (typeof SAATHI_ACTIONS)[number];
 
-export type SaathiKind = SaathiAction | 'ask_doses' | 'ask_counts' | 'ask_eggs' | 'ask_stock' | 'ask_vaccines' | 'help' | 'unknown';
+export type SaathiKind = SaathiAction | 'ask_doses' | 'ask_counts' | 'ask_eggs' | 'ask_stock' | 'ask_vaccines' | 'help' | 'chat' | 'unknown';
 
 export type Intent = {
   kind: SaathiKind;
@@ -85,6 +85,7 @@ const NEED: Record<SaathiKind, string> = {
   ask_stock: 'stock.read',
   ask_vaccines: 'health.read',
   help: 'farm.read',
+  chat: 'farm.read',
   unknown: 'farm.read',
 };
 
@@ -175,6 +176,11 @@ export function parseUtterance(raw: string, today: string): Intent {
   const text = fold(raw);
   const intent = blankIntent(raw.trim().slice(0, 500));
   const nums = numbers(text);
+  if (nums.length === 0 && /^(hi|hello|hey|namaste|namaskar|good morning|good evening|thanks|thank you|thankyou)\b/.test(text)) {
+    intent.kind = 'chat';
+    intent.confidence = 0.95;
+    return intent;
+  }
   readDate(text, today, intent);
   readBatch(text, intent);
   const question = has(text, [
@@ -354,6 +360,7 @@ export function resolveIntent(intent: Intent, ctx: SaathiContext): SaathiReply {
   if (intent.kind === 'unknown' || intent.confidence < SAATHI_MIN_CONFIDENCE) {
     return ask('saathi.ask.unclear', intent.kind === 'unknown' ? blankIntent(intent.note) : intent);
   }
+  if (intent.kind === 'chat') return { type: 'answer', speechKey: 'saathi.say.hello', vars: {} };
   if (!can(ctx, intent.kind)) return { type: 'denied', speechKey: 'saathi.denied', vars: {} };
   if (intent.kind === 'help') return { type: 'answer', speechKey: `saathi.help.${intent.section ?? 'saathi'}`, vars: {} };
   if (intent.kind === 'ask_doses') return { type: 'lookup', lookup: 'doses' };

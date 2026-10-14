@@ -1,4 +1,4 @@
-import { batchInputSchema, birdTypeInputSchema, movementInputSchema, MOVEMENT_TYPES, rangeAreaInputSchema, sexCountInputSchema } from '@gavran/shared';
+import { batchInputSchema, batchStage, birdTypeInputSchema, movementInputSchema, MOVEMENT_TYPES, rangeAreaInputSchema, sexCountInputSchema } from '@gavran/shared';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
@@ -151,7 +151,11 @@ function BatchForm({
   onDone: () => void;
 }) {
   const { t } = useTranslation();
+  const queryClient = useQueryClient();
   const today = localToday();
+  const [shedCode, setShedCode] = useState('');
+  const [shedName, setShedName] = useState('');
+  const [shedBirds, setShedBirds] = useState('50');
   const form = useForm<z.infer<typeof batchInputSchema>>({
     resolver: zodResolver(batchInputSchema),
     defaultValues: {
@@ -159,6 +163,7 @@ function BatchForm({
       birdTypeId: types[0]?.id ?? '',
       sourceNote: '',
       hatchDate: '',
+      eggSetOn: '',
       openedOn: today,
       shedId: sheds[0]?.id ?? '',
       birdCount: 1,
@@ -169,8 +174,23 @@ function BatchForm({
     onSuccess: onDone,
     onError: (error) => applyFields(error, (name, err) => form.setError(name as 'code', err)),
   });
+  const addShed = useMutation({
+    mutationFn: () =>
+      api<Shed>(`/api/v1/farms/${farmId}/sheds`, {
+        method: 'POST',
+        json: { code: shedCode, name: shedName, shedType: 'brooder', usableCapacity: Number(shedBirds), status: 'active', notes: '' },
+      }),
+    onSuccess: async (shed) => {
+      await queryClient.invalidateQueries({ queryKey: ['sheds', farmId] });
+      form.setValue('shedId', shed.id);
+      setShedCode('');
+      setShedName('');
+    },
+  });
   const errors = form.formState.errors;
   const openedOn = form.watch('openedOn');
+  const shedId = form.watch('shedId');
+  const blockReason = types.length === 0 ? t('batches.needType') : sheds.length === 0 ? t('batches.needShed') : !shedId ? t('batches.pickShed') : null;
   return (
     <Card>
       <form className="grid gap-3" onSubmit={form.handleSubmit((values) => mutation.mutate(values))} noValidate>
@@ -187,13 +207,27 @@ function BatchForm({
           </select>
         </Field>
         <Field id="batch-shed" label={t('batches.shed')} error={text(t, errors.shedId?.message)} hint={t('fieldHint.batch-shed')}>
-          <select id="batch-shed" className={selectClass} {...form.register('shedId')}>
-            {sheds.map((shed) => (
-              <option key={shed.id} value={shed.id}>
-                {shed.code} · {shed.name}
-              </option>
-            ))}
-          </select>
+          {sheds.length === 0 ? (
+            <div className="grid gap-2">
+              <p className="text-sm font-semibold">{t('batches.noShed')}</p>
+              <Input id="quick-shed-code" value={shedCode} placeholder="A1" onChange={(event) => setShedCode(event.target.value)} aria-label={t('batches.shed')} />
+              <Input id="quick-shed-name" value={shedName} placeholder={t('batches.noShed')} onChange={(event) => setShedName(event.target.value)} aria-label={t('batches.addShed')} />
+              <Input id="quick-shed-birds" inputMode="numeric" value={shedBirds} placeholder="50" onChange={(event) => setShedBirds(event.target.value)} aria-label={t('batches.shedBirds')} />
+              <Button type="button" variant="outline" disabled={addShed.isPending || shedCode.trim().length === 0 || shedName.trim().length < 2} onClick={() => addShed.mutate()}>
+                {t('batches.addShed')}
+              </Button>
+              {addShed.isError ? <Alert>{explain(addShed.error, t)}</Alert> : null}
+            </div>
+          ) : (
+            <select id="batch-shed" className={selectClass} {...form.register('shedId')}>
+              <option value="">{t('batches.pickShed')}</option>
+              {sheds.map((shed) => (
+                <option key={shed.id} value={shed.id}>
+                  {shed.code} · {shed.name}
+                </option>
+              ))}
+            </select>
+          )}
         </Field>
         <Field id="batch-count" label={t('batches.count')} hint={t('batches.countHint')} error={text(t, errors.birdCount?.message)}>
           <Input id="batch-count" type="number" min={1} placeholder={t('batches.countPlaceholder')} {...form.register('birdCount', { valueAsNumber: true })} />
@@ -204,12 +238,15 @@ function BatchForm({
         <Field id="batch-hatch" label={`${t('batches.hatchDate')} (${t('common.optional')})`} hint={t('batches.hatchHint')} error={text(t, errors.hatchDate?.message)}>
           <Input id="batch-hatch" type="date" max={openedOn || undefined} {...form.register('hatchDate')} />
         </Field>
+        <Field id="batch-set" label={`${t('batches.eggSetOn')} (${t('common.optional')})`} hint={t('batches.eggSetHint')}>
+          <Input id="batch-set" type="date" {...form.register('eggSetOn')} />
+        </Field>
         <Field id="batch-source" label={`${t('batches.source')} (${t('common.optional')})`} error={text(t, errors.sourceNote?.message)} hint={t('fieldHint.batch-source')}>
           <TextArea id="batch-source" {...form.register('sourceNote')}  placeholder={t('fieldPh.batch-source')}/>
         </Field>
-        {types.length === 0 ? <Alert>{t('batches.needType')}</Alert> : null}
+        {blockReason ? <p className="text-sm font-semibold">{blockReason}</p> : null}
         {mutation.isError ? <Alert>{explain(mutation.error, t)}</Alert> : null}
-        <Button type="submit" disabled={mutation.isPending || types.length === 0 || sheds.length === 0}>
+        <Button type="submit" disabled={mutation.isPending || Boolean(blockReason)}>
           {mutation.isPending ? t('batches.saving') : t('batches.save')}
         </Button>
       </form>
@@ -233,6 +270,7 @@ export function BatchDetailPage() {
   if (detail.isLoading) return <p>{t('common.loading')}</p>;
   if (detail.isError || !detail.data) return <Alert>{explain(detail.error, t)}</Alert>;
   const { batch, movements } = detail.data;
+  const stage = batchStage({ today: localToday(), eggSetOn: batch.eggSetOn ?? null, hatchDate: batch.hatchDate });
   const canMove = Boolean(access?.permissions.includes('movement.create') && batch.status === 'open');
   const canReadHealth = Boolean(access?.permissions.includes('health.read'));
   const canRecordHealth = Boolean(access?.permissions.includes('health.record'));
@@ -247,6 +285,15 @@ export function BatchDetailPage() {
         </p>
         {batch.sourceNote ? <p className="mt-2 text-sm">{batch.sourceNote}</p> : null}
       </div>
+      <Card>
+        <p className="text-sm text-ink-soft">{t('batches.stageLabel')}</p>
+        <p className="font-display text-2xl">{t(`batches.stage.${stage.stage}`)}</p>
+        {stage.daysInStage !== null ? <p className="text-sm">{t('batches.daysInStage', { count: stage.daysInStage })}</p> : null}
+        {stage.stage === 'brooding' && stage.broodingDaysLeft !== null && stage.broodingDaysLeft <= 3 ? (
+          <p className="text-sm font-semibold">{t('batches.broodingEnds', { count: stage.broodingDaysLeft })}</p>
+        ) : null}
+        {stage.stage === 'brooding' ? <p className="text-sm text-ink-soft">{t('batches.chickGuard')}</p> : null}
+      </Card>
       <BatchDosePanel
         farmId={farmId}
         batchId={batchId}

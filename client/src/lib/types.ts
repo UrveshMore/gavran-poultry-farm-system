@@ -89,6 +89,7 @@ export type Batch = {
   birdTypeName: string;
   sourceNote: string | null;
   hatchDate: string | null;
+  eggSetOn?: string | null;
   openedOn: string;
   status: 'open' | 'closed';
   version: number;
@@ -167,7 +168,7 @@ export type CandlingRecord = {
   lines: Array<{ label: string; eggCount: number }>;
 };
 
-export type EggCategory = { id: string; name: string; status: 'active' | 'archived' };
+export type EggCategory = { id: string; name: string; status: 'active' | 'archived'; purpose?: 'incubator' | 'sale' | 'eaten' | 'broken' | null };
 
 export type TaskSeason = 'summer_heat' | 'monsoon' | 'winter';
 
@@ -564,5 +565,5 @@ export type EggCollection = {
   shiftLabel: string | null;
   notes: string | null;
   total: number;
-  lines: Array<{ categoryId: string; categoryName: string; eggCount: number }>;
+  lines: Array<{ categoryId: string; categoryName: string; eggCount: number; purpose?: 'incubator' | 'sale' | 'eaten' | 'broken' | null }>;
 };

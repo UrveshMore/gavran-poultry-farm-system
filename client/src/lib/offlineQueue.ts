@@ -1,5 +1,6 @@
 import { applySyncResult, captureClass, enqueueCapture, syncMode, type QueueItem } from '@gavran/shared';
 import { ApiError, api } from '@/lib/api';
+import { newId } from '@/lib/ids';
 
 const LEGACY_KEY = 'gavran.offlineQueue';
 const DB_NAME = 'gavran';
@@ -78,9 +79,9 @@ export async function waitingCount(): Promise<number> {
   return rows.filter((row) => row.state === 'pending' || row.state === 'failed' || row.state === 'syncing').length;
 }
 
-export async function queueWrite(farmId: string, path: string, body: unknown, idempotencyKey = crypto.randomUUID()): Promise<'queued' | 'refused' | 'online_only'> {
+export async function queueWrite(farmId: string, path: string, body: unknown, idempotencyKey = newId()): Promise<'queued' | 'refused' | 'online_only'> {
   const next = enqueueCapture(await readQueue(), {
-    id: crypto.randomUUID(),
+    id: newId(),
     farmId,
     path,
     body,
@@ -95,7 +96,7 @@ export function queueAttendance(farmId: string, body: unknown) {
 }
 
 export async function postOrQueue(farmId: string, path: string, body: unknown): Promise<'sent' | 'queued'> {
-  const idempotencyKey = crypto.randomUUID();
+  const idempotencyKey = newId();
   const offline = typeof navigator !== 'undefined' && navigator.onLine === false;
   if ((offline || captureClass(path) === 'queueable') && offline) {
     const outcome = await queueWrite(farmId, path, body, idempotencyKey);

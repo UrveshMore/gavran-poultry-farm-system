@@ -22,6 +22,7 @@ export type BatchRecord = {
   birdTypeName: string;
   sourceNote: string | null;
   hatchDate: string | null;
+  eggSetOn: string | null;
   openedOn: string;
   status: BatchStatus;
   version: number;
@@ -198,6 +199,7 @@ type BatchRow = RowDataPacket & {
   bird_type_name: string;
   source_note: string | null;
   hatch_date: Date | string | null;
+  egg_set_on: Date | string | null;
   opened_on: Date | string;
   status: BatchStatus;
   version: number;
@@ -220,6 +222,7 @@ async function mapBatch(db: Db, row: BatchRow): Promise<BatchRecord> {
     birdTypeName: row.bird_type_name,
     sourceNote: row.source_note,
     hatchDate: asDate(row.hatch_date),
+    eggSetOn: asDate(row.egg_set_on),
     openedOn: asDate(row.opened_on) ?? '',
     status: row.status,
     version: Number(row.version),
@@ -231,7 +234,7 @@ async function mapBatch(db: Db, row: BatchRow): Promise<BatchRecord> {
 
 const BATCH_SELECT = `
   SELECT b.id, b.farm_id, b.code, b.bird_type_id, t.name AS bird_type_name, b.source_note,
-         b.hatch_date, b.opened_on, b.status, b.version
+         b.hatch_date, b.egg_set_on, b.opened_on, b.status, b.version
   FROM batches b
   JOIN bird_types t ON t.id = b.bird_type_id
 `;
@@ -244,6 +247,7 @@ export async function insertBatch(
     birdTypeId: string;
     sourceNote: string | null;
     hatchDate: string | null;
+    eggSetOn?: string | null;
     openedOn: string;
     shedId: string;
     birdCount: number;
@@ -254,9 +258,9 @@ export async function insertBatch(
   await exec(
     db,
     `INSERT INTO batches
-      (id, farm_id, code, bird_type_id, source_note, hatch_date, opened_on, created_by)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
-    [id, input.farmId, input.code, input.birdTypeId, input.sourceNote, input.hatchDate, input.openedOn, input.createdBy],
+      (id, farm_id, code, bird_type_id, source_note, hatch_date, opened_on, created_by, egg_set_on)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+    [id, input.farmId, input.code, input.birdTypeId, input.sourceNote, input.hatchDate, input.openedOn, input.createdBy, input.eggSetOn ?? null],
   );
   await insertMovement(db, {
     farmId: input.farmId,

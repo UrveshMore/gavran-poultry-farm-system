@@ -63,7 +63,7 @@ export function createApp() {
       allowedHeaders: ['Content-Type', 'X-CSRF-Token', 'Idempotency-Key', 'X-Request-Id'],
     }),
   );
-  app.use(express.json({ limit: '100kb' }));
+  app.use(express.json({ limit: '8mb' }));
   app.use(cookieParser());
   app.use(requestLogger);
   app.get(

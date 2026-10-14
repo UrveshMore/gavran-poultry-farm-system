@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.35.0 — 2026-10-14
+
+Home fixes. Charts, a chat button, and phone alarms that repeat.
+
+- Gavran Saathi answers hello. A Gemini key is tried before it is kept, and the page says Key saved and tested OK. A photo is shrunk before it is sent. The round button sits on every farm screen.
+- Home draws egg counts, birds lost, feed used, roosters and hens by flock, and income next to kharch. A death rate is not set. Income minus kharch uses the same typed unit.
+- The phone app repeats morning medicine and low feed at 8:00, and evening medicine and today's egg entry at 17:00, including after the app is closed. Opening the farm refreshes the words once that day. Each person can turn a line off. Text messages are not sent.
+- Dates are typed as dd/mm/yyyy. The guided tour is stored once per person. A second owner is invited from People. An empty shed list can add a shed on the flock form. Egg lines can be For incubator, For sale, Eaten at home, and Broken. A flock shows incubator, brooding, or grow-out. Brooding is 28 days because that is the length that was asked for.
+
 ## 0.34.0 — 2026-10-14
 
 My medicines. The owner or a manager types the dose.

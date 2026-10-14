@@ -2,7 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { Navigate, Route, Routes } from 'react-router-dom';
 import { AppShell } from '@/components/Shell';
-import { Button } from '@/components/ui';
+import { Button, Splash } from '@/components/ui';
 import { ApiError, fetchMe } from '@/lib/api';
 import { AccountPage, LoginPage, RegisterPage } from '@/pages/AuthPages';
 import { BatchDetailPage, BatchesPage } from '@/pages/BatchPages';
@@ -37,12 +37,13 @@ import { isNativeApp, savedServer } from '@/lib/serverAddress';
 function RequireAuth() {
   const { t } = useTranslation();
   const me = useQuery({ queryKey: ['me'], queryFn: fetchMe, retry: false });
-  if (me.isLoading) return <p className="p-6">{t('common.loading')}</p>;
+  if (me.isLoading) return <Splash />;
   if (me.isError) {
-    if (me.error instanceof ApiError && me.error.status === 401) return <Navigate to="/login" replace />;
+    if (me.error instanceof ApiError && (me.error.status === 401 || me.error.code === 'SESSION')) return <Navigate to="/login" replace />;
+    const offline = me.error instanceof ApiError && me.error.code === 'NETWORK';
     return (
       <div className="grid gap-3 p-6">
-        <p role="alert">{t('common.errorGeneric')}</p>
+        <Splash message={offline ? t('common.network') : t('common.errorGeneric')} />
         <Button type="button" onClick={() => void me.refetch()}>
           {t('common.retry')}
         </Button>

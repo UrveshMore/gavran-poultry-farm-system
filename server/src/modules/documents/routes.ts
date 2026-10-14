@@ -6,7 +6,7 @@ import { sendData } from '../../http/respond.js';
 import { currentFarm, currentUser, requireFarmPermission } from '../../middleware/requirePermission.js';
 import { getDocuments, openDocument, storeDocument } from './service.js';
 
-const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 5 * 1024 * 1024, files: 1 } });
+const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 12 * 1024 * 1024, files: 1 } });
 export const documentRoutes = Router();
 
 function idempotencyOf(req: Request) {

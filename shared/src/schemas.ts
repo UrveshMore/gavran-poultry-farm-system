@@ -222,6 +222,7 @@ export const batchInputSchema = z
     birdTypeId: z.string().uuid('invalid_format'),
     sourceNote: z.string().trim().max(255, 'too_big'),
     hatchDate: z.union([calendarDateSchema, z.literal('')]),
+    eggSetOn: z.union([calendarDateSchema, z.literal('')]).optional(),
     openedOn: calendarDateSchema,
     shedId: z.string().uuid('invalid_format'),
     birdCount: z.number({ invalid_type_error: 'invalid_format' }).int('invalid_format').min(1, 'too_small').max(1_000_000, 'too_big'),

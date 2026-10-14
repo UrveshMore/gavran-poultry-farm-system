@@ -131,6 +131,7 @@ export async function createBatch(actor: Actor, access: FarmAccess, body: unknow
         birdTypeId: birdType.id,
         sourceNote: input.sourceNote === '' ? null : input.sourceNote,
         hatchDate: input.hatchDate === '' ? null : input.hatchDate,
+        eggSetOn: input.eggSetOn ? input.eggSetOn : null,
         openedOn: input.openedOn,
         shedId: input.shedId,
         birdCount: input.birdCount,

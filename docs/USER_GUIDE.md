@@ -55,6 +55,8 @@ These are not 4317, 4318, or 3307, because Cursor on the owner's Windows PC alre
 3. Tap **Tell me on this phone** if you want this browser to show a notice. The page always answers. On this computer, `http://127.0.0.1:5317` can ask. A phone on a plain `http://192.168…` address cannot. Set `HTTPS=1`, start again, and open the `https://` address on the phone (see the Windows setup notes). The program asks first. It does not send a notice overnight. If notices are blocked or the list is empty, the page says that, and the coloured band is still the list.
 4. When you write the medicine for a care day you set, that job is marked done.
 5. Tap a tile under the cards. A tile with one job opens that job. A tile with many jobs opens those jobs.
+6. The graphs under the cards are egg counts, birds lost, feed used, roosters and hens in each flock, and income next to kharch. Birds lost is a count. A death rate is not set. Income minus kharch appears only when both numbers use the same unit you typed.
+7. Phone alerts are on the same page. Morning medicine and low feed default to 8:00. Evening medicine and today's egg entry default to 17:00. Each person can turn a line off. On the phone app these repeat after the app is closed. Opening the farm refreshes the words once that day. Text messages are not sent.
 
 ## Today
 
@@ -77,17 +79,17 @@ These are not 4317, 4318, or 3307, because Cursor on the owner's Windows PC alre
 
 **What it is.** A helper that turns speech, typed words, or a photo into a card you can correct. Nothing is written until you tap Save.
 
-**Where it is.** Daily work, then Gavran Saathi. The key is under Farm details.
+**Where it is.** The round button at the bottom right of every farm screen, and also Daily work, then Gavran Saathi. The key is under Farm details.
 
 **Why it is used.** So a count can be spoken in English, Hindi, or Marathi, and still checked before it is written.
 
 **How to use it.**
 
-1. Type or tap Speak. The reply is shown and spoken.
+1. Type or tap the mic. Hello gets a hello back. The reply is shown and spoken.
 2. Read the card. Change the flock, the number, or the day. If the flock or the day is missing, Saathi asks.
 3. Tap Save only when it is right.
 4. An egg or chick photo shows a count and boxes. Type your count, then confirm. That opens the same card. A bird photo is an age guess, not a hatch date. A sick bird is matched only to the farm papers, with the page. The line says possible - confirm with vet. If the paper has no amount, the page says so.
-5. The Gemini key stays on this computer. The full key is not sent back to the phone.
+5. The Gemini key stays on this computer. Paste the whole key. The page says Key saved and tested OK, or it says the key did not work and does not keep it. The full key is not sent back to the phone. A photo is made smaller before it is sent.
 
 ## Yard book
 
@@ -167,11 +169,12 @@ These are not 4317, 4318, or 3307, because Cursor on the owner's Windows PC alre
 **How to use it.**
 
 1. Save a bird name first.
-2. Then add a flock: a short code, the shed, how many birds, the day it opened, and the hatch day if you know it.
-3. The hatch day cannot be after the opened day. On the medicine paper, that date is day 1.
-4. Open the flock. Medicine days lists today, tomorrow, and this week. Tick **Mark given** after you give that line. The words and amounts are copied from the chick-day paper. One line has no day and no amount; it says to check with the vet.
-5. The first time, write a short note that you checked the paper. Until then, a tick is refused. The sample farm is already marked checked, and the note starts with Sample.
-6. Each medicine has a picture from that paper, or a plain bottle, powder, or drop drawing. You can add your own photo. The page tries to clear a white background. If it cannot, it keeps the photo as it is.
+2. Then add a flock: a short code, the shed, how many birds, the day it opened, the hatch day, and the egg set date if you know them. If there is no shed yet, the form says so and you can add one there. A grey button says why it is waiting.
+3. The flock page shows Incubator, Brooding, or Grow-out. Brooding runs 28 days from the hatch day because that is the length that was asked for. It is not an official formula. Near the end it says brooding ends in a few days, and it reminds you about the chick guard and paper.
+4. The hatch day cannot be after the opened day. On the medicine paper, that date is day 1.
+5. Open the flock. Medicine days lists today, tomorrow, and this week. Tick **Mark given** after you give that line. If a line has no day, the button says so. The words and amounts are copied from the chick-day paper. One line has no day and no amount; it says to check with the vet.
+6. The first time, write a short note that you checked the paper. Until then, a tick is refused. The sample farm is already marked checked, and the note starts with Sample.
+7. Each medicine has a picture from that paper, or a plain bottle, powder, or drop drawing. You can add your own photo. The page tries to clear a white background. If it cannot, it keeps the photo as it is.
 
 ## Eggs
 
@@ -185,8 +188,8 @@ These are not 4317, 4318, or 3307, because Cursor on the owner's Windows PC alre
 
 **How to use it.**
 
-1. Add the sort names you use.
-2. Then record a day, optional flock and shed, and a count for each sort.
+1. Add the sort names you use, or tap Add egg lines for For incubator, For sale, Eaten at home, and Broken. Total is those four added together.
+2. Then record a day, optional flock and shed, and a count for each line. Days are typed as dd/mm/yyyy.
 
 ## Birds lost
 
@@ -391,6 +394,7 @@ These are not 4317, 4318, or 3307, because Cursor on the owner's Windows PC alre
 2. A mail address and a long secret phrase remain for the owner and a manager.
 3. Owner sees everything.
 4. A worker sees daily jobs, birds, hatch, health, and feed.
+5. Add owner invites another owner for this same farm. Tell them the mail address and the secret phrase yourself. Nothing is sent.
 
 ## Farm details
 

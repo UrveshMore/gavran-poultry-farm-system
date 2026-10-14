@@ -84,7 +84,7 @@ describe('saathi intents', () => {
     { text: 'konati las due aahe', check: (reply) => expect(reply.type === 'lookup' && reply.lookup).toBe('vaccines') },
     { text: 'andi kase lihayche', check: (reply) => expect(reply.type === 'answer' && reply.speechKey).toBe('saathi.help.eggs') },
     { text: 'आज 12 अंडी बैच B', check: (reply) => expect(reply.type === 'confirm' && reply.card.action).toBe('eggs') },
-    { text: 'hello there', check: (reply) => expect(reply.type === 'ask' && reply.speechKey).toBe('saathi.ask.unclear') },
+    { text: 'hello there', check: (reply) => expect(reply.type === 'answer' && reply.speechKey).toBe('saathi.say.hello') },
   ];
 
   it('matches the authored utterances in English, Hindi, and Marathi', () => {

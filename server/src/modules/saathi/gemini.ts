@@ -1,5 +1,20 @@
 const MODEL = 'gemini-2.5-flash';
 
+/** A tiny call used before a key is stored. A bad key must not be saved. */
+export async function probeGemini(apiKey: string): Promise<boolean> {
+  try {
+    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json', 'x-goog-api-key': apiKey },
+      body: JSON.stringify({ contents: [{ role: 'user', parts: [{ text: 'Reply with the word ok' }] }] }),
+      signal: AbortSignal.timeout(8000),
+    });
+    return response.ok;
+  } catch {
+    return false;
+  }
+}
+
 type Part = { text: string } | { inline_data: { mime_type: string; data: string } };
 
 export async function geminiJson(apiKey: string, parts: Part[], schema: object): Promise<unknown | null> {

@@ -11,6 +11,8 @@ import {
   changePassword,
   currentPublicUser,
   login,
+  markHomeTour,
+  readHomeTour,
   pinLogin,
   logout,
   logoutAll,
@@ -98,6 +100,22 @@ authRoutes.post(
     await logoutAll(user.id, meta(req));
     clearSessionCookies(res, req);
     sendData(res, 200, { signedOut: true }, req.requestId);
+  }),
+);
+
+authRoutes.get(
+  '/tour',
+  authenticate,
+  asyncHandler(async (req, res) => {
+    sendData(res, 200, await readHomeTour(currentUser(req).id), req.requestId);
+  }),
+);
+
+authRoutes.post(
+  '/tour',
+  authenticate,
+  asyncHandler(async (req, res) => {
+    sendData(res, 200, await markHomeTour(currentUser(req).id), req.requestId);
   }),
 );
 

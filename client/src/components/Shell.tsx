@@ -17,11 +17,13 @@ import {
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom';
+import { SaathiDock } from '@/components/SaathiDock';
 import { alertCount, type DashboardData } from '@/components/DashboardCards';
 import { PageExplain } from '@/components/Tour';
 import { api } from '@/lib/api';
 import { flushQueue, subscribeQueue, waitingCount } from '@/lib/offlineQueue';
 import { schedulePhoneAlerts } from '@/lib/phoneAlerts';
+import { isNativeApp } from '@/lib/serverAddress';
 import { useQuery } from '@tanstack/react-query';
 import { useQueryClient } from '@tanstack/react-query';
 import { InstallPrompt } from './InstallPrompt';
@@ -86,9 +88,25 @@ export function AppShell() {
   }, []);
 
   useEffect(() => {
-    if (!board.data) return;
-    void schedulePhoneAlerts(board.data);
-  }, [board.data]);
+    if (!board.data || !farmId) return;
+    void schedulePhoneAlerts(farmId, board.data);
+  }, [board.data, farmId]);
+
+  useEffect(() => {
+    if (!isNativeApp()) return;
+    let remove: (() => void) | undefined;
+    void import('@capacitor/app')
+      .then(({ App }) => App.addListener('backButton', ({ canGoBack }) => {
+        if (canGoBack) navigate(-1);
+      }))
+      .then((handle) => {
+        remove = () => {
+          void handle.remove();
+        };
+      })
+      .catch(() => undefined);
+    return () => remove?.();
+  }, [navigate]);
 
   async function signOut() {
     try {
@@ -139,8 +157,15 @@ export function AppShell() {
         </nav>
       </aside>
       <div className="min-w-0">
-        <header className="sticky top-0 z-20 flex items-center justify-between gap-3 border-b border-line bg-paper/95 px-4 py-3 backdrop-blur">
-          <Brand compact />
+        <header className="sticky top-0 z-20 flex items-center justify-between gap-3 border-b border-line bg-paper/95 px-4 py-3 pt-[max(0.75rem,env(safe-area-inset-top))] backdrop-blur">
+          <div className="flex min-w-0 items-center gap-2">
+            {showBack(location.pathname) ? (
+              <button type="button" className="min-h-11 rounded-xl px-3 text-sm font-semibold text-grove" onClick={() => navigate(-1)}>
+                {t('shell.back')}
+              </button>
+            ) : null}
+            <Brand compact />
+          </div>
           <div className="flex items-center gap-2">
             {farmId ? (
               <NavLink to={`/farms/${farmId}#alerts`} className="relative inline-flex min-h-11 min-w-11 items-center justify-center rounded-xl hover:bg-paper-deep" aria-label={t('alerts.bell')}>
@@ -171,6 +196,7 @@ export function AppShell() {
           <Outlet />
         </main>
       </div>
+      {farmId ? <SaathiDock farmId={farmId} /> : null}
       {farmId ? (
         <nav className="fixed inset-x-0 bottom-0 z-20 grid grid-cols-5 border-t border-line bg-white pb-[env(safe-area-inset-bottom)] md:hidden">
           {mobile.map((item) => (
@@ -183,6 +209,12 @@ export function AppShell() {
       ) : null}
     </div>
   );
+}
+
+function showBack(pathname: string): boolean {
+  const parts = pathname.split('/').filter(Boolean);
+  if (parts[0] === 'account' || parts[0] === 'server') return true;
+  return parts[0] === 'farms' && parts.length > 2;
 }
 
 function Brand({ compact = false }: { compact?: boolean }) {

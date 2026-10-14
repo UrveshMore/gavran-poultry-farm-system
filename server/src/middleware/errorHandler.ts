@@ -46,7 +46,15 @@ export const errorHandler: ErrorRequestHandler = (err, req, res, _next) => {
   if (typeof err === 'object' && err !== null && 'code' in err && (err as { code?: string }).code === 'LIMIT_FILE_SIZE') {
     res.status(413).json({
       ok: false,
-      error: { code: 'FILE_TOO_LARGE', message: 'That file is larger than 5 MB.' },
+      error: { code: 'FILE_TOO_LARGE', message: 'That photo is still too big. Use a smaller one.' },
+      requestId: req.requestId,
+    });
+    return;
+  }
+  if (typeof err === 'object' && err !== null && 'status' in err && (err as { status?: number }).status === 413) {
+    res.status(413).json({
+      ok: false,
+      error: { code: 'PAYLOAD_TOO_LARGE', message: 'That photo is still too big. Use a smaller one.' },
       requestId: req.requestId,
     });
     return;

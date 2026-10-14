@@ -8,7 +8,7 @@ import { getDashboard } from '../dashboard/service.js';
 import type { FarmAccess } from '../farms/access.js';
 import type { AuthUser } from '../auth/types.js';
 import { loadContext } from './context.js';
-import { geminiJson } from './gemini.js';
+import { geminiJson, probeGemini } from './gemini.js';
 import { decryptSecret, encryptSecret } from './secret.js';
 
 const keySchema = z.object({ apiKey: z.string().trim().min(20).max(200) });
@@ -28,6 +28,7 @@ const modelSchema = {
     date: { type: 'string' },
     title: { type: 'string' },
     section: { type: 'string' },
+    reply: { type: 'string' },
   },
   required: ['kind', 'confidence'],
 };
@@ -41,6 +42,11 @@ export async function readKey(farmId: string): Promise<{ configured: boolean; hi
 
 export async function saveKey(access: FarmAccess, userId: string, body: unknown) {
   const input = keySchema.parse(body);
+  const tested = process.env.NODE_ENV !== 'test';
+  if (tested) {
+    const ok = await probeGemini(input.apiKey);
+    if (!ok) throw new AppError(422, 'SAATHI_KEY_INVALID', 'That key did not work. Check it and try again.');
+  }
   const sealed = encryptSecret(input.apiKey);
   await pool.query(
     `INSERT INTO farm_ai_keys (farm_id, cipher_text, nonce, auth_tag, hint, updated_by)
@@ -48,7 +54,7 @@ export async function saveKey(access: FarmAccess, userId: string, body: unknown)
      ON DUPLICATE KEY UPDATE cipher_text = VALUES(cipher_text), nonce = VALUES(nonce), auth_tag = VALUES(auth_tag), hint = VALUES(hint), updated_by = VALUES(updated_by)`,
     [access.farmId, sealed.cipherText, sealed.nonce, sealed.authTag, sealed.hint, userId],
   );
-  return { configured: true, hint: sealed.hint };
+  return { configured: true, hint: sealed.hint, tested };
 }
 
 export async function clearKey(farmId: string) {
@@ -95,6 +101,12 @@ export async function propose(actor: Actor, access: FarmAccess, body: unknown): 
         const row = cleaned as Record<string, unknown>;
         const kind = String(row.kind ?? '');
         const confidence = Number(row.confidence);
+        if (kind === 'chat' && confidence >= 0.6) {
+          const text = typeof row.reply === 'string' ? row.reply.trim().slice(0, 500) : '';
+          return text
+            ? { type: 'answer', speechKey: 'saathi.say.model', vars: { text } }
+            : { type: 'answer', speechKey: 'saathi.say.hello', vars: {} };
+        }
         const known = ['eggs', 'loss', 'hatch', 'dose', 'task', 'feed', 'sale', 'expense', 'ask_doses', 'ask_counts', 'ask_eggs', 'ask_stock', 'ask_vaccines', 'help'];
         if (known.includes(kind) && confidence >= 0.6) {
           const intent = blankIntent(input.text);

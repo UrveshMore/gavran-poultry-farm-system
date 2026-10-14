@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import { MedicineToday, type DoseGroup } from '@/components/DoseSchedule';
+import { FarmCharts } from '@/components/FarmCharts';
 import { Card } from '@/components/ui';
 import { showFarmNotice } from '@/lib/notify';
 
@@ -52,6 +53,23 @@ export type DashboardData = {
   attention: Array<{ code: string; count: number; path: string }>;
   alerts: DashAlert[];
   doses: { approved: boolean; groups: DoseGroup[] } | null;
+  charts?: {
+    eggs: Array<{ date: string; count: number }>;
+    losses: Array<{ date: string; count: number }>;
+    lossRate: 'not_set';
+    feed: { unitLabel: string | null; days: Array<{ date: string; quantity: number }> };
+    flocks: Array<{ code: string; roosters: number | null; hens: number | null }>;
+    money: Array<{ unitLabel: string | null; income: number | null; kharch: number | null; difference: number | null }>;
+    moneyBasis: 'not_set';
+  };
+  phone?: {
+    morningOn: boolean;
+    eveningOn: boolean;
+    lowStockOn: boolean;
+    eggsOn: boolean;
+    morningMinute: number;
+    eveningMinute: number;
+  };
 };
 
 function num(value: number | null, missing: string) {
@@ -272,6 +290,7 @@ export function DashboardCards({ farmId, data, canRecord = false }: { farmId: st
           </Link>
         ) : null}
       </div>
+      <FarmCharts farmId={farmId} data={data} />
       {data.attention.length > 0 ? (
         <Card>
           <p className="font-display text-2xl">{t('dash.attention')}</p>

@@ -351,6 +351,17 @@ export async function sessionFromAccess(sessionId: string, userId: string): Prom
   return new Date(session.expiresAt).getTime() > Date.now();
 }
 
+export async function readHomeTour(userId: string): Promise<{ seen: boolean }> {
+  const row = await pool.query('SELECT home_tour_seen_at AS seen_at FROM users WHERE id = ?', [userId]);
+  const seenAt = (row[0] as Array<{ seen_at: Date | null }>)[0]?.seen_at ?? null;
+  return { seen: Boolean(seenAt) };
+}
+
+export async function markHomeTour(userId: string): Promise<{ seen: boolean }> {
+  await pool.query('UPDATE users SET home_tour_seen_at = COALESCE(home_tour_seen_at, CURRENT_TIMESTAMP(3)) WHERE id = ?', [userId]);
+  return { seen: true };
+}
+
 export function normalizeLocale(value: string | undefined): Locale | undefined {
   if (value === 'en' || value === 'hi' || value === 'mr') return value;
   return undefined;

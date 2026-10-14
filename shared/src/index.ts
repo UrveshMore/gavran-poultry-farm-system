@@ -40,8 +40,10 @@ export { noticeGate, noticeResult } from './notice.js';
 export type { NoticeGate, NoticePermission, NoticeResult } from './notice.js';
 export { OFFLINE_DECISION, applySyncResult, captureClass, enqueueCapture, pathLeaf, syncMode } from './offline.js';
 export type { CaptureClass, QueueItem, QueueState } from './offline.js';
-export { planPhoneAlerts } from './phoneAlerts.js';
-export type { PhoneAlertKind, PhoneAlertPlan } from './phoneAlerts.js';
+export { BROODING_DAYS, batchStage } from './lifecycle.js';
+export type { BatchStageName } from './lifecycle.js';
+export { dailyPhoneNotices, planPhoneAlerts } from './phoneAlerts.js';
+export type { DailyPhoneNotice, PhoneAlertKind, PhoneAlertPlan } from './phoneAlerts.js';
 export {
   SAATHI_MIN_CONFIDENCE,
   SAATHI_VET_LABEL,

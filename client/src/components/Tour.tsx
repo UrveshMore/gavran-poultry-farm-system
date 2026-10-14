@@ -2,6 +2,7 @@ import { driver, type DriveStep } from 'driver.js';
 import 'driver.js/dist/driver.css';
 import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
+import { api } from '@/lib/api';
 
 type Translate = (key: string) => string;
 
@@ -37,7 +38,9 @@ export function startHomeTour(role: string, t: Translate, markSeen = true) {
     steps,
     skipMissingElement: true,
     onDestroyed: () => {
-      if (markSeen) localStorage.setItem(`${HOME_KEY}.${role}`, '1');
+      if (!markSeen) return;
+      localStorage.setItem(`${HOME_KEY}.${role}`, '1');
+      void api('/api/v1/auth/tour', { method: 'POST' }).catch(() => undefined);
     },
   });
   tour.drive();
@@ -63,9 +66,29 @@ export function startScreenTour(screen: 'eggs' | 'incubators' | 'batches' | 'hea
 export function HomeTour({ role }: { role: string }) {
   const { t } = useTranslation();
   useEffect(() => {
-    if (localStorage.getItem(`${HOME_KEY}.${role}`)) return;
-    const timer = window.setTimeout(() => startHomeTour(role, t), 400);
-    return () => window.clearTimeout(timer);
+    let cancel = false;
+    const timer = window.setTimeout(() => {
+      void api<{ seen: boolean }>('/api/v1/auth/tour')
+        .then((row) => {
+          if (cancel) return;
+          if (row.seen) {
+            localStorage.setItem(`${HOME_KEY}.${role}`, '1');
+            return;
+          }
+          if (localStorage.getItem(`${HOME_KEY}.${role}`)) {
+            void api('/api/v1/auth/tour', { method: 'POST' }).catch(() => undefined);
+            return;
+          }
+          startHomeTour(role, t);
+        })
+        .catch(() => {
+          if (!cancel && !localStorage.getItem(`${HOME_KEY}.${role}`)) startHomeTour(role, t);
+        });
+    }, 400);
+    return () => {
+      cancel = true;
+      window.clearTimeout(timer);
+    };
   }, [role, t]);
   return null;
 }

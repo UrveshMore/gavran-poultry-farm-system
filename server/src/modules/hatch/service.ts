@@ -58,6 +58,7 @@ export async function createHatch(actor: Actor, access: FarmAccess, sittingId: s
           birdTypeId: birdType.id,
           sourceNote: `hatch ${sitting.code}`,
           hatchDate: input.hatchedOn,
+          eggSetOn: sitting.startedOn,
           openedOn: input.hatchedOn,
           shedId: input.shedId,
           birdCount: input.liveChicks,

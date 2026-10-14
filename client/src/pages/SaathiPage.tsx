@@ -5,7 +5,9 @@ import { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
 import { Alert, Button, Card, Field, Input } from '@/components/ui';
-import { api } from '@/lib/api';
+import { ApiError, api, errorKey } from '@/lib/api';
+import { newId } from '@/lib/ids';
+import { compressPhoto } from '@/lib/photo';
 
 type ChatReply = Extract<SaathiReply, { type: 'confirm' | 'ask' | 'answer' | 'denied' }>;
 type Line = { role: 'user' | 'assistant'; text: string };
@@ -38,8 +40,7 @@ function ready(card: SaathiCard): boolean {
   return Boolean(value('sittingId') && value('hatchedOn') && value('liveChicks') && (chicks === 0 || (value('batchCode') && value('birdTypeId') && value('shedId'))));
 }
 
-export function SaathiPage() {
-  const { farmId = '' } = useParams();
+export function SaathiChat({ farmId, compact = false }: { farmId: string; compact?: boolean }) {
   const { t, i18n } = useTranslation();
   const [text, setText] = useState('');
   const [lines, setLines] = useState<Line[]>([]);
@@ -67,7 +68,7 @@ export function SaathiPage() {
   });
 
   const save = useMutation({
-    mutationFn: (next: SaathiCard) => api(`/api/v1/farms/${farmId}/saathi/commit`, { method: 'POST', json: next, idempotencyKey: crypto.randomUUID() }),
+    mutationFn: (next: SaathiCard) => api(`/api/v1/farms/${farmId}/saathi/commit`, { method: 'POST', json: next, idempotencyKey: newId() }),
     onSuccess: () => {
       const sentence = t('saathi.saved');
       setLines((current) => [...current, { role: 'assistant', text: sentence }]);
@@ -79,8 +80,9 @@ export function SaathiPage() {
 
   const upload = useMutation({
     mutationFn: async (file: File) => {
+      const smaller = await compressPhoto(file);
       const form = new FormData();
-      form.set('file', file);
+      form.set('file', smaller);
       form.set('kind', kindRef.current);
       return api<{ id: string; kind: string; ai: PhotoAi; matches: Array<{ title: string; sourceFile: string; sourcePage: number; howToGive: string; amountOnPage: boolean; label: string }>; saved: false }>(
         `/api/v1/farms/${farmId}/saathi/photos`,
@@ -153,12 +155,23 @@ export function SaathiPage() {
     media.start();
   }
 
+  function problem(error: unknown): string {
+    if (error instanceof ApiError) {
+      const key = errorKey(error);
+      if (key) return t(key);
+      if (error.message) return error.message;
+    }
+    return t('common.errorGeneric');
+  }
+
   return (
     <div className="grid gap-4">
-      <div>
-        <h1 data-tour="screen-title" className="font-display text-3xl font-semibold">{t('saathi.title')}</h1>
-        <p data-tour="screen-body" className="mt-1 text-ink-soft">{t('saathi.body')}</p>
-      </div>
+      {compact ? null : (
+        <div>
+          <h1 data-tour="screen-title" className="font-display text-3xl font-semibold">{t('saathi.title')}</h1>
+          <p data-tour="screen-body" className="mt-1 text-ink-soft">{t('saathi.body')}</p>
+        </div>
+      )}
       {key.data && !key.data.configured ? <Alert>{t('saathi.photo.needKey')}</Alert> : null}
       <Card>
         <ul className="grid max-h-80 gap-2 overflow-auto">
@@ -180,7 +193,7 @@ export function SaathiPage() {
           <Button type="submit" disabled={send.isPending}>{t('saathi.send')}</Button>
           <Button type="button" data-tour="screen-action" onClick={listen}>{listening ? t('saathi.listening') : t('saathi.mic')}</Button>
         </form>
-        {send.isError || upload.isError ? <Alert>{t('common.errorGeneric')}</Alert> : null}
+        {send.isError || upload.isError ? <Alert>{problem(send.error ?? upload.error)}</Alert> : null}
       </Card>
       {card ? (
         <Card>
@@ -210,7 +223,7 @@ export function SaathiPage() {
           <Button type="button" className="mt-3" disabled={!ready(card) || save.isPending} onClick={() => save.mutate(card)}>
             {t('saathi.save')}
           </Button>
-          {save.isError ? <Alert>{t('common.errorGeneric')}</Alert> : null}
+          {save.isError ? <Alert>{problem(save.error)}</Alert> : null}
         </Card>
       ) : null}
       <Card>
@@ -285,6 +298,11 @@ export function SaathiPage() {
       </Card>
     </div>
   );
+}
+
+export function SaathiPage() {
+  const { farmId = '' } = useParams();
+  return <SaathiChat farmId={farmId} />;
 }
 
 type SpeechRec = {

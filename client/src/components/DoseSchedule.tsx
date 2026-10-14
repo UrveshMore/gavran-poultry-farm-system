@@ -49,7 +49,8 @@ function explain(error: unknown, t: (key: string) => string) {
   if (error instanceof ApiError) {
     if (error.status === 403) return t('common.permissionDenied');
     const key = errorKey(error);
-    return key ? t(key) : t('common.errorGeneric');
+    if (key) return t(key);
+    if (error.message) return error.message;
   }
   return t('common.errorGeneric');
 }
@@ -140,16 +141,19 @@ export function DoseLineRow({
         {line.medicineKeys.map((key) => (
           <MedicinePhoto key={key} farmId={farmId} medicineKey={key} canUpload={canUpload && line.origin !== 'owner'} />
         ))}
-        {canRecord && line.date && (approved || line.origin === 'owner') ? (
-          <Button
-            type="button"
-            variant={line.given ? 'outline' : 'default'}
-            disabled={line.given || mark.isPending}
-            data-dose-tick={line.rowId}
-            onClick={() => mark.mutate()}
-          >
-            {line.given ? t('doses.given') : t('doses.markGiven')}
-          </Button>
+        {canRecord && (approved || line.origin === 'owner') ? (
+          <div>
+            <Button
+              type="button"
+              variant={line.given ? 'outline' : 'default'}
+              disabled={line.given || mark.isPending || !line.date}
+              data-dose-tick={line.rowId}
+              onClick={() => mark.mutate()}
+            >
+              {line.given ? t('doses.given') : t('doses.markGiven')}
+            </Button>
+            {!line.date ? <p className="text-sm text-ink-soft">{t('doses.noDay')}</p> : null}
+          </div>
         ) : null}
       </div>
       {mark.isError ? <Alert>{explain(mark.error, t)}</Alert> : null}
