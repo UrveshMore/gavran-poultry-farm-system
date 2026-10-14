@@ -36,6 +36,8 @@ export type {
 export { isIanaTimeZone } from './time.js';
 export { installSurface, isIosUserAgent } from './install.js';
 export type { InstallSurface } from './install.js';
+export { noticeGate, noticeResult } from './notice.js';
+export type { NoticeGate, NoticePermission, NoticeResult } from './notice.js';
 export { OFFLINE_DECISION, applySyncResult, captureClass, enqueueCapture } from './offline.js';
 export type { CaptureClass, QueueItem, QueueState } from './offline.js';
 export { likePattern } from './search.js';

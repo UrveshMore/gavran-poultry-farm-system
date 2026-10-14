@@ -6,6 +6,7 @@ import { todayInTimeZone } from '../batches/service.js';
 import { listBatches, listSexCounts } from '../batches/repository.js';
 import type { FarmAccess } from '../farms/access.js';
 import { findFarmById } from '../farms/repository.js';
+import { medicineToday } from '../doses/service.js';
 import { listItems } from '../stock/repository.js';
 import { listTasks } from '../tasks/repository.js';
 import type { RowDataPacket } from 'mysql2/promise';
@@ -20,7 +21,8 @@ export type AttentionCode =
   | 'unapproved_medicine'
   | 'candling_not_set'
   | 'hatch_day_not_set'
-  | 'payments_not_set';
+  | 'payments_not_set'
+  | 'schedule_not_checked';
 
 export type AttentionItem = { code: AttentionCode; count: number; path: string };
 
@@ -99,6 +101,11 @@ export async function getDashboard(access: FarmAccess, userId: string) {
     attention.push({ code: 'reorder_not_set', count: stock.reorderNotSet, path: 'stock' });
   }
 
+  const doses = can(access, 'health.read') ? await medicineToday(access.farmId) : null;
+  if (doses && !doses.approved) {
+    attention.push({ code: 'schedule_not_checked', count: 0, path: 'batches' });
+  }
+
   const finance = can(access, 'sale.read') || can(access, 'expense.read') || can(access, 'supplier.read');
   const money = finance ? await moneySection(access, monthStart, today) : null;
   if (money && money.pending.status === 'not_set' && money.pending.billsExist) {
@@ -117,7 +124,8 @@ export async function getDashboard(access: FarmAccess, userId: string) {
     stock,
     money,
     attention,
-    alerts: alertRows({ eggs, birds, tasks, health, stock }),
+    doses,
+    alerts: alertRows({ eggs, birds, tasks, health, stock, doses }),
   };
 }
 
@@ -127,8 +135,11 @@ function alertRows(input: {
   tasks: { overdue: number } | null;
   health: { vaccines: { overdue: unknown[]; dueToday: unknown[] } } | null;
   stock: { low: unknown[] } | null;
-}): Array<{ code: 'care_overdue' | 'care_due' | 'low_stock' | 'task_overdue' | 'eggs_missing'; count: number; path: string }> {
-  const rows: Array<{ code: 'care_overdue' | 'care_due' | 'low_stock' | 'task_overdue' | 'eggs_missing'; count: number; path: string }> = [];
+  doses: { approved: boolean; groups: Array<{ lines: Array<{ given: boolean }> }> } | null;
+}): Array<{ code: 'care_overdue' | 'care_due' | 'low_stock' | 'task_overdue' | 'eggs_missing' | 'dose_today'; count: number; path: string }> {
+  const rows: Array<{ code: 'care_overdue' | 'care_due' | 'low_stock' | 'task_overdue' | 'eggs_missing' | 'dose_today'; count: number; path: string }> = [];
+  const dueDoses = input.doses?.groups.reduce((sum, group) => sum + group.lines.filter((line) => !line.given).length, 0) ?? 0;
+  if (dueDoses > 0) rows.push({ code: 'dose_today', count: dueDoses, path: 'batches' });
   const overdueCare = input.health?.vaccines.overdue.length ?? 0;
   const dueCare = input.health?.vaccines.dueToday.length ?? 0;
   if (overdueCare > 0) rows.push({ code: 'care_overdue', count: overdueCare, path: 'health' });

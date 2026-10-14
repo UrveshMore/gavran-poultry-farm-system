@@ -1,10 +1,17 @@
+import { noticeGate, noticeResult, type NoticePermission } from '@gavran/shared';
 import { Bell, Bird, Egg, Stethoscope, Wheat } from 'lucide-react';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
+import { MedicineToday, type DoseGroup } from '@/components/DoseSchedule';
 import { Card } from '@/components/ui';
+import { showFarmNotice } from '@/lib/notify';
 
-export type DashAlert = { code: 'care_overdue' | 'care_due' | 'low_stock' | 'task_overdue' | 'eggs_missing'; count: number; path: string };
+export type DashAlert = {
+  code: 'care_overdue' | 'care_due' | 'low_stock' | 'task_overdue' | 'eggs_missing' | 'dose_today';
+  count: number;
+  path: string;
+};
 
 export type DashCare = { id: string; title: string; dueOn: string };
 
@@ -44,6 +51,7 @@ export type DashboardData = {
   } | null;
   attention: Array<{ code: string; count: number; path: string }>;
   alerts: DashAlert[];
+  doses: { approved: boolean; groups: DoseGroup[] } | null;
 };
 
 function num(value: number | null, missing: string) {
@@ -54,9 +62,10 @@ export function alertCount(alerts: DashAlert[]): number {
   return alerts.reduce((sum, row) => sum + row.count, 0);
 }
 
-export function DashboardCards({ farmId, data }: { farmId: string; data: DashboardData }) {
+export function DashboardCards({ farmId, data, canRecord = false }: { farmId: string; data: DashboardData; canRecord?: boolean }) {
   const { t } = useTranslation();
   const notSet = t('dash.notSet');
+  const [notice, setNotice] = useState<string | null>(null);
   const care = [
     ...(data.health?.vaccines.overdue ?? []).map((row) => ({ ...row, when: 'overdue' as const })),
     ...(data.health?.vaccines.dueToday ?? []).map((row) => ({ ...row, when: 'today' as const })),
@@ -64,22 +73,54 @@ export function DashboardCards({ farmId, data }: { farmId: string; data: Dashboa
   ];
 
   useEffect(() => {
-    if (data.alerts.length === 0 || typeof Notification === 'undefined' || Notification.permission !== 'granted') return;
+    if (!window.isSecureContext || data.alerts.length === 0 || typeof Notification === 'undefined' || Notification.permission !== 'granted') return;
     const key = `gavran.alert.${farmId}.${data.today}`;
     if (localStorage.getItem(key)) return;
     const body = data.alerts.map((row) => t(`dash.alert.${row.code}`, { count: row.count })).join('. ');
-    const show = async () => {
-      const ready = await navigator.serviceWorker?.ready.catch(() => undefined);
-      if (ready) await ready.showNotification(t('dash.title'), { body });
-      else new Notification(t('dash.title'), { body });
-      localStorage.setItem(key, '1');
-    };
-    void show();
+    void showFarmNotice(t('dash.title'), body)
+      .then(() => localStorage.setItem(key, '1'))
+      .catch(() => undefined);
   }, [data.alerts, data.today, farmId, t]);
 
   async function allowAlerts() {
-    if (typeof Notification === 'undefined') return;
-    await Notification.requestPermission();
+    const gate = noticeGate({ secure: window.isSecureContext, hasNotification: typeof Notification !== 'undefined' });
+    if (gate === 'insecure') {
+      setNotice(t('dash.alertInsecure'));
+      return;
+    }
+    if (gate === 'unsupported' || typeof Notification === 'undefined') {
+      setNotice(t('dash.alertUnsupported'));
+      return;
+    }
+    let permission: NoticePermission = Notification.permission === 'granted' || Notification.permission === 'denied' ? Notification.permission : 'default';
+    if (permission !== 'granted') {
+      try {
+        const answer = await Notification.requestPermission();
+        permission = answer === 'granted' || answer === 'denied' ? answer : 'default';
+      } catch {
+        setNotice(t('dash.alertFailed'));
+        return;
+      }
+    }
+    let shown = false;
+    if (permission === 'granted' && data.alerts.length > 0) {
+      const body = data.alerts.map((row) => t(`dash.alert.${row.code}`, { count: row.count })).join('. ');
+      try {
+        await showFarmNotice(t('dash.title'), body);
+        shown = true;
+        localStorage.setItem(`gavran.alert.${farmId}.${data.today}`, '1');
+      } catch {
+        shown = false;
+      }
+    }
+    const result = noticeResult({ permission, alertCount: data.alerts.length, shown });
+    const message = {
+      denied: t('dash.alertDenied'),
+      empty: t('dash.alertEmpty'),
+      failed: t('dash.alertFailed'),
+      show: t('dash.alertOn'),
+    }[result];
+    setNotice(message);
   }
 
   return (
@@ -99,13 +140,17 @@ export function DashboardCards({ farmId, data }: { farmId: string; data: Dashboa
       ) : null}
       <div className="flex flex-wrap items-center justify-between gap-2">
         <h2 className="font-display text-2xl font-semibold">{t('dash.title')}</h2>
-        {typeof Notification !== 'undefined' && Notification.permission !== 'granted' ? (
-          <button type="button" className="min-h-11 rounded-xl px-3 text-sm font-semibold text-grove underline" onClick={() => void allowAlerts()}>
-            {t('dash.allowAlerts')}
-          </button>
-        ) : null}
+        <button type="button" className="min-h-11 rounded-xl px-3 text-sm font-semibold text-grove underline" onClick={() => void allowAlerts()}>
+          {typeof Notification !== 'undefined' && Notification.permission === 'granted' ? t('dash.allowAlertsAgain') : t('dash.allowAlerts')}
+        </button>
       </div>
+      {notice ? (
+        <p id="phone-notice" role="status" className="rounded-2xl bg-paper-deep px-4 py-3 text-sm font-semibold">
+          {notice}
+        </p>
+      ) : null}
       <div className="grid gap-3 sm:grid-cols-2">
+        <MedicineToday farmId={farmId} doses={data.doses} canRecord={canRecord} />
         {data.birds ? (
           <Link to={`/farms/${farmId}/batches`} className="block">
             <Card>

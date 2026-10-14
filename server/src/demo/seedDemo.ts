@@ -28,6 +28,7 @@ import { insertAssignment, insertAttendance, insertCompletion, insertItem as ins
 import { insertNote } from '../modules/yard/repository.js';
 import { insertFile } from '../modules/documents/repository.js';
 import { hashPassword } from '../security/password.js';
+import { DOSE_TEMPLATE_ID } from '../modules/doses/catalog.js';
 
 /** Local demo only. Shorter than the sign-up rule on purpose. */
 export const DEMO_ADMIN_EMAIL = 'admin@gmail.com';
@@ -234,6 +235,15 @@ export async function seedDemo(): Promise<string> {
       birds: 24,
       source: 'Sample: home-bred breeders',
     });
+    const batchD = await batch({
+      code: 'D',
+      typeId: desi,
+      shedId: brooder,
+      hatch: day(-2),
+      opened: day(-2),
+      birds: 12,
+      source: 'Sample',
+    });
 
     const sex = async (batchId: string, roosters: number, hens: number) => {
       const existing = await findId(
@@ -254,6 +264,19 @@ export async function seedDemo(): Promise<string> {
     await sex(batchA, 10, 13);
     await sex(batchB, 2, 28);
     await sex(batchC, 6, 18);
+    await sex(batchD, 6, 6);
+    await exec(
+      db,
+      `INSERT INTO farm_schedule_approvals (farm_id, template_id, approved, verification_note, approved_by)
+       VALUES (?, ?, 1, ?, ?)
+       ON DUPLICATE KEY UPDATE approved = 1, verification_note = VALUES(verification_note), approved_by = VALUES(approved_by)`,
+      [
+        farmIdInner,
+        DOSE_TEMPLATE_ID,
+        'Sample: I read this chick-day paper with the vet. The words are what the paper says.',
+        adminId,
+      ],
+    );
 
     const range = await (async () => {
       const existing = await findId(db, 'SELECT id FROM range_areas WHERE farm_id = ? AND name = ?', [farmIdInner, 'Sample mango yard']);

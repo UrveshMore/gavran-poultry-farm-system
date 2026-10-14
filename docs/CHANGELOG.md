@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.31.0 — 2026-10-14
+
+Chick-day medicine lines, and a phone notice that says what happened.
+
+- The day-by-day lines from `patil-poultry-step-by-step-process.pdf` pages 17–27 are a schedule. Each line keeps the page. The hatch date is day 1 on that paper. A flock page shows today, tomorrow, and this week. A tick records that the line was given. The sample farm's copy is marked checked, and the note starts with Sample. One line, Coryza at 600 g, has no day and no amount and says to check with the vet.
+- Home has a Today's medicine card, grouped by flock, morning and evening.
+- Pictures come from that PDF or a plain drawing. An owner can add a photo. A white background is cleared when the local tool can do it.
+- **Tell me on this phone** always writes a result on the page. A plain network address cannot show a notice. `HTTPS=1` serves a local certificate so a phone on the same Wi-Fi can.
+
 ## 0.30.0 — 2026-10-14
 
 A local sample farm, and a home screen of today's numbers.

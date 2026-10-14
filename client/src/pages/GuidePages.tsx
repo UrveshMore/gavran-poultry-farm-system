@@ -113,7 +113,9 @@ export function FarmHomePage() {
   return (
     <div className="grid gap-4">
       <HomeTour role={farm.role} />
-      {board.data ? <DashboardCards farmId={farmId} data={board.data} /> : null}
+      {board.data ? (
+        <DashboardCards farmId={farmId} data={board.data} canRecord={Boolean(farm.permissions.includes('health.record'))} />
+      ) : null}
       {board.isError ? <Alert>{t('common.errorGeneric')}</Alert> : null}
       <div className="flex items-start justify-between gap-3">
         <div>

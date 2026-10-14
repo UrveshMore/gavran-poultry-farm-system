@@ -6,7 +6,7 @@ import { App } from './App';
 import './i18n';
 import './index.css';
 
-if (import.meta.env.PROD) {
+if (import.meta.env.PROD || import.meta.env.VITE_HTTPS === '1') {
   void import('virtual:pwa-register').then(({ registerSW }) => {
     registerSW({ immediate: true });
   });

@@ -6,6 +6,7 @@ import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { Link, useParams } from 'react-router-dom';
 import { z } from 'zod';
+import { BatchDosePanel } from '@/components/DoseSchedule';
 import { ScreenTour } from '@/components/Tour';
 import { Alert, Button, Card, Field, Input, TextArea } from '@/components/ui';
 import { ApiError, api, errorKey } from '@/lib/api';
@@ -233,6 +234,9 @@ export function BatchDetailPage() {
   if (detail.isError || !detail.data) return <Alert>{explain(detail.error, t)}</Alert>;
   const { batch, movements } = detail.data;
   const canMove = Boolean(access?.permissions.includes('movement.create') && batch.status === 'open');
+  const canReadHealth = Boolean(access?.permissions.includes('health.read'));
+  const canRecordHealth = Boolean(access?.permissions.includes('health.record'));
+  const canApproveHealth = Boolean(access?.permissions.includes('health.approve'));
   return (
     <div className="grid gap-4">
       <div>
@@ -243,6 +247,13 @@ export function BatchDetailPage() {
         </p>
         {batch.sourceNote ? <p className="mt-2 text-sm">{batch.sourceNote}</p> : null}
       </div>
+      <BatchDosePanel
+        farmId={farmId}
+        batchId={batchId}
+        canRead={canReadHealth}
+        canRecord={canRecordHealth}
+        canApprove={canApproveHealth}
+      />
       <Card>
         <h2 className="font-display text-2xl">{t('batches.where')}</h2>
         {batch.placements.length === 0 ? (

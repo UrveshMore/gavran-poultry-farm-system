@@ -52,7 +52,7 @@ These are not 4317, 4318, or 3307, because Cursor on the owner's Windows PC alre
 
 1. Read the coloured band. Tap a line to open that page.
 2. Tap a card to open flocks, eggs, hatch sets, jobs, care, feed, or sales.
-3. Tap **Tell me on this phone** if you want this browser to show a notice. The program asks first. It does not send a notice overnight.
+3. Tap **Tell me on this phone** if you want this browser to show a notice. The page always answers. On this computer, `http://127.0.0.1:5317` can ask. A phone on a plain `http://192.168…` address cannot. Set `HTTPS=1`, start again, and open the `https://` address on the phone (see the Windows setup notes). The program asks first. It does not send a notice overnight. If notices are blocked or the list is empty, the page says that, and the coloured band is still the list.
 4. When you write the medicine for a care day you set, that job is marked done.
 5. Tap a tile under the cards. A tile with one job opens that job. A tile with many jobs opens those jobs.
 
@@ -138,7 +138,9 @@ These are not 4317, 4318, or 3307, because Cursor on the owner's Windows PC alre
 
 ![Flocks](../client/public/guide/batches.png)
 
-**What it is.** A group of birds you started on one day, in one shed.
+![Medicine days on a flock](../client/public/guide/batch-medicine.png)
+
+**What it is.** A group of birds you started on one day, in one shed. The flock page also lists the chick-day medicine paper.
 
 **Where it is.** Birds and eggs, then Flocks.
 
@@ -148,7 +150,10 @@ These are not 4317, 4318, or 3307, because Cursor on the owner's Windows PC alre
 
 1. Save a bird name first.
 2. Then add a flock: a short code, the shed, how many birds, the day it opened, and the hatch day if you know it.
-3. The hatch day cannot be after the opened day.
+3. The hatch day cannot be after the opened day. On the medicine paper, that date is day 1.
+4. Open the flock. Medicine days lists today, tomorrow, and this week. Tick **Mark given** after you give that line. The words and amounts are copied from the chick-day paper. One line has no day and no amount; it says to check with the vet.
+5. The first time, write a short note that you checked the paper. Until then, a tick is refused. The sample farm is already marked checked, and the note starts with Sample.
+6. Each medicine has a picture from that paper, or a plain bottle, powder, or drop drawing. You can add your own photo. The page tries to clear a white background. If it cannot, it keeps the photo as it is.
 
 ## Eggs
 

@@ -81,7 +81,7 @@ This fills a local farm so you can click around. It will not run if `NODE_ENV` i
 npm run db:seed:demo
 ```
 
-Running it again does not add a second copy. Every sample row starts with the word Sample.
+Running it again does not add a second copy. Every sample row starts with the word Sample. Flock D hatched two days ago, so today's medicine card shows the morning and evening lines from the chick-day paper. That paper is marked checked, and the note starts with Sample.
 
 Sign in as the owner with **I am the owner**:
 
@@ -124,11 +124,45 @@ Leave both windows open. One window can start both with `npm run dev`.
 
 ## 9. Open the app
 
-Open this address in a browser:
+Open this address in a browser on the same computer:
 
 http://127.0.0.1:5317
 
 Sign in with the owner account from step 7, or with a worker's mobile number and PIN. The API is at http://127.0.0.1:5318. The browser talks to it through the frontend, so you do not open the API address to use the farm screens.
+
+**Tell me on this phone** asks this browser to show today's list. On `http://127.0.0.1:5317` the page says what happened. It does not send a notice overnight. If the browser blocks notices, the page says so, and the coloured band on Home still lists the day.
+
+## 9b. Open it on a phone in the house
+
+A phone on `http://192.168.x.x:5317` cannot show a notice. Browsers only allow notices on a secure page, or on `127.0.0.1` on the computer itself. The coloured band on Home still works over plain http.
+
+To let the phone ask for notices, and to allow install:
+
+1. On the computer, find the address. In PowerShell: `ipconfig`. Use the IPv4 address on Wi-Fi, such as `192.168.31.7`.
+2. In `.env`, add `HTTPS=1` and start the frontend again (`npm run dev -w @gavran/client`).
+3. The window prints a Phone line. On the phone, join the same Wi-Fi and open `https://192.168.31.7:5317` (use your own address).
+4. The first certificate is made on this computer and is not from a public authority. The phone shows a warning. Open the advanced choice and continue. Then sign in.
+5. Tap **Tell me on this phone**. The page says whether notices are on, blocked, or not possible. Allow them if the phone asks.
+6. Install uses the browser's own prompt once the page is the secure one. On an iPhone, use Share, then Add to Home Screen.
+
+If you want the warning gone, install [mkcert](https://github.com/FiloSottile/mkcert), run `mkcert -install`, then:
+
+```powershell
+mkdir certs
+mkcert -key-file certs/lan-key.pem -cert-file certs/lan.pem localhost 127.0.0.1 192.168.31.7
+```
+
+Use your own address in that command. In `.env`:
+
+```
+HTTPS=1
+HTTPS_CERT=certs/lan.pem
+HTTPS_KEY=certs/lan-key.pem
+```
+
+Start the frontend again. Install the same local authority on the phone if mkcert's docs say to, then open the https address. The `certs` folder stays on this computer.
+
+Windows may ask to allow Node through the firewall the first time a phone connects. Allow private networks. Leave `COOKIE_SECURE=false` for this local run so sign-in still works.
 
 ## Stop
 
