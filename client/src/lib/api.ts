@@ -1,3 +1,4 @@
+import { withServer } from './serverAddress';
 import type { PublicUser } from './types';
 
 export class ApiError extends Error {
@@ -28,14 +29,14 @@ function readCookie(name: string): string | null {
 async function csrfToken(): Promise<string> {
   const existing = readCookie('gavran_csrf');
   if (existing) return existing;
-  const res = await fetch('/api/v1/auth/csrf', { credentials: 'include' });
+  const res = await fetch(withServer('/api/v1/auth/csrf'), { credentials: 'include' });
   const body = (await res.json()) as { data?: { csrfToken?: string } };
   if (!body.data?.csrfToken) throw new ApiError(res.status, 'CSRF_INVALID', 'Missing CSRF token.');
   return body.data.csrfToken;
 }
 
 async function refreshSession(): Promise<boolean> {
-  const res = await fetch('/api/v1/auth/refresh', {
+  const res = await fetch(withServer('/api/v1/auth/refresh'), {
     method: 'POST',
     credentials: 'include',
     headers: { 'X-CSRF-Token': await csrfToken() },
@@ -49,7 +50,7 @@ export async function api<T>(path: string, options: Options = {}): Promise<T> {
   if (options.json !== undefined) headers.set('content-type', 'application/json');
   if (options.idempotencyKey) headers.set('Idempotency-Key', options.idempotencyKey);
   if (method !== 'GET' && method !== 'HEAD') headers.set('X-CSRF-Token', await csrfToken());
-  const res = await fetch(path, {
+  const res = await fetch(withServer(path), {
     method,
     headers,
     credentials: 'include',

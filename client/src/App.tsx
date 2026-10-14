@@ -28,7 +28,9 @@ import { OfflinePage } from '@/pages/OfflinePages';
 import { SearchPageView } from '@/pages/SearchPages';
 import { SchedulesPage } from '@/pages/SchedulePages';
 import { FarmHomePage, GroupPage, HelpPage, TodayPage } from '@/pages/GuidePages';
+import { ServerAddressPage } from '@/pages/ServerAddressPage';
 import { YardPageView } from '@/pages/YardPages';
+import { isNativeApp, savedServer } from '@/lib/serverAddress';
 
 function RequireAuth() {
   const { t } = useTranslation();
@@ -49,6 +51,7 @@ function RequireAuth() {
 }
 
 export function App() {
+  if (isNativeApp() && !savedServer()) return <ServerAddressPage />;
   return (
     <Routes>
       <Route path="/login" element={<LoginPage />} />

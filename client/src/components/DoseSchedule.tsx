@@ -4,6 +4,8 @@ import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import { Alert, Button, Card, Field, TextArea } from '@/components/ui';
 import { ApiError, api, errorKey } from '@/lib/api';
+import { postOrQueue } from '@/lib/offlineQueue';
+import { withServer } from '@/lib/serverAddress';
 
 export type DoseSlot = 'morning' | 'evening' | 'full_day';
 
@@ -72,7 +74,7 @@ function MedicinePhoto({ farmId, medicineKey, canUpload }: { farmId: string; med
         <span className="flex h-16 w-16 items-center justify-center rounded-xl bg-paper-deep text-xs font-semibold">{t('doses.noPhoto')}</span>
       ) : (
         <img
-          src={`/api/v1/farms/${farmId}/medicine-photos/${medicineKey}?v=${bust}`}
+          src={withServer(`/api/v1/farms/${farmId}/medicine-photos/${medicineKey}?v=${bust}`)}
           alt={medicineKey}
           className="h-16 w-16 object-contain"
           onError={() => setFailed(true)}
@@ -116,10 +118,7 @@ export function DoseLineRow({
   const queryClient = useQueryClient();
   const mark = useMutation({
     mutationFn: () =>
-      api(`/api/v1/farms/${farmId}/batches/${batchId}/doses`, {
-        method: 'POST',
-        json: { rowId: line.rowId, givenOn: line.date },
-      }),
+      postOrQueue(farmId, `/api/v1/farms/${farmId}/batches/${batchId}/doses`, { rowId: line.rowId, givenOn: line.date }),
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: ['batch-doses', farmId, batchId] });
       void queryClient.invalidateQueries({ queryKey: ['dashboard', farmId] });

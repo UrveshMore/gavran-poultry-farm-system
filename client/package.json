@@ -10,6 +10,9 @@
     "preview": "vite preview --host 0.0.0.0 --strictPort"
   },
   "dependencies": {
+    "@capacitor/android": "^7.6.9",
+    "@capacitor/core": "^7.6.9",
+    "@capacitor/local-notifications": "^7.0.7",
     "@gavran/shared": "0.1.0",
     "@hookform/resolvers": "^3.10.0",
     "@radix-ui/react-label": "^2.1.2",
@@ -29,6 +32,7 @@
     "zod": "^3.24.2"
   },
   "devDependencies": {
+    "@capacitor/cli": "^7.6.9",
     "@tailwindcss/vite": "^4.0.7",
     "@types/react": "^19.0.10",
     "@types/react-dom": "^19.0.4",

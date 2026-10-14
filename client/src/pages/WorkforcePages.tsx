@@ -145,9 +145,9 @@ export function WorkforcePage() {
             <div id="create-workforce" />
             <form
               className="grid gap-3"
-              onSubmit={attendanceForm.handleSubmit((values) => {
+              onSubmit={attendanceForm.handleSubmit(async (values) => {
                 if (!navigator.onLine) {
-                  const outcome = queueAttendance(farmId, values);
+                  const outcome = await queueAttendance(farmId, values);
                   if (outcome === 'queued') {
                     setHeld(true);
                     attendanceForm.reset({ userId: '', attendedOn: localToday(), attendedTime: '', methodLabel: '', note: '' });

@@ -11,3 +11,8 @@ coverage/
 uploads/
 certs/
 .vite/
+client/android/.gradle/
+client/android/**/build/
+client/android/local.properties
+client/android/captures/
+*.apk

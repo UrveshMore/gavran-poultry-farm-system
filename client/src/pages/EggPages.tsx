@@ -9,6 +9,7 @@ import { z } from 'zod';
 import { ScreenTour } from '@/components/Tour';
 import { Alert, Button, Card, Field, Input, TextArea } from '@/components/ui';
 import { ApiError, api, errorKey } from '@/lib/api';
+import { postOrQueue } from '@/lib/offlineQueue';
 import type { Batch, EggCategory, EggCollection, FarmSummary, Shed } from '@/lib/types';
 import { localToday } from '@/lib/today';
 
@@ -192,7 +193,7 @@ function CollectionForm({ farmId, categories, onDone }: { farmId: string; catego
   const [counts, setCounts] = useState<Record<string, string>>({});
   const [fieldError, setFieldError] = useState<string | null>(null);
   const mutation = useMutation({
-    mutationFn: (values: z.infer<typeof eggCollectionInputSchema>) => api(`/api/v1/farms/${farmId}/eggs`, { method: 'POST', json: values }),
+    mutationFn: (values: z.infer<typeof eggCollectionInputSchema>) => postOrQueue(farmId, `/api/v1/farms/${farmId}/eggs`, values),
     onSuccess: onDone,
   });
   const openBatches = (batches.data ?? []).filter((batch) => batch.status === 'open');

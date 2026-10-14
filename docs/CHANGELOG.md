@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.32.0 — 2026-10-14
+
+A phone app, rows that wait on the device, and one process for a laptop that stays on.
+
+- The Android app is the same screens. The first open asks for the computer address and remembers it.
+- Eggs, a medicine tick, a job, a loss, and who came today wait on the device when the computer cannot be reached. They send themselves when it can. If someone else already changed an egg, tick, job, or loss, the screen says so. Who-came-today still stays as a conflict. Feed, money, medicine records, and yard notes do not wait.
+- On the phone app, opening the farm sets a reminder for today's morning medicine and low feed at 8:00, and for evening medicine and missing eggs at 17:00.
+- `npm run laptop` builds the screens and serves them from the API. `scripts/install-startup-task.ps1` starts that when Windows signs in. A small laptop can use MySQL installed on the PC, with no Docker.
+
 ## 0.31.0 — 2026-10-14
 
 Chick-day medicine lines, and a phone notice that says what happened.

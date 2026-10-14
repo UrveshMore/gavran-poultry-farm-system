@@ -1,10 +1,10 @@
 import type { QueueItem } from '@gavran/shared';
-import { useState } from 'react';
+import { pathLeaf } from '@gavran/shared';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
 import { Alert, Button, Card } from '@/components/ui';
-import { ApiError, api } from '@/lib/api';
-import { finishQueued, readQueue, removeQueued, replaceQueued } from '@/lib/offlineQueue';
+import { flushQueue, readQueue, removeQueued, subscribeQueue } from '@/lib/offlineQueue';
 
 function labelKey(state: QueueItem['state']): string {
   if (state === 'pending') return 'offline.pending';
@@ -14,29 +14,30 @@ function labelKey(state: QueueItem['state']): string {
   return 'offline.failed';
 }
 
+function kindKey(path: string): string {
+  const leaf = pathLeaf(path);
+  if (leaf === 'eggs') return 'offline.eggs';
+  if (leaf === 'doses') return 'offline.doses';
+  if (leaf === 'tasks' || leaf === 'complete') return 'offline.tasks';
+  if (leaf === 'losses') return 'offline.losses';
+  return 'offline.attendance';
+}
+
 export function OfflinePage() {
   const { farmId = '' } = useParams();
   const { t } = useTranslation();
-  const [rows, setRows] = useState(() => readQueue().filter((row) => row.farmId === farmId));
+  const [rows, setRows] = useState<QueueItem[]>([]);
   const [error, setError] = useState<string | null>(null);
 
-  function refresh() {
-    setRows(readQueue().filter((row) => row.farmId === farmId));
-  }
-
-  async function send(item: QueueItem) {
-    if (item.state === 'conflict' || item.state === 'synced' || item.state === 'syncing') return;
-    replaceQueued(item.id, { ...item, state: 'syncing' });
+  useEffect(() => {
+    const refresh = () => {
+      void readQueue()
+        .then((items) => setRows(items.filter((row) => row.farmId === farmId)))
+        .catch(() => setError(t('common.errorGeneric')));
+    };
     refresh();
-    try {
-      await api(item.path, { method: 'POST', json: item.body, idempotencyKey: item.idempotencyKey });
-      finishQueued({ ...item, state: 'syncing' }, 200);
-    } catch (caught) {
-      finishQueued({ ...item, state: 'syncing' }, caught instanceof ApiError ? caught.status : 0);
-      if (!(caught instanceof ApiError)) setError(t('common.errorGeneric'));
-    }
-    refresh();
-  }
+    return subscribeQueue(refresh);
+  }, [farmId, t]);
 
   return (
     <div className="grid gap-4">
@@ -55,11 +56,12 @@ export function OfflinePage() {
       ) : (
         rows.map((row) => (
           <Card key={row.id}>
-            <p className="font-semibold">{t('offline.attendance')}</p>
+            <p className="font-semibold">{t(kindKey(row.path))}</p>
             <p>{t(labelKey(row.state))}</p>
+            {row.detail === 'changed' ? <p>{t('offline.changed')}</p> : null}
             <div className="mt-2 flex flex-wrap gap-2">
               {row.state === 'pending' || row.state === 'failed' ? (
-                <Button type="button" onClick={() => void send(row)}>
+                <Button type="button" onClick={() => void flushQueue()}>
                   {t('offline.send')}
                 </Button>
               ) : null}
@@ -68,8 +70,7 @@ export function OfflinePage() {
                   type="button"
                   variant="outline"
                   onClick={() => {
-                    removeQueued(row.id);
-                    refresh();
+                    void removeQueued(row.id);
                   }}
                 >
                   {t('offline.drop')}

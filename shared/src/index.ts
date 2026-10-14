@@ -38,8 +38,10 @@ export { installSurface, isIosUserAgent } from './install.js';
 export type { InstallSurface } from './install.js';
 export { noticeGate, noticeResult } from './notice.js';
 export type { NoticeGate, NoticePermission, NoticeResult } from './notice.js';
-export { OFFLINE_DECISION, applySyncResult, captureClass, enqueueCapture } from './offline.js';
+export { OFFLINE_DECISION, applySyncResult, captureClass, enqueueCapture, pathLeaf, syncMode } from './offline.js';
 export type { CaptureClass, QueueItem, QueueState } from './offline.js';
+export { planPhoneAlerts } from './phoneAlerts.js';
+export type { PhoneAlertKind, PhoneAlertPlan } from './phoneAlerts.js';
 export { likePattern } from './search.js';
 export {
   batchInputSchema,

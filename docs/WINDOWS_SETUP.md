@@ -164,6 +164,56 @@ Start the frontend again. Install the same local authority on the phone if mkcer
 
 Windows may ask to allow Node through the firewall the first time a phone connects. Allow private networks. Leave `COOKIE_SECURE=false` for this local run so sign-in still works.
 
+## 10. Leave it running on this laptop
+
+This is one program. It builds the screens, then serves them on `PORT` (sample **5318**). You do not also run the Vite window.
+
+Before the first run, open `.env` and replace `JWT_SECRET` with your own text of at least 32 characters. The sample secret is refused when this mode starts. Leave `COOKIE_SECURE=false` so sign-in works on this computer and through the Tailscale address below. The program reads that flag from `.env`.
+
+```powershell
+npm run laptop
+```
+
+Open http://127.0.0.1:5318 on this computer. The same address is what a phone stores.
+
+To start it each time you sign in to Windows:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\scripts\install-startup-task.ps1
+```
+
+The task name is Gavran. Remove it with `schtasks /Delete /TN Gavran /F`.
+
+**Little memory.** Install MySQL on the PC and do not start Docker. Point `DB_PORT` in `.env` at that MySQL (a native install is often `3306`). In MySQL's config, a small `innodb_buffer_pool_size`, such as `128M`, leaves RAM for Windows. That is a computer setting, not a farm rule. Do not run `npm run dev` at the same time. One Node process is enough.
+
+## Use from anywhere with Tailscale (free)
+
+Tailscale gives the laptop an https address that works when you are away from the house. The personal plan is free.
+
+1. Install Tailscale from [tailscale.com](https://tailscale.com/) on the laptop and on the phone. Sign in with the same account.
+2. Start Gavran with `npm run laptop`, or with the sign-in task above. Leave the laptop on.
+3. In PowerShell, publish the API port. Use the `PORT` from `.env` if it is not 5318.
+
+```powershell
+tailscale serve --bg 5318
+```
+
+If that form is not accepted, use `tailscale serve --bg http://127.0.0.1:5318`.
+
+4. Run `tailscale serve status`. It prints `https://<this-computer>.ts.net`.
+5. On the phone, type that address, including `https://`.
+6. A phone on the same Wi-Fi can use `http://` plus the house address and port, such as `http://192.168.1.10:5318`. When Windows asks, allow that port on private networks.
+
+## Install the Android app
+
+The app file is `gavran.apk`. It is the same screens. The first open asks where the computer is, and the phone remembers that address.
+
+1. Copy `gavran.apk` onto the phone.
+2. Open Settings and allow this source to install apps. That is often the Files app, or Chrome.
+3. Open the file and install Gavran.
+4. On the first screen, type the Tailscale address, or `http://` plus the house address and `:5318`.
+5. The computer must be on. Open the app once while it is on. The phone can then remind you at 8:00 and at 17:00 about today's medicine, low feed, and eggs that are not written.
+
 ## Stop
 
 In the repository folder:

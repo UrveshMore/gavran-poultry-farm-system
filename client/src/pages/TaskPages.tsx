@@ -8,6 +8,7 @@ import { Link, useParams } from 'react-router-dom';
 import { z } from 'zod';
 import { Alert, Button, Card, Field, Input, TextArea } from '@/components/ui';
 import { ApiError, api, errorKey } from '@/lib/api';
+import { postOrQueue } from '@/lib/offlineQueue';
 import type { FarmSummary, FarmTask, Member, TaskSeason, TaskTemplate } from '@/lib/types';
 import { localToday } from '@/lib/today';
 
@@ -255,7 +256,7 @@ function TaskForm({
     defaultValues: { title: '', dueOn: localToday(), instructions: '', assigneeUserId: '', proofRequired: false, templateId: '' },
   });
   const mutation = useMutation({
-    mutationFn: (values: z.infer<typeof taskInputSchema>) => api(`/api/v1/farms/${farmId}/tasks`, { method: 'POST', json: values }),
+    mutationFn: (values: z.infer<typeof taskInputSchema>) => postOrQueue(farmId, `/api/v1/farms/${farmId}/tasks`, values),
     onSuccess: onDone,
   });
 
@@ -319,7 +320,7 @@ export function TaskDetailPage() {
   const form = useForm<z.infer<typeof taskCompleteSchema>>({ resolver: zodResolver(taskCompleteSchema), defaultValues: { note: '' } });
   const mutation = useMutation({
     mutationFn: (values: z.infer<typeof taskCompleteSchema>) =>
-      api(`/api/v1/farms/${farmId}/tasks/${taskId}/complete`, { method: 'POST', json: values }),
+      postOrQueue(farmId, `/api/v1/farms/${farmId}/tasks/${taskId}/complete`, values),
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: ['task', farmId, taskId] });
       void queryClient.invalidateQueries({ queryKey: ['tasks', farmId] });

@@ -435,16 +435,16 @@ These are not 4317, 4318, or 3307, because Cursor on the owner's Windows PC alre
 
 ![Saved on this phone](../client/public/guide/offline.png)
 
-**What it is.** Attendance written while the internet was down. It waits here until you send it.
+**What it is.** Eggs, a medicine tick, a job, a loss, or who came today, written while the computer could not be reached.
 
 **Where it is.** Farm setup, then Saved on this phone.
 
-**Why it is used.** Only who-came-today can wait on the phone. Feed, money, deaths, and medicine are not stored offline.
+**Why it is used.** Those rows wait on the phone and send themselves when the computer is back. Feed, money, and medicine records do not wait. If someone else already changed an egg, tick, job, or loss, the screen says so. Who-came-today stays as a conflict and is not rewritten.
 
 **How to use it.**
 
-1. When the internet is back, open this screen and tap Send.
-2. If the farm already has that row, it stays as a conflict and is not merged.
+1. When the computer is back, the waiting rows send themselves. You can also open this screen and tap Send.
+2. A line on the other screens says how many rows are waiting.
 
 ## Find a record
 

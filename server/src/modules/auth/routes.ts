@@ -30,7 +30,7 @@ authRoutes.get(
   asyncHandler(async (req, res) => {
     const existing = req.cookies?.[COOKIE.csrf];
     const token = typeof existing === 'string' && existing.length > 0 ? existing : newToken();
-    if (token !== existing) setCsrfCookie(res, token);
+    if (token !== existing) setCsrfCookie(res, token, req);
     sendData(res, 200, { csrfToken: token }, req.requestId);
   }),
 );
@@ -46,7 +46,7 @@ authRoutes.post(
   '/register',
   asyncHandler(async (req, res) => {
     const issued = await registerFirstOwner(req.body, meta(req));
-    setSessionCookies(res, issued);
+    setSessionCookies(res, issued, req);
     sendData(res, 201, { user: issued.user, csrfToken: issued.csrfToken }, req.requestId);
   }),
 );
@@ -55,7 +55,7 @@ authRoutes.post(
   '/login',
   asyncHandler(async (req, res) => {
     const issued = await login(req.body, meta(req));
-    setSessionCookies(res, issued);
+    setSessionCookies(res, issued, req);
     sendData(res, 200, { user: issued.user, csrfToken: issued.csrfToken }, req.requestId);
   }),
 );
@@ -64,7 +64,7 @@ authRoutes.post(
   '/pin-login',
   asyncHandler(async (req, res) => {
     const issued = await pinLogin(req.body, meta(req));
-    setSessionCookies(res, issued);
+    setSessionCookies(res, issued, req);
     sendData(res, 200, { user: issued.user, csrfToken: issued.csrfToken }, req.requestId);
   }),
 );
@@ -74,7 +74,7 @@ authRoutes.post(
   asyncHandler(async (req, res) => {
     const token = req.cookies?.[COOKIE.refresh];
     const issued = await refresh(typeof token === 'string' ? token : undefined, meta(req));
-    setSessionCookies(res, issued);
+    setSessionCookies(res, issued, req);
     sendData(res, 200, { user: issued.user, csrfToken: issued.csrfToken }, req.requestId);
   }),
 );
@@ -85,7 +85,7 @@ authRoutes.post(
     const access = req.cookies?.[COOKIE.access];
     const payload = typeof access === 'string' ? await verifyAccessToken(access) : null;
     await logout(payload?.sid ?? null, meta(req), payload?.sub ?? null);
-    clearSessionCookies(res);
+    clearSessionCookies(res, req);
     sendData(res, 200, { signedOut: true }, req.requestId);
   }),
 );
@@ -96,7 +96,7 @@ authRoutes.post(
   asyncHandler(async (req, res) => {
     const user = currentUser(req);
     await logoutAll(user.id, meta(req));
-    clearSessionCookies(res);
+    clearSessionCookies(res, req);
     sendData(res, 200, { signedOut: true }, req.requestId);
   }),
 );

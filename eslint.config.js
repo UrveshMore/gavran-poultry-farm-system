@@ -7,6 +7,7 @@ export default tseslint.config(
       '**/dist/**',
       '**/node_modules/**',
       '**/dev-dist/**',
+      'client/android/**',
       'uploads/**',
       '**/*.sql',
       'eslint.config.js',

@@ -1,3 +1,6 @@
+import { existsSync } from 'node:fs';
+import { resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import express from 'express';
@@ -44,9 +47,16 @@ export function createApp() {
   app.set('trust proxy', false);
   app.use(requestContext);
   app.use(helmet());
+  const nativeOrigins = new Set(['https://localhost', 'capacitor://localhost']);
   app.use(
     cors({
-      origin: env.CORS_ORIGIN,
+      origin(origin, callback) {
+        if (!origin || origin === env.CORS_ORIGIN || nativeOrigins.has(origin)) {
+          callback(null, true);
+          return;
+        }
+        callback(null, false);
+      },
       credentials: true,
       allowedHeaders: ['Content-Type', 'X-CSRF-Token', 'Idempotency-Key', 'X-Request-Id'],
     }),
@@ -92,6 +102,21 @@ export function createApp() {
   app.use('/api/v1/farms', expenseRoutes);
   app.use('/api/v1/farms', reportRoutes);
   app.use('/api/v1/farms', safeguardRoutes);
+  if (env.SERVE_CLIENT) {
+    const clientDir = resolve(fileURLToPath(new URL('.', import.meta.url)), '../../client/dist');
+    if (existsSync(clientDir)) {
+      app.use(express.static(clientDir, { index: false }));
+      app.use((req, res, next) => {
+        if ((req.method !== 'GET' && req.method !== 'HEAD') || req.path.startsWith('/api')) {
+          next();
+          return;
+        }
+        res.sendFile(resolve(clientDir, 'index.html'), (error) => {
+          if (error) next(error);
+        });
+      });
+    }
+  }
   app.use(notFound);
   app.use(errorHandler);
   return app;

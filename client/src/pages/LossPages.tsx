@@ -8,6 +8,7 @@ import { z } from 'zod';
 import { JumpAdd } from '@/components/JumpAdd';
 import { Alert, Button, Card, Field, Input, TextArea } from '@/components/ui';
 import { ApiError, api, errorKey } from '@/lib/api';
+import { postOrQueue } from '@/lib/offlineQueue';
 import type { FarmSummary, LossPage } from '@/lib/types';
 import { localToday } from '@/lib/today';
 
@@ -36,7 +37,7 @@ export function LossesPage() {
     defaultValues: { occurredOn: localToday(), birdCount: 0, note: '', movementId: '' },
   });
   const mutation = useMutation({
-    mutationFn: (values: z.infer<typeof lossIncidentSchema>) => api(`/api/v1/farms/${farmId}/losses`, { method: 'POST', json: values }),
+    mutationFn: (values: z.infer<typeof lossIncidentSchema>) => postOrQueue(farmId, `/api/v1/farms/${farmId}/losses`, values),
     onSuccess: () => {
       form.reset({ occurredOn: localToday(), birdCount: 0, note: '', movementId: '' });
       void queryClient.invalidateQueries({ queryKey: ['losses', farmId] });

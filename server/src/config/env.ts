@@ -22,6 +22,7 @@ const schema = z.object({
   REFRESH_TOKEN_TTL_SECONDS: z.coerce.number().int().positive().default(1_209_600),
   COOKIE_SECURE: z.string().optional(),
   CORS_ORIGIN: z.string().min(1).default('http://127.0.0.1:5317'),
+  SERVE_CLIENT: z.string().optional(),
   LOGIN_RATE_LIMIT_MAX: z.coerce.number().int().positive().default(10),
   LOGIN_RATE_LIMIT_WINDOW_MS: z.coerce.number().int().positive().default(900_000),
   PIN_RATE_LIMIT_MAX: z.coerce.number().int().positive().default(5),
@@ -60,6 +61,7 @@ export const env = {
   ...parsed.data,
   COOKIE_SECURE: cookieSecure,
   SEED_DEV: parsed.data.SEED_DEV === 'true',
+  SERVE_CLIENT: parsed.data.SERVE_CLIENT === 'true',
 };
 
 export type AppEnv = typeof env;

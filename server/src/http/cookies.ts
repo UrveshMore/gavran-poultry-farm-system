@@ -1,4 +1,4 @@
-import type { Response } from 'express';
+import type { Request, Response } from 'express';
 import { env } from '../config/env.js';
 
 export const COOKIE = {
@@ -13,37 +13,48 @@ const base = {
   path: '/',
 };
 
+function cookieFlags(req?: Request) {
+  const origin = req?.get('origin') ?? '';
+  if (origin === 'https://localhost' || origin.startsWith('capacitor://')) {
+    return { sameSite: 'none' as const, secure: true, path: '/' };
+  }
+  return base;
+}
+
 export function setSessionCookies(
   res: Response,
   tokens: { accessToken: string; refreshToken: string; csrfToken: string },
+  req?: Request,
 ): void {
+  const flags = cookieFlags(req);
   res.cookie(COOKIE.access, tokens.accessToken, {
-    ...base,
+    ...flags,
     httpOnly: true,
     maxAge: env.ACCESS_TOKEN_TTL_SECONDS * 1000,
   });
   res.cookie(COOKIE.refresh, tokens.refreshToken, {
-    ...base,
+    ...flags,
     httpOnly: true,
     maxAge: env.REFRESH_TOKEN_TTL_SECONDS * 1000,
   });
   res.cookie(COOKIE.csrf, tokens.csrfToken, {
-    ...base,
+    ...flags,
     httpOnly: false,
     maxAge: env.REFRESH_TOKEN_TTL_SECONDS * 1000,
   });
 }
 
-export function setCsrfCookie(res: Response, token: string): void {
+export function setCsrfCookie(res: Response, token: string, req?: Request): void {
   res.cookie(COOKIE.csrf, token, {
-    ...base,
+    ...cookieFlags(req),
     httpOnly: false,
     maxAge: env.REFRESH_TOKEN_TTL_SECONDS * 1000,
   });
 }
 
-export function clearSessionCookies(res: Response): void {
-  res.clearCookie(COOKIE.access, { ...base, httpOnly: true });
-  res.clearCookie(COOKIE.refresh, { ...base, httpOnly: true });
-  res.clearCookie(COOKIE.csrf, { ...base, httpOnly: false });
+export function clearSessionCookies(res: Response, req?: Request): void {
+  const flags = cookieFlags(req);
+  res.clearCookie(COOKIE.access, { ...flags, httpOnly: true });
+  res.clearCookie(COOKIE.refresh, { ...flags, httpOnly: true });
+  res.clearCookie(COOKIE.csrf, { ...flags, httpOnly: false });
 }

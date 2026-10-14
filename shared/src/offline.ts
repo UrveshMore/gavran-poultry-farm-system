@@ -22,7 +22,6 @@ const REFUSED = [
   'invoice-documents',
   'orders',
   'market-prices',
-  'losses',
   'medicine-records',
   'suppliers',
   'purchase-orders',
@@ -31,15 +30,25 @@ const REFUSED = [
   'supplier-payments',
 ] as const;
 
+const QUEUEABLE = ['attendance', 'eggs', 'doses', 'tasks', 'complete', 'losses'] as const;
+
 const KEY_PATTERN = /^[\x21-\x7e]{8,80}$/;
 
-/** Decision 10 is open, so only an attendance post may wait on the device. */
-export function captureClass(path: string): CaptureClass {
+export function pathLeaf(path: string): string {
   const clean = (path.split('?')[0] ?? path).replace(/\/+$/, '');
-  const leaf = clean.split('/').pop() ?? '';
+  return clean.split('/').pop() ?? '';
+}
+
+/** Decision 10 stays open. Eggs, dose ticks, jobs, losses, and attendance may wait. Money and feed do not. */
+export function captureClass(path: string): CaptureClass {
+  const leaf = pathLeaf(path);
   if ((REFUSED as readonly string[]).includes(leaf)) return 'refused';
-  if (leaf === 'attendance') return 'queueable';
+  if ((QUEUEABLE as readonly string[]).includes(leaf)) return 'queueable';
   return 'online_only';
+}
+
+export function syncMode(path: string): 'keep' | 'last_write' {
+  return pathLeaf(path) === 'attendance' ? 'keep' : 'last_write';
 }
 
 export function enqueueCapture(
@@ -67,10 +76,14 @@ export function enqueueCapture(
   };
 }
 
-/** A conflict stays on the device. The earlier server row is not replaced. */
-export function applySyncResult(item: QueueItem, status: number): QueueItem {
+/**
+ * Attendance keeps a 409 on the device.
+ * Other queued writes use last-write: the body stays, the row is marked sent, and detail is `changed`.
+ */
+export function applySyncResult(item: QueueItem, status: number, mode: 'keep' | 'last_write' = 'keep'): QueueItem {
   if (item.state === 'conflict' || item.state === 'synced') return item;
   if (status >= 200 && status < 300) return { ...item, state: 'synced', detail: '' };
+  if (status === 409 && mode === 'last_write') return { ...item, state: 'synced', detail: 'changed' };
   if (status === 409) return { ...item, state: 'conflict', detail: 'conflict' };
   return { ...item, state: 'failed', detail: String(status) };
 }

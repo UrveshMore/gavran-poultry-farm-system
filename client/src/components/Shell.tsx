@@ -20,6 +20,8 @@ import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { alertCount, type DashboardData } from '@/components/DashboardCards';
 import { PageExplain } from '@/components/Tour';
 import { api } from '@/lib/api';
+import { flushQueue, subscribeQueue, waitingCount } from '@/lib/offlineQueue';
+import { schedulePhoneAlerts } from '@/lib/phoneAlerts';
 import { useQuery } from '@tanstack/react-query';
 import { useQueryClient } from '@tanstack/react-query';
 import { InstallPrompt } from './InstallPrompt';
@@ -49,6 +51,7 @@ export function AppShell() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [online, setOnline] = useState(navigator.onLine);
+  const [waiting, setWaiting] = useState(0);
   const farmMatch = location.pathname.match(/^\/farms\/([^/]+)/);
   const farmId = farmMatch && farmMatch[1] !== 'new' ? farmMatch[1] : undefined;
   const farms = useQuery({ queryKey: ['farms'], queryFn: () => api<FarmSummary[]>('/api/v1/farms'), enabled: Boolean(farmId) });
@@ -62,15 +65,30 @@ export function AppShell() {
   const groups = farm ? visibleGroups(farm.permissions) : [];
 
   useEffect(() => {
-    const on = () => setOnline(true);
+    const refresh = () => {
+      void waitingCount().then(setWaiting);
+    };
+    refresh();
+    const stop = subscribeQueue(refresh);
+    const on = () => {
+      setOnline(true);
+      void flushQueue().finally(refresh);
+    };
     const off = () => setOnline(false);
     window.addEventListener('online', on);
     window.addEventListener('offline', off);
+    if (navigator.onLine) void flushQueue().finally(refresh);
     return () => {
+      stop();
       window.removeEventListener('online', on);
       window.removeEventListener('offline', off);
     };
   }, []);
+
+  useEffect(() => {
+    if (!board.data) return;
+    void schedulePhoneAlerts(board.data);
+  }, [board.data]);
 
   async function signOut() {
     try {
@@ -143,9 +161,9 @@ export function AppShell() {
             </button>
           </div>
         </header>
-        {!online ? (
+        {!online || waiting > 0 ? (
           <p role="status" className="bg-clay px-4 py-2 text-sm font-semibold text-ink">
-            {t('shell.offline')}
+            {t('shell.waiting', { count: waiting })}
           </p>
         ) : null}
         <main id="content" className="mx-auto grid w-full max-w-3xl gap-4 px-4 pb-28 pt-5 md:max-w-5xl md:pb-10">
