@@ -1,5 +1,5 @@
 import type { Locale } from '@gavran/shared';
-import { changePasswordSchema, loginSchema, profileSchema, registerSchema } from '@gavran/shared';
+import { changePasswordSchema, loginSchema, pinLoginSchema, profileSchema, registerSchema } from '@gavran/shared';
 import { pool } from '../../db/pool.js';
 import { withTransaction } from '../../db/transaction.js';
 import { AppError } from '../../http/errors.js';
@@ -14,6 +14,7 @@ import {
   findSessionById,
   findUserByEmail,
   findUserById,
+  findUserByMobile,
   insertSession,
   insertUser,
   markSessionReplaced,
@@ -26,7 +27,22 @@ import {
 } from './repository.js';
 import type { PublicUser, UserRecord } from './types.js';
 
-export const loginThrottle = createLoginThrottle(env.LOGIN_RATE_LIMIT_MAX, env.LOGIN_RATE_LIMIT_WINDOW_MS);
+const emailThrottle = createLoginThrottle(env.LOGIN_RATE_LIMIT_MAX, env.LOGIN_RATE_LIMIT_WINDOW_MS);
+export const pinThrottle = createLoginThrottle(env.PIN_RATE_LIMIT_MAX, env.LOGIN_RATE_LIMIT_WINDOW_MS);
+
+/** Email sign-in limit. `reset` also clears the PIN limit so API tests stay isolated. */
+export const loginThrottle = {
+  assert(key: string): void {
+    emailThrottle.assert(key);
+  },
+  fail(key: string): void {
+    emailThrottle.fail(key);
+  },
+  reset(): void {
+    emailThrottle.reset();
+    pinThrottle.reset();
+  },
+};
 
 export type ClientMeta = { ip: string; userAgent: string | null; requestId: string };
 
@@ -41,6 +57,7 @@ function publicUser(user: UserRecord): PublicUser {
   return {
     id: user.id,
     email: user.email,
+    mobile: user.mobile,
     displayName: user.displayName,
     preferredLocale: user.preferredLocale,
     platformRole: user.platformRole,
@@ -156,6 +173,47 @@ export async function login(body: unknown, meta: ClientMeta): Promise<IssuedSess
   return issue(user, session);
 }
 
+export async function pinLogin(body: unknown, meta: ClientMeta): Promise<IssuedSession> {
+  const input = pinLoginSchema.parse(body);
+  const mobileKey = `pin:${input.mobile}`;
+  const ipKey = `ip:${meta.ip}`;
+  pinThrottle.assert(mobileKey);
+  pinThrottle.assert(ipKey);
+  const user = await findUserByMobile(pool, input.mobile);
+  const ok = await verifyPassword(input.pin, user?.pinHash ?? (await dummyPasswordHash()));
+  if (!user || !ok) {
+    pinThrottle.fail(mobileKey);
+    pinThrottle.fail(ipKey);
+    await writeAudit(pool, {
+      farmId: null,
+      actorUserId: user?.id ?? null,
+      action: 'auth.login.failure',
+      entityType: 'user',
+      entityId: user?.id ?? null,
+      requestId: meta.requestId,
+      summary: { mobile: input.mobile, reason: 'invalid_credentials' },
+    });
+    throw new AppError(401, 'AUTH_INVALID_CREDENTIALS', 'Mobile number or PIN is incorrect.');
+  }
+  if (user.status !== 'active') {
+    throw new AppError(403, 'ACCOUNT_DEACTIVATED', 'This account is deactivated.');
+  }
+  const session = await withTransaction(async (conn) => {
+    const created = await insertSession(conn, { userId: user.id, userAgent: meta.userAgent, ip: meta.ip });
+    await writeAudit(conn, {
+      farmId: null,
+      actorUserId: user.id,
+      action: 'auth.login.success',
+      entityType: 'session',
+      entityId: created.session.id,
+      requestId: meta.requestId,
+      summary: { mobile: user.mobile },
+    });
+    return created;
+  });
+  return issue(user, session);
+}
+
 export async function refresh(refreshToken: string | undefined, meta: ClientMeta): Promise<IssuedSession> {
   if (!refreshToken) throw new AppError(401, 'AUTH_REQUIRED', 'Sign in required.');
   const outcome = await withTransaction(async (conn) => {
@@ -238,7 +296,7 @@ export async function changePassword(userId: string, sessionId: string, body: un
   const input = changePasswordSchema.parse(body);
   const user = await findUserById(pool, userId);
   if (!user || user.status !== 'active') throw new AppError(401, 'AUTH_REQUIRED', 'Sign in required.');
-  const ok = await verifyPassword(input.currentPassword, user.passwordHash);
+  const ok = user.passwordHash ? await verifyPassword(input.currentPassword, user.passwordHash) : false;
   if (!ok) throw new AppError(401, 'AUTH_INVALID_CREDENTIALS', 'Email or password is incorrect.');
   const passwordHash = await hashPassword(input.newPassword);
   await withTransaction(async (conn) => {

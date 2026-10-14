@@ -1,4 +1,4 @@
-const SECRET_KEY = /password|token|secret|authorization|cookie/i;
+const SECRET_KEY = /password|token|secret|authorization|cookie|^pin$|pin_hash|pinHash/i;
 
 export function redact(value: unknown): unknown {
   if (Array.isArray(value)) return value.map((item) => redact(item));

@@ -3,7 +3,8 @@ export type FarmRole = 'owner' | 'manager' | 'worker' | 'family_helper' | 'vet_a
 
 export type PublicUser = {
   id: string;
-  email: string;
+  email: string | null;
+  mobile: string | null;
   displayName: string;
   preferredLocale: Locale;
   platformRole: 'system_administrator' | null;
@@ -57,7 +58,8 @@ export type Shed = {
 export type Member = {
   id: string;
   userId: string;
-  email: string;
+  email: string | null;
+  mobile: string | null;
   displayName: string;
   role: FarmRole;
   status: 'active' | 'revoked';

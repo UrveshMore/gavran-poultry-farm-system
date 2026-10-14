@@ -1,4 +1,4 @@
-import { loginSchema, registerSchema, changePasswordSchema } from '@gavran/shared';
+import { loginSchema, registerSchema, changePasswordSchema, pinLoginSchema } from '@gavran/shared';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useState, type ReactNode } from 'react';
@@ -7,6 +7,7 @@ import { useTranslation } from 'react-i18next';
 import { Link, Navigate } from 'react-router-dom';
 import { z } from 'zod';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
+import { PinPad } from '@/components/PinPad';
 import { Alert, Button, Card, Field, Input, Logo } from '@/components/ui';
 import { ApiError, api, errorKey, fetchMe } from '@/lib/api';
 import type { PublicUser } from '@/lib/types';
@@ -27,6 +28,7 @@ function describe(error: unknown, t: (key: string) => string) {
 export function LoginPage() {
   const { t, i18n } = useTranslation();
   const queryClient = useQueryClient();
+  const [ownerMode, setOwnerMode] = useState(false);
   const me = useQuery({ queryKey: ['me'], queryFn: fetchMe, retry: false });
   const bootstrap = useQuery({
     queryKey: ['bootstrap'],
@@ -55,20 +57,34 @@ export function LoginPage() {
       <Card className="grid gap-4">
         <div>
           <h1 className="font-display text-3xl font-semibold">{t('auth.signInTitle')}</h1>
-          <p className="mt-1 text-ink-soft">{t('auth.signInBody')}</p>
+          <p className="mt-1 text-ink-soft">{ownerMode ? t('auth.ownerBody') : t('auth.workerBody')}</p>
         </div>
-        <form className="grid gap-3" onSubmit={form.handleSubmit((values) => mutation.mutate(values))} noValidate>
-          <Field id="email" label={t('auth.email')} error={message(t, form.formState.errors.email?.message)} hint={t('fieldHint.email')}>
-            <Input id="email" type="email" autoComplete="username" aria-invalid={Boolean(form.formState.errors.email)} {...form.register('email')}  placeholder={t('fieldPh.email')}/>
-          </Field>
-          <Field id="password" label={t('auth.password')} error={message(t, form.formState.errors.password?.message)} hint={t('fieldHint.password')}>
-            <Input id="password" type="password" autoComplete="current-password" aria-invalid={Boolean(form.formState.errors.password)} {...form.register('password')}  placeholder={t('fieldPh.password')}/>
-          </Field>
-          {mutation.isError ? <Alert>{describe(mutation.error, t)}</Alert> : null}
-          <Button type="submit" disabled={mutation.isPending}>
-            {mutation.isPending ? t('auth.signingIn') : t('auth.signIn')}
-          </Button>
-        </form>
+        {ownerMode ? (
+          <form className="grid gap-3" onSubmit={form.handleSubmit((values) => mutation.mutate(values))} noValidate>
+            <Field id="email" label={t('auth.email')} error={message(t, form.formState.errors.email?.message)} hint={t('fieldHint.email')}>
+              <Input id="email" type="email" autoComplete="username" aria-invalid={Boolean(form.formState.errors.email)} {...form.register('email')} placeholder={t('fieldPh.email')} />
+            </Field>
+            <Field id="password" label={t('auth.password')} error={message(t, form.formState.errors.password?.message)} hint={t('fieldHint.password')}>
+              <Input id="password" type="password" autoComplete="current-password" aria-invalid={Boolean(form.formState.errors.password)} {...form.register('password')} placeholder={t('fieldPh.password')} />
+            </Field>
+            {mutation.isError ? <Alert>{describe(mutation.error, t)}</Alert> : null}
+            <Button type="submit" className="min-h-14" disabled={mutation.isPending}>
+              {mutation.isPending ? t('auth.signingIn') : t('auth.signIn')}
+            </Button>
+          </form>
+        ) : (
+          <PinLogin
+            onSuccess={async (user) => {
+              if (i18n.language !== user.preferredLocale) {
+                await api('/api/v1/auth/me', { method: 'PATCH', json: { preferredLocale: i18n.language } });
+              }
+              await queryClient.invalidateQueries({ queryKey: ['me'] });
+            }}
+          />
+        )}
+        <Button type="button" variant="outline" className="min-h-14" onClick={() => setOwnerMode((value) => !value)}>
+          {ownerMode ? t('auth.workerToggle') : t('auth.ownerToggle')}
+        </Button>
         {bootstrap.data?.bootstrapRequired ? (
           <p className="text-sm">
             {t('auth.bootstrapHint')}{' '}
@@ -79,6 +95,63 @@ export function LoginPage() {
         ) : null}
       </Card>
     </AuthFrame>
+  );
+}
+
+function PinLogin({ onSuccess }: { onSuccess: (user: PublicUser) => Promise<void> }) {
+  const { t } = useTranslation();
+  const [mobile, setMobile] = useState('');
+  const [pin, setPin] = useState('');
+  const [fieldError, setFieldError] = useState<string | undefined>();
+  const mutation = useMutation({
+    mutationFn: () => {
+      const parsed = pinLoginSchema.safeParse({ mobile, pin });
+      if (!parsed.success) {
+        setFieldError(parsed.error.issues[0]?.message ?? 'invalid_format');
+        return Promise.reject(new Error('invalid'));
+      }
+      setFieldError(undefined);
+      return api<{ user: PublicUser }>('/api/v1/auth/pin-login', { method: 'POST', json: parsed.data });
+    },
+    onSuccess: async (data) => {
+      await onSuccess(data.user);
+    },
+  });
+  const ready = pinLoginSchema.safeParse({ mobile, pin }).success;
+
+  return (
+    <form
+      className="grid gap-3"
+      onSubmit={(event) => {
+        event.preventDefault();
+        if (ready) mutation.mutate();
+      }}
+      noValidate
+    >
+      <Field id="mobile" label={t('auth.mobile')} error={fieldError ? message(t, fieldError) : undefined} hint={t('auth.mobileHint')}>
+        <Input
+          id="mobile"
+          type="tel"
+          inputMode="numeric"
+          autoComplete="tel"
+          className="min-h-14 text-2xl"
+          value={mobile}
+          onChange={(event) => setMobile(event.target.value)}
+          placeholder={t('fieldPh.auth-mobile')}
+        />
+      </Field>
+      <div>
+        <p className="text-sm font-semibold">{t('auth.pin')}</p>
+        <p className="text-sm text-ink-soft">{t('auth.pinHint')}</p>
+      </div>
+      <PinPad value={pin} onChange={setPin} backLabel={t('auth.pinBack')} />
+      {mutation.isError && !(mutation.error instanceof Error && mutation.error.message === 'invalid') ? (
+        <Alert>{describe(mutation.error, t)}</Alert>
+      ) : null}
+      <Button type="submit" className="min-h-14 text-lg" disabled={!ready || mutation.isPending}>
+        {mutation.isPending ? t('auth.signingIn') : t('auth.signIn')}
+      </Button>
+    </form>
   );
 }
 

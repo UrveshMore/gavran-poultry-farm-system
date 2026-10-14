@@ -11,6 +11,7 @@ import {
   changePassword,
   currentPublicUser,
   login,
+  pinLogin,
   logout,
   logoutAll,
   refresh,
@@ -54,6 +55,15 @@ authRoutes.post(
   '/login',
   asyncHandler(async (req, res) => {
     const issued = await login(req.body, meta(req));
+    setSessionCookies(res, issued);
+    sendData(res, 200, { user: issued.user, csrfToken: issued.csrfToken }, req.requestId);
+  }),
+);
+
+authRoutes.post(
+  '/pin-login',
+  asyncHandler(async (req, res) => {
+    const issued = await pinLogin(req.body, meta(req));
     setSessionCookies(res, issued);
     sendData(res, 200, { user: issued.user, csrfToken: issued.csrfToken }, req.requestId);
   }),

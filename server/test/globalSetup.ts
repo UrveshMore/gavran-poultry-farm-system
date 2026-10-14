@@ -1,6 +1,7 @@
 export async function setup(): Promise<void> {
   process.env.NODE_ENV = 'test';
   process.env.DB_HOST = '127.0.0.1';
+  // Example .env uses 3317. Tests stay on the port CI publishes.
   process.env.DB_PORT = '3307';
   process.env.DB_USER = 'gavran';
   process.env.DB_PASSWORD = 'gavran_local';

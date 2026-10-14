@@ -6,6 +6,25 @@ Hindi and Marathi in the program are provisional until a fluent speaker reviews 
 
 Open the program, sign in, and tap the farm name. The first visit starts a short tour. An owner, a manager, and a worker each see only their own tiles. Eggs, Flocks, Incubator machines, and Sick birds and medicines explain themselves once. Tap **Explain this screen** there, or **Show me around** on Help, to play a tour again.
 
+## Sign in
+
+A worker signs in with the mobile number and the PIN the owner set. The number keys are large. Spaces in the number are ignored. The PIN is four to six digits.
+
+The owner signs in with a mail address and a long secret phrase. On the sign-in screen, choose **I am the owner**.
+
+Nothing is sent to the worker. The owner says the PIN out loud or writes it down. The owner or a manager can set a new PIN. The old PIN stops working, and that person is signed out. After five wrong tries, sign-in waits.
+
+## Ports on your computer
+
+Copy `.env.example` to `.env` before the first start. The sample is:
+
+- `CLIENT_PORT=5317` — the program in the browser
+- `PORT=5318` — the API. The browser program sends `/api` to this port
+- `MYSQL_PORT=3317` and `DB_PORT=3317` — MySQL on this computer
+- `CORS_ORIGIN=http://127.0.0.1:5317`
+
+These are not 4317, 4318, or 3307, because Cursor on the owner's Windows PC already forwards those ports. The steps are in `docs/WINDOWS_SETUP.md`. Automated tests still use database port 3307.
+
 ## Home
 
 ![Home](../client/public/guide/home.png)
@@ -308,13 +327,14 @@ Open the program, sign in, and tap the farm name. The first visit starts a short
 
 **Where it is.** The People tile. A worker does not see this tile.
 
-**Why it is used.** So each person has their own sign-in. Nothing is sent to them; you tell them the secret words yourself.
+**Why it is used.** So each person has their own sign-in. Nothing is sent; you tell them the mobile number and the PIN yourself.
 
 **How to use it.**
 
-1. Write the name, the mail address, a long secret phrase, and the role.
-2. Owner sees everything.
-3. A worker sees daily jobs, birds, hatch, health, and feed.
+1. For a worker, write the name, the mobile number, and a PIN of four to six digits, then tell them that PIN.
+2. A mail address and a long secret phrase remain for the owner and a manager.
+3. Owner sees everything.
+4. A worker sees daily jobs, birds, hatch, health, and feed.
 
 ## Farm details
 

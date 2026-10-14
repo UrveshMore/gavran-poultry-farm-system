@@ -59,6 +59,7 @@ Inside a farm, the home tiles show only the groups that role can open. The serve
 | `document.record` | Store a JPEG, PNG, WebP, or PDF with a note. |
 | `yard.read` | View yard notes: let-out, shut-in, and free notes. |
 | `yard.record` | Write a yard note. No clock time is suggested. |
+| `pin.reset` | Set a new sign-in PIN and drop that person's sessions. Owner and manager. A worker does not have this. |
 
 `GET /api/v1/farms` lists farms the caller belongs to, including farms where they have zero permissions. It does not include contact details.
 

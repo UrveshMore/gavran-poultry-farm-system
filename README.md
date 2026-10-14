@@ -19,13 +19,15 @@ npm run db:migrate
 npm run dev
 ```
 
-- App: http://127.0.0.1:4317
-- API: http://127.0.0.1:4318
-- MySQL on the host: port 3307
+- App: http://127.0.0.1:5317 (`CLIENT_PORT`)
+- API: http://127.0.0.1:5318 (`PORT`; the app sends `/api` there)
+- MySQL on the host: port 3317 (`MYSQL_PORT` and `DB_PORT`)
+
+Those sample ports are in `.env.example`. They are not 4317, 4318, or 3307, because Cursor on the owner's Windows PC already forwards those. Automated tests still set `DB_PORT` to 3307.
 
 The farmer guide is `docs/USER_GUIDE.md` and `docs/USER_GUIDE.pdf`. The same words, with a picture of each screen, are on Help inside the program. The first visit starts a short tour. Help can play it again.
 
-The first visit can create the owner account. After that, people join by invitation from the farm's People screen. Nothing is emailed. Share the temporary password yourself.
+The first visit can create the owner account with a mail address and a long secret phrase. After that, People can add a worker with a name, a mobile number, and a PIN of four to six digits. The worker signs in with that number and PIN. Nothing is sent. Tell them the PIN yourself. A mail address is still there for a manager who uses one.
 
 `npm run db:seed` creates a local owner only when `SEED_DEV=true` (the script sets that). Default seed email is `owner@gavran.local` and the password is `change-me-local-only`. The command does not print the password and does not create a farm. Do not enable seeding in production.
 

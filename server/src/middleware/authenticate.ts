@@ -21,6 +21,7 @@ export const authenticate: RequestHandler = asyncHandler(async (req, _res, next)
   req.authUser = {
     id: user.id,
     email: user.email,
+    mobile: user.mobile,
     displayName: user.displayName,
     preferredLocale: user.preferredLocale,
     platformRole: user.platformRole,

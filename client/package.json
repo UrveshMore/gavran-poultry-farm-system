@@ -4,10 +4,10 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "vite --host 0.0.0.0 --port 4317 --strictPort",
+    "dev": "vite --host 0.0.0.0 --strictPort",
     "build": "tsc -p tsconfig.json --noEmit && vite build",
     "typecheck": "tsc -p tsconfig.json --noEmit",
-    "preview": "vite preview --host 0.0.0.0 --port 4317 --strictPort"
+    "preview": "vite preview --host 0.0.0.0 --strictPort"
   },
   "dependencies": {
     "@gavran/shared": "0.1.0",

@@ -5,6 +5,8 @@ import {
   inviteSchema,
   isPermission,
   membershipUpdateSchema,
+  pinPersonSchema,
+  pinResetSchema,
   shedInputSchema,
   shedUpdateSchema,
   type FarmInput,
@@ -19,7 +21,17 @@ import { AppError } from '../../http/errors.js';
 import { finishIdempotency, requestPath, reserveIdempotency } from '../../http/idempotency.js';
 import { writeAudit } from '../audit/repository.js';
 import { listAudit } from '../audit/repository.js';
-import { findUserByEmail, findUserById, insertUser, lockUser, revokeAllSessionsExcept, setUserStatus } from '../auth/repository.js';
+import {
+  findUserByEmail,
+  findUserById,
+  findUserByMobile,
+  insertPinUser,
+  insertUser,
+  lockUser,
+  revokeAllSessionsExcept,
+  setUserStatus,
+  updatePinHash,
+} from '../auth/repository.js';
 import { hashPassword } from '../../security/password.js';
 import type { AuthUser } from '../auth/types.js';
 import type { FarmAccess } from './access.js';
@@ -418,6 +430,92 @@ export async function inviteMember(actor: Actor, access: FarmAccess, body: unkno
     if (isDup(error)) throw new AppError(409, 'CONFLICT', 'That person is already on this farm.');
     throw error;
   }
+}
+
+export async function createPinMember(actor: Actor, access: FarmAccess, body: unknown, idempotency: IdempotencyInput) {
+  const input = pinPersonSchema.parse(body);
+  const path = requestPath(idempotency.path);
+  try {
+    return await withTransaction(async (conn) => {
+      const reserved = await reserveIdempotency(conn, {
+        userId: actor.user.id,
+        farmId: access.farmId,
+        key: idempotency.key,
+        method: idempotency.method,
+        path,
+      });
+      if (reserved.mode === 'replay') return reserved;
+      let user = await findUserByMobile(conn, input.mobile);
+      let userCreated = false;
+      if (!user) {
+        user = await insertPinUser(conn, {
+          displayName: input.displayName.trim(),
+          mobile: input.mobile,
+          pinHash: await hashPassword(input.pin),
+          preferredLocale: actor.user.preferredLocale,
+        });
+        userCreated = true;
+        await writeAudit(conn, {
+          farmId: access.farmId,
+          actorUserId: actor.user.id,
+          action: 'user.registered',
+          entityType: 'user',
+          entityId: user.id,
+          requestId: actor.requestId,
+          summary: { mobile: input.mobile },
+        });
+      }
+      const membershipId = await insertMembership(conn, {
+        farmId: access.farmId,
+        userId: user.id,
+        role: input.role,
+        createdBy: actor.user.id,
+      });
+      await writeAudit(conn, {
+        farmId: access.farmId,
+        actorUserId: actor.user.id,
+        action: 'membership.created',
+        entityType: 'membership',
+        entityId: membershipId,
+        requestId: actor.requestId,
+        summary: { mobile: input.mobile, role: input.role },
+      });
+      const members = await listMembers(conn, access.farmId);
+      const member = members.find((item) => item.id === membershipId);
+      if (!member) throw new Error('Membership insert failed.');
+      const data = { member, userCreated };
+      if (reserved.mode === 'new') await finishIdempotency(conn, reserved.id, 201, data);
+      return { mode: 'created' as const, status: 201, data };
+    });
+  } catch (error) {
+    if (isDup(error)) throw new AppError(409, 'CONFLICT', 'That person is already on this farm.');
+    throw error;
+  }
+}
+
+export async function resetMemberPin(actor: Actor, access: FarmAccess, membershipId: string, body: unknown): Promise<MemberRecord> {
+  if (!/^[0-9a-f-]{36}$/i.test(membershipId)) throw new AppError(404, 'NOT_FOUND', 'Not found.');
+  const input = pinResetSchema.parse(body);
+  return withTransaction(async (conn) => {
+    const snaps = await listMembershipSnaps(conn, access.farmId, true);
+    const current = snaps.find((row) => row.id === membershipId);
+    if (!current) throw new AppError(404, 'NOT_FOUND', 'Not found.');
+    await updatePinHash(conn, current.userId, await hashPassword(input.pin));
+    await revokeAllSessionsExcept(conn, current.userId, null);
+    const members = await listMembers(conn, access.farmId);
+    const member = members.find((item) => item.id === membershipId);
+    if (!member) throw new AppError(404, 'NOT_FOUND', 'Not found.');
+    await writeAudit(conn, {
+      farmId: access.farmId,
+      actorUserId: actor.user.id,
+      action: 'auth.pin.reset',
+      entityType: 'user',
+      entityId: current.userId,
+      requestId: actor.requestId,
+      summary: { mobile: member.mobile },
+    });
+    return member;
+  });
 }
 
 export async function patchMember(actor: Actor, access: FarmAccess, membershipId: string, body: unknown): Promise<MemberRecord> {

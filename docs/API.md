@@ -22,6 +22,7 @@ Field codes are `too_small`, `too_big`, `invalid_format`, `required`, or `differ
 | GET | `/auth/bootstrap` | No | `{ bootstrapRequired }` |
 | POST | `/auth/register` | No | 201 first user only. Then 403 `BOOTSTRAP_CLOSED`. Sets session cookies. |
 | POST | `/auth/login` | No | 200 or 401 `AUTH_INVALID_CREDENTIALS`. Correct password on a deactivated user is 403 `ACCOUNT_DEACTIVATED`. |
+| POST | `/auth/pin-login` | No | Body `mobile` and `pin` (4–6 digits). Mobile is digits only, 10–15, after marks are removed. 401 `AUTH_INVALID_CREDENTIALS`. Five failures in the window return 429 `RATE_LIMITED` even if the next PIN is correct. A correct PIN on a deactivated user is 403 `ACCOUNT_DEACTIVATED`. |
 | POST | `/auth/refresh` | Refresh cookie | Rotates refresh token. Reuse revokes the family and returns 401. |
 | POST | `/auth/logout` | Cookie optional | Clears cookies. |
 | POST | `/auth/logout-all` | Access | Revokes every session. |
@@ -47,7 +48,11 @@ Bodies never include the access or refresh token.
 
 `GET|POST /farms/:farmId/members` — `user.read` / `user.manage`. Invite body: email, display name, role, optional password (required for a new user, at least 10 characters), and `permissionGrants` only for `family_helper`.
 
+`POST /farms/:farmId/members/pin` — `user.manage`. Body: display name, mobile, PIN, and role `worker` or `manager`. A new person has no mail address. If that mobile number already exists, the farm membership is added and the PIN is not changed. 409 `CONFLICT` when that person is already on this farm. The PIN is not in the response.
+
 `PATCH /farms/:farmId/members/:membershipId` — `user.manage`. 409 `LAST_OWNER` when the change would remove the last active owner. 403 when deactivating yourself.
+
+`POST /farms/:farmId/members/:membershipId/pin` — `pin.reset` (owner and manager). Body: `{ "pin" }`. Stores a new hash and revokes that person's sessions. The PIN is not in the response. A worker receives 403.
 
 `GET /farms/:farmId/audit` — `audit.read`. Query `limit` (1–100, default 20) and `offset` (0–1000, default 0).
 

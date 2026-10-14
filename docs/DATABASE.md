@@ -4,7 +4,7 @@ MySQL 8.4, `utf8mb4` / `utf8mb4_0900_ai_ci`, session time zone `+00:00`. Migrati
 
 ## 001 identity
 
-- `users` — email unique, lowercase in the application. `status` is `active` or `deactivated`. `platform_role` is `system_administrator` or null.
+- `users` — email unique when set, lowercase in the application, and null for a PIN-only person. `mobile` is unique when set (digits only). `pin_hash` uses the same scrypt format as `password_hash` and is never selected into an API response. `status` is `active` or `deactivated`. `platform_role` is `system_administrator` or null.
 - `roles`, `permissions`, `role_permissions` — seeded Phase 1 catalog. Fixed UUIDs `00000000-0000-4000-8000-000000000001` through `000000000006` for roles and `000000000101` through `000000000108` for permissions.
 - `sessions` — refresh token stored as SHA-256, `family_id` for reuse detection, `revoked_at`, `replaced_by`.
 - `password_reset_tokens` — table only. No reset endpoint until a delivery channel exists.

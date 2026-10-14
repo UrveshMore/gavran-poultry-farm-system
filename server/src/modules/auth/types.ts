@@ -2,7 +2,8 @@ import type { Locale } from '@gavran/shared';
 
 export type PublicUser = {
   id: string;
-  email: string;
+  email: string | null;
+  mobile: string | null;
   displayName: string;
   preferredLocale: Locale;
   platformRole: 'system_administrator' | null;
@@ -11,4 +12,7 @@ export type PublicUser = {
 
 export type AuthUser = PublicUser & { sessionId: string };
 
-export type UserRecord = PublicUser & { passwordHash: string };
+export type UserRecord = PublicUser & {
+  passwordHash: string | null;
+  pinHash: string | null;
+};

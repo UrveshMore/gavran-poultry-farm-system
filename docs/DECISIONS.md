@@ -7,7 +7,7 @@ Dated 2026-10-13. Technical choices below are provisional engineering defaults f
 | Id | Decision | Why |
 |---|---|---|
 | T1 | Monorepo npm workspaces: `@gavran/shared`, `@gavran/server`, `@gavran/client`. | One schema package for API and UI validation. |
-| T2 | MySQL 8.4 in Docker, host port 3307, app user `gavran`. Local passwords live in `docker-compose.yml` and `.env.example` and are not production secrets. | Avoids clashing with a host MySQL on 3306. |
+| T2 | MySQL 8.4 in Docker. The host port is `MYSQL_PORT` and `DB_PORT`. `.env.example` uses 3317. App user `gavran`. Local passwords live in `docker-compose.yml` and `.env.example` and are not production secrets. Automated tests and CI set `DB_PORT` to 3307. | 3317 avoids a host MySQL on 3306 and Cursor forwarding on 3307 on the owner's Windows PC. |
 | T3 | Browser auth uses httpOnly cookies `gavran_access` (JWT, 15 minutes) and `gavran_refresh` (14 days, rotated). CSRF is a non-httpOnly `gavran_csrf` cookie matched to `X-CSRF-Token`. Tokens are not returned as access or refresh fields in JSON. Locale may be stored in `localStorage` under `gavran.locale`. | Blueprint authentication note: do not store long-lived credentials in localStorage. |
 | T4 | Passwords use Node `scrypt` with N=16384, r=8, p=1, keyLen=64. Format `scrypt$N$r$p$salt$hash`. This is the Node interactive default and still needs a security review before production. | No extra password library. |
 | T5 | A user with zero memberships, or an existing owner, may create a farm and becomes its owner. Invited workers cannot create a farm. | Stops shadow farms without blocking the first owner. |
@@ -21,7 +21,7 @@ Dated 2026-10-13. Technical choices below are provisional engineering defaults f
 | T13 | `Idempotency-Key` (8–80 printable ASCII) is optional on farm create, shed create, and member invite. | Retries can replay the stored response. |
 | T14 | DDL is not wrapped in a transaction. A failed migration file can leave partial tables. Down scripts exist. | MySQL implicit commit on DDL. |
 | T15 | `LIMIT` and `OFFSET` are interpolated only after they are validated integers, because mysql2 prepared statements reject those placeholders. | Documented in the audit repository. |
-| T16 | The dev client is `http://127.0.0.1:4317` and proxies `/api` to `127.0.0.1:4318` so cookies stay same-origin. | Uncommon ports, away from 3000, 5173, and 8080. |
+| T16 | The dev client port is `CLIENT_PORT`. `.env.example` uses 5317 and proxies `/api` to `PORT` 5318 so cookies stay same-origin. | 5317 and 5318 stay off 3000, 5173, and 8080, and off 4317 and 4318, which Cursor already forwards on the owner's Windows PC. |
 | T17 | Canonical Git history remote is https://github.com/UrveshMore/gavran-poultry-farm-system on `main`. | Owner request, 2026-10-13. |
 | T18 | Bird types are names the farm types. Batch status is only `open` or `closed`. Movement types are opening, transfer, sale, mortality, culling, and other exit. A sale has no price field. | Decision 3 is still open, so no species catalog was seeded. |
 | T19 | Egg sorts are names the farm types. Fertile and table are optional labels the screen can create; they are not required rows. A collection may omit batch and shed. Counts are whole eggs. There is no price column. | Owner answer on 2026-10-13, decision 2. |
@@ -52,6 +52,7 @@ Dated 2026-10-13. Technical choices below are provisional engineering defaults f
 | T44 | Knowledge rows are one disease, medicine, or care note. Columns are use, signs, how the paper said to give it, when, and care. Photo slides store the name and say the amount was not on the page. Unreadable brooding temperatures are not stored. Old fragment rows, and approvals or medicine rows that pointed at them, were removed. | The PDF text layer dropped vowel signs. Doses are not invented. |
 | T45 | The farm home is ten tiles. Screens the role cannot open are hidden. Setup holds sheds, papers, saved count names, the spare-copy check, and the change list. A first visit starts a driver.js tour per role. Help replays it. Each screen's guide says what it is, where it is, why it is used, and how to use it. | A worker should not hunt through money screens. |
 | T46 | A yard note is `let_out`, `shut_in`, or `note`, with an optional clock time. No time is suggested. Workers may write one. It is not queued offline. | A backyard day starts and ends at the gate. Decision 10 stays open. |
+| T47 | A worker or manager may be added with a name, a mobile number of 10 to 15 digits, and a PIN of 4 to 6 digits. The PIN is stored with the same scrypt hash as a password and is never returned. Five failures in the sign-in window lock that number and that address. The owner and a manager may set a new PIN, which drops that person's sessions. The owner still signs in with a mail address and a long secret phrase. Creating the person needs `user.manage`. `pin.reset` is separate, so a manager can set a new PIN without inviting people. An existing mobile number is linked and its PIN is left as it was. | No numbering plan and no delivery channel were chosen. |
 
 ## Still open (blueprint section 18)
 

@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.29.0 — 2026-10-14
+
+Worker sign-in by mobile number, and ports from the environment.
+
+- The owner adds a worker with a name, a mobile number, and a PIN of four to six digits. The worker signs in with large buttons. The owner still uses a mail address and a long secret phrase.
+- The PIN is stored only as a hash. Five wrong tries lock that number until the window passes. The owner or a manager can set a new PIN. A worker cannot.
+- `CLIENT_PORT`, `PORT`, `MYSQL_PORT`, and `DB_PORT` come from `.env`. The sample is 5317, 5318, and 3317, because 4317, 4318, and 3307 are already forwarded on the owner's Windows PC. Tests still use database port 3307.
+
 ## 0.28.0 — 2026-10-14
 
 Farmer navigation, knowledge notes, and a guided tour.

@@ -24,11 +24,13 @@ describe('redaction', () => {
       redact({
         email: 'a@example.com',
         password: 'secret',
+        pin: '4821',
         nested: { refreshToken: 'abc', note: 'ok' },
       }),
     ).toEqual({
       email: 'a@example.com',
       password: '[redacted]',
+      pin: '[redacted]',
       nested: { refreshToken: '[redacted]', note: 'ok' },
     });
   });

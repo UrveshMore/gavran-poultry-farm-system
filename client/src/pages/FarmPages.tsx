@@ -7,6 +7,8 @@ import {
   WEIGHT_UNITS,
   farmInputSchema,
   inviteSchema,
+  pinPersonSchema,
+  pinResetSchema,
   shedInputSchema,
 } from '@gavran/shared';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -16,6 +18,7 @@ import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { z } from 'zod';
+import { PinPad } from '@/components/PinPad';
 import { Alert, Button, Card, Field, Input, TextArea } from '@/components/ui';
 import { ApiError, api, errorKey } from '@/lib/api';
 import type { AuditPage, FarmDetail, FarmSummary, Member, Shed } from '@/lib/types';
@@ -485,7 +488,12 @@ export function PeoplePage() {
           </Button>
         ) : null}
       </div>
-      {open ? <InviteForm farmId={farmId} onDone={() => { setOpen(false); void queryClient.invalidateQueries({ queryKey: ['members', farmId] }); }} /> : null}
+      {open ? (
+        <div className="grid gap-3">
+          <PinPersonForm farmId={farmId} onDone={() => { setOpen(false); void queryClient.invalidateQueries({ queryKey: ['members', farmId] }); }} />
+          <InviteForm farmId={farmId} onDone={() => { setOpen(false); void queryClient.invalidateQueries({ queryKey: ['members', farmId] }); }} />
+        </div>
+      ) : null}
       {members.data.length === 0 ? (
         <Card>
           <h2 className="font-display text-2xl">{t('people.emptyTitle')}</h2>
@@ -500,7 +508,7 @@ export function PeoplePage() {
                   <h2 className="font-display text-2xl">
                     {member.displayName} {member.userId === me.data?.id ? <span className="text-base text-ink-soft">({t('people.you')})</span> : null}
                   </h2>
-                  <p className="text-sm text-ink-soft">{member.email}</p>
+                  <p className="text-sm text-ink-soft">{member.mobile ?? member.email}</p>
                   <p className="text-sm font-semibold">
                     {t(`role.${member.role}`)}
                     {member.status === 'revoked' ? ` · ${t('people.revokedLabel')}` : ''}
@@ -511,6 +519,9 @@ export function PeoplePage() {
                   ) : null}
                 </div>
               </div>
+              {access?.permissions.includes('pin.reset') && member.mobile ? (
+                <PinResetForm farmId={farmId} membershipId={member.id} onDone={() => void queryClient.invalidateQueries({ queryKey: ['members', farmId] })} />
+              ) : null}
               {access?.permissions.includes('user.manage') ? (
                 <div className="mt-3 flex flex-wrap gap-2">
                   {member.status === 'active' ? (
@@ -559,8 +570,126 @@ export function PeoplePage() {
   );
 }
 
+function PinPersonForm({ farmId, onDone }: { farmId: string; onDone: () => void }) {
+  const { t } = useTranslation();
+  const [displayName, setDisplayName] = useState('');
+  const [mobile, setMobile] = useState('');
+  const [pin, setPin] = useState('');
+  const [role, setRole] = useState<'worker' | 'manager'>('worker');
+  const [notice, setNotice] = useState<string | null>(null);
+  const [fields, setFields] = useState<Record<string, string>>({});
+  const mutation = useMutation({
+    mutationFn: () => {
+      const parsed = pinPersonSchema.safeParse({ displayName, mobile, pin, role });
+      if (!parsed.success) {
+        const next: Record<string, string> = {};
+        for (const issue of parsed.error.issues) next[String(issue.path[0] ?? 'form')] = issue.message;
+        setFields(next);
+        return Promise.reject(new Error('invalid'));
+      }
+      setFields({});
+      return api<{ userCreated: boolean }>(`/api/v1/farms/${farmId}/members/pin`, { method: 'POST', json: parsed.data });
+    },
+    onSuccess: () => {
+      setNotice(t('people.pinSaved'));
+      onDone();
+    },
+    onError: (error) => applyFields(error, (name, err) => setFields((current) => ({ ...current, [name]: err.message }))),
+  });
+
+  return (
+    <Card>
+      <form
+        className="grid gap-3"
+        onSubmit={(event) => {
+          event.preventDefault();
+          mutation.mutate();
+        }}
+        noValidate
+      >
+        <h2 className="font-display text-2xl">{t('people.pinFormTitle')}</h2>
+        <Field id="person-pin-name" label={t('people.name')} error={text(t, fields.displayName)} hint={t('fieldHint.person-name')}>
+          <Input id="person-pin-name" value={displayName} onChange={(event) => setDisplayName(event.target.value)} placeholder={t('fieldPh.person-name')} />
+        </Field>
+        <Field id="person-mobile" label={t('people.mobile')} error={text(t, fields.mobile)} hint={t('fieldHint.person-mobile')}>
+          <Input id="person-mobile" type="tel" inputMode="numeric" autoComplete="tel" className="min-h-14 text-xl" value={mobile} onChange={(event) => setMobile(event.target.value)} placeholder={t('fieldPh.person-mobile')} />
+        </Field>
+        <div>
+          <p className="text-sm font-semibold">{t('people.pin')}</p>
+          <p className="text-sm text-ink-soft">{t('fieldHint.person-pin')}</p>
+          {fields.pin ? <p className="text-sm text-clay">{text(t, fields.pin)}</p> : null}
+        </div>
+        <PinPad value={pin} onChange={setPin} backLabel={t('auth.pinBack')} />
+        <Field id="person-pin-role" label={t('people.role')} hint={t('fieldHint.person-role')}>
+          <select id="person-pin-role" className="min-h-14 rounded-xl border border-line bg-white px-3 text-lg" value={role} onChange={(event) => setRole(event.target.value === 'manager' ? 'manager' : 'worker')}>
+            <option value="worker">{t('role.worker')}</option>
+            <option value="manager">{t('role.manager')}</option>
+          </select>
+        </Field>
+        {mutation.isError && !(mutation.error instanceof Error && mutation.error.message === 'invalid') ? <Alert>{explain(mutation.error, t)}</Alert> : null}
+        {notice ? <Alert tone="ok">{notice}</Alert> : null}
+        <Button type="submit" className="min-h-14" disabled={mutation.isPending}>
+          {mutation.isPending ? t('people.saving') : t('people.pinSave')}
+        </Button>
+      </form>
+    </Card>
+  );
+}
+
+function PinResetForm({ farmId, membershipId, onDone }: { farmId: string; membershipId: string; onDone: () => void }) {
+  const { t } = useTranslation();
+  const [open, setOpen] = useState(false);
+  const [pin, setPin] = useState('');
+  const [notice, setNotice] = useState<string | null>(null);
+  const mutation = useMutation({
+    mutationFn: () => {
+      const parsed = pinResetSchema.safeParse({ pin });
+      if (!parsed.success) return Promise.reject(new Error('invalid'));
+      return api(`/api/v1/farms/${farmId}/members/${membershipId}/pin`, { method: 'POST', json: parsed.data });
+    },
+    onSuccess: () => {
+      setNotice(t('people.pinResetSaved'));
+      setPin('');
+      setOpen(false);
+      onDone();
+    },
+  });
+  if (!open) {
+    return (
+      <div className="mt-3">
+        <Button type="button" variant="outline" className="min-h-14" onClick={() => setOpen(true)}>
+          {t('people.pinReset')}
+        </Button>
+        {notice ? <p className="mt-2 text-sm text-grove">{notice}</p> : null}
+      </div>
+    );
+  }
+  return (
+    <form
+      className="mt-3 grid gap-3"
+      onSubmit={(event) => {
+        event.preventDefault();
+        mutation.mutate();
+      }}
+    >
+      <p className="text-sm font-semibold">{t('people.pinReset')}</p>
+      <PinPad value={pin} onChange={setPin} backLabel={t('auth.pinBack')} />
+      {mutation.isError && !(mutation.error instanceof Error && mutation.error.message === 'invalid') ? <Alert>{explain(mutation.error, t)}</Alert> : null}
+      <div className="flex flex-wrap gap-2">
+        <Button type="submit" className="min-h-14" disabled={!pinResetSchema.safeParse({ pin }).success || mutation.isPending}>
+          {t('people.pinReset')}
+        </Button>
+        <Button type="button" variant="outline" className="min-h-14" onClick={() => setOpen(false)}>
+          {t('people.cancel')}
+        </Button>
+      </div>
+    </form>
+  );
+}
+
 function InviteForm({ farmId, onDone }: { farmId: string; onDone: () => void }) {
   const { t } = useTranslation();
+  const [showMail, setShowMail] = useState(false);
   const [notice, setNotice] = useState<string | null>(null);
   const form = useForm<z.infer<typeof inviteSchema>>({
     resolver: zodResolver(inviteSchema),
@@ -580,6 +709,13 @@ function InviteForm({ farmId, onDone }: { farmId: string; onDone: () => void }) 
     onError: (error) => applyFields(error, (name, err) => form.setError(name as 'email', err)),
   });
   const errors = form.formState.errors;
+  if (!showMail) {
+    return (
+      <Button type="button" variant="outline" className="min-h-14 justify-self-start" onClick={() => setShowMail(true)}>
+        {t('people.showMail')}
+      </Button>
+    );
+  }
   return (
     <Card>
       <form className="grid gap-3" onSubmit={form.handleSubmit((values) => mutation.mutate(values))} noValidate>
@@ -617,6 +753,9 @@ function InviteForm({ farmId, onDone }: { farmId: string; onDone: () => void }) 
         {notice ? <Alert tone="ok">{notice}</Alert> : null}
         <Button type="submit" disabled={mutation.isPending}>
           {mutation.isPending ? t('people.saving') : t('people.save')}
+        </Button>
+        <Button type="button" variant="ghost" onClick={() => setShowMail(false)}>
+          {t('people.hideMail')}
         </Button>
       </form>
     </Card>

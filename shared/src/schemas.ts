@@ -42,6 +42,35 @@ export const loginSchema = z.object({
   password: z.string().min(1, 'required').max(128, 'too_big'),
 });
 
+/** Digits only, 10 to 15. No country plan is assumed. Spaces and other marks are dropped. */
+export const mobileSchema = z
+  .string()
+  .trim()
+  .transform((value) => value.replace(/\D/g, ''))
+  .refine((value) => /^\d{10,15}$/.test(value), 'invalid_format');
+
+export const pinSchema = z.string().regex(/^\d{4,6}$/, 'invalid_format');
+
+export const pinLoginSchema = z.object({
+  mobile: mobileSchema,
+  pin: pinSchema,
+});
+
+export const pinPersonSchema = z.object({
+  displayName: displayNameSchema,
+  mobile: mobileSchema,
+  pin: pinSchema,
+  role: z.enum(['worker', 'manager']),
+});
+
+export const pinResetSchema = z.object({
+  pin: pinSchema,
+});
+
+export type PinLoginInput = z.infer<typeof pinLoginSchema>;
+export type PinPersonInput = z.infer<typeof pinPersonSchema>;
+export type PinResetInput = z.infer<typeof pinResetSchema>;
+
 export const changePasswordSchema = z
   .object({
     currentPassword: z.string().min(1, 'required').max(128, 'too_big'),

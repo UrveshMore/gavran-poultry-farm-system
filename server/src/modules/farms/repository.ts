@@ -461,7 +461,8 @@ export async function updateShed(db: Db, farmId: string, shedId: string, version
 export type MemberRecord = {
   id: string;
   userId: string;
-  email: string;
+  email: string | null;
+  mobile: string | null;
   displayName: string;
   role: FarmRole;
   status: 'active' | 'revoked';
@@ -474,7 +475,8 @@ export async function listMembers(db: Db, farmId: string): Promise<MemberRecord[
     RowDataPacket & {
       id: string;
       user_id: string;
-      email: string;
+      email: string | null;
+      mobile: string | null;
       display_name: string;
       role_code: string;
       status: 'active' | 'revoked';
@@ -483,7 +485,7 @@ export async function listMembers(db: Db, farmId: string): Promise<MemberRecord[
     }
   >(
     db,
-    `SELECT m.id, u.id AS user_id, u.email, u.display_name, u.status AS user_status,
+    `SELECT m.id, u.id AS user_id, u.email, u.mobile, u.display_name, u.status AS user_status,
             r.code AS role_code, m.status, p.code AS permission_code
      FROM farm_memberships m
      JOIN users u ON u.id = m.user_id
@@ -503,6 +505,7 @@ export async function listMembers(db: Db, farmId: string): Promise<MemberRecord[
         id: row.id,
         userId: row.user_id,
         email: row.email,
+        mobile: row.mobile,
         displayName: row.display_name,
         role: row.role_code,
         status: row.status,

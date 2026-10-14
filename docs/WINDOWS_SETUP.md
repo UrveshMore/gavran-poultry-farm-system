@@ -33,7 +33,17 @@ From the repository folder:
 copy .env.example .env
 ```
 
-Leave the values in `.env` as they are for this local copy. `DB_PORT` is `3307`. The app reads that file from the repository root.
+Leave the values in `.env` as they are for this local copy. The app reads that file from the repository root.
+
+| Name | Sample | What it is |
+|---|---|---|
+| `CLIENT_PORT` | `5317` | The program in the browser (Vite dev and preview). |
+| `PORT` | `5318` | The API. The browser program sends `/api` to this port. |
+| `MYSQL_PORT` | `3317` | The MySQL port Docker publishes on this computer. |
+| `DB_PORT` | `3317` | The MySQL port the API connects to. Keep it the same as `MYSQL_PORT`. |
+| `CORS_ORIGIN` | `http://127.0.0.1:5317` | The browser address the API accepts. |
+
+These are not 4317, 4318, or 3307. Cursor on this Windows PC already forwards those ports. Automated tests still set `DB_PORT` to 3307; that does not change this `.env`.
 
 `gavran_local` and `gavran_root_local` are development database passwords only. Replace `JWT_SECRET` before any shared deployment. It must be at least 32 characters.
 
@@ -51,7 +61,7 @@ Docker Desktop must already be running.
 docker compose up -d --wait
 ```
 
-That starts MySQL 8.4 and publishes it on port **3307**. The database name is `gavran`. The same command is `npm run db:up`.
+That starts MySQL 8.4 and publishes it on `MYSQL_PORT` (**3317** in the sample `.env`). The database name is `gavran`. The same command is `npm run db:up`.
 
 The first start can take a minute. When the command returns, MySQL is accepting connections.
 
@@ -67,23 +77,23 @@ You should see a list of applied migration files. Running it again later prints 
 
 Start the app first (the next step), then open:
 
-http://127.0.0.1:4317/register
+http://127.0.0.1:5317/register
 
-The page title is **Create the first owner**. It works only while the database has no users. Use your own email, your name, and a password of at least 10 characters. Nothing is emailed.
+The page title is **Create the first owner**. It works only while the database has no users. Use your own email, your name, and a password of at least 10 characters. Nothing is emailed. The owner keeps signing in with that email and password. On the sign-in screen, choose **I am the owner**.
 
-After that account exists, the register page closes. Add other people from the farm's People screen and share the temporary password yourself.
+After that account exists, the register page closes. On People, add a worker with a name, a mobile number, and a PIN of four to six digits. Tell them the PIN yourself. Nothing is sent. They sign in with the mobile number and the PIN, on large buttons. You or a manager can set a new PIN. A mail address is still there when a manager uses one.
 
 ## 8. Start the backend and the frontend
 
 Use two PowerShell windows. In both, `cd` to the repository folder.
 
-Backend (API on port 4318):
+Backend (API on `PORT`, sample 5318):
 
 ```powershell
 npm run dev -w @gavran/server
 ```
 
-Frontend (app on port 4317):
+Frontend (app on `CLIENT_PORT`, sample 5317):
 
 ```powershell
 npm run dev -w @gavran/client
@@ -95,9 +105,9 @@ Leave both windows open. One window can start both with `npm run dev`.
 
 Open this address in a browser:
 
-http://127.0.0.1:4317
+http://127.0.0.1:5317
 
-Sign in with the owner account from step 7. The API is at http://127.0.0.1:4318. The browser talks to it through the frontend, so you do not open the API address to use the farm screens.
+Sign in with the owner account from step 7, or with a worker's mobile number and PIN. The API is at http://127.0.0.1:5318. The browser talks to it through the frontend, so you do not open the API address to use the farm screens.
 
 ## Stop
 

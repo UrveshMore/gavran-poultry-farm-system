@@ -1,10 +1,15 @@
 import tailwindcss from '@tailwindcss/vite';
 import react from '@vitejs/plugin-react';
 import { fileURLToPath, URL } from 'node:url';
-import { defineConfig } from 'vite';
+import { defineConfig, loadEnv } from 'vite';
 import { VitePWA } from 'vite-plugin-pwa';
 
-export default defineConfig({
+export default defineConfig(({ mode }) => {
+  const root = fileURLToPath(new URL('..', import.meta.url));
+  const env = loadEnv(mode, root, '');
+  const clientPort = Number(env.CLIENT_PORT || 5317);
+  const apiPort = Number(env.PORT || 5318);
+  return {
   plugins: [
     react(),
     tailwindcss(),
@@ -44,10 +49,19 @@ export default defineConfig({
   },
   server: {
     host: '0.0.0.0',
-    port: 4317,
+    port: clientPort,
     strictPort: true,
     proxy: {
-      '/api': { target: 'http://127.0.0.1:4318', changeOrigin: true },
+      '/api': { target: `http://127.0.0.1:${apiPort}`, changeOrigin: true },
     },
   },
+  preview: {
+    host: '0.0.0.0',
+    port: clientPort,
+    strictPort: true,
+    proxy: {
+      '/api': { target: `http://127.0.0.1:${apiPort}`, changeOrigin: true },
+    },
+  },
+};
 });

@@ -8,9 +8,11 @@ import type { UserRecord } from './types.js';
 
 type UserRow = RowDataPacket & {
   id: string;
-  email: string;
+  email: string | null;
+  mobile: string | null;
   display_name: string;
-  password_hash: string;
+  password_hash: string | null;
+  pin_hash: string | null;
   status: 'active' | 'deactivated';
   preferred_locale: Locale;
   platform_role: 'system_administrator' | null;
@@ -20,15 +22,17 @@ function mapUser(row: UserRow): UserRecord {
   return {
     id: row.id,
     email: row.email,
+    mobile: row.mobile,
     displayName: row.display_name,
     passwordHash: row.password_hash,
+    pinHash: row.pin_hash,
     status: row.status,
     preferredLocale: row.preferred_locale,
     platformRole: row.platform_role,
   };
 }
 
-const USER_COLUMNS = `id, email, display_name, password_hash, status, preferred_locale, platform_role`;
+const USER_COLUMNS = `id, email, mobile, display_name, password_hash, pin_hash, status, preferred_locale, platform_role`;
 
 export async function lockUser(db: Db, userId: string): Promise<void> {
   await one(db, 'SELECT id FROM users WHERE id = ? FOR UPDATE', [userId]);
@@ -63,6 +67,31 @@ export async function insertUser(
 export async function findUserByEmail(db: Db, email: string): Promise<UserRecord | null> {
   const row = await one<UserRow>(db, `SELECT ${USER_COLUMNS} FROM users WHERE email = ?`, [email]);
   return row ? mapUser(row) : null;
+}
+
+export async function findUserByMobile(db: Db, mobile: string): Promise<UserRecord | null> {
+  const row = await one<UserRow>(db, `SELECT ${USER_COLUMNS} FROM users WHERE mobile = ?`, [mobile]);
+  return row ? mapUser(row) : null;
+}
+
+export async function insertPinUser(
+  db: Db,
+  input: { displayName: string; mobile: string; pinHash: string; preferredLocale: Locale },
+): Promise<UserRecord> {
+  const id = randomUUID();
+  await exec(
+    db,
+    `INSERT INTO users (id, email, display_name, password_hash, mobile, pin_hash, preferred_locale)
+     VALUES (?, NULL, ?, NULL, ?, ?, ?)`,
+    [id, input.displayName, input.mobile, input.pinHash, input.preferredLocale],
+  );
+  const created = await findUserById(db, id);
+  if (!created) throw new Error('User insert failed.');
+  return created;
+}
+
+export async function updatePinHash(db: Db, userId: string, pinHash: string): Promise<void> {
+  await exec(db, 'UPDATE users SET pin_hash = ? WHERE id = ?', [pinHash, userId]);
 }
 
 export async function findUserById(db: Db, id: string): Promise<UserRecord | null> {

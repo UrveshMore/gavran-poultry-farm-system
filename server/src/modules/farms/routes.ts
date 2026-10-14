@@ -9,10 +9,12 @@ import {
   createShed,
   getAudit,
   getFarm,
+  createPinMember,
   getMembers,
   getSheds,
   inviteMember,
   listMyFarms,
+  resetMemberPin,
   patchFarm,
   patchMember,
   patchShed,
@@ -116,6 +118,15 @@ farmRoutes.post(
   }),
 );
 
+farmRoutes.post(
+  '/:farmId/members/pin',
+  ...requireFarmPermission('user.manage'),
+  asyncHandler(async (req, res) => {
+    const result = await createPinMember(actor(req), currentFarm(req), req.body, idempotencyOf(req));
+    sendData(res, result.status, result.data, req.requestId);
+  }),
+);
+
 farmRoutes.patch(
   '/:farmId/members/:membershipId',
   ...requireFarmPermission('user.manage'),
@@ -123,6 +134,16 @@ farmRoutes.patch(
     const membershipId = req.params.membershipId;
     if (typeof membershipId !== 'string') return;
     sendData(res, 200, await patchMember(actor(req), currentFarm(req), membershipId, req.body), req.requestId);
+  }),
+);
+
+farmRoutes.post(
+  '/:farmId/members/:membershipId/pin',
+  ...requireFarmPermission('pin.reset'),
+  asyncHandler(async (req, res) => {
+    const membershipId = req.params.membershipId;
+    if (typeof membershipId !== 'string') return;
+    sendData(res, 200, await resetMemberPin(actor(req), currentFarm(req), membershipId, req.body), req.requestId);
   }),
 );
 

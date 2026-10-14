@@ -1,7 +1,7 @@
 # Architecture
 
 ```
-client (Vite, port 4317) -- /api proxy --> server (Express, port 4318) --> MySQL 8.4 (host 3307)
+client (Vite, CLIENT_PORT, example 5317) -- /api proxy --> server (Express, PORT, example 5318) --> MySQL 8.4 (DB_PORT / MYSQL_PORT, example 3317)
 shared (Zod schemas, permission catalog)
 ```
 
