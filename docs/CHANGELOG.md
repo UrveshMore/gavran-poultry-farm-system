@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.30.0 — 2026-10-14
+
+A local sample farm, and a home screen of today's numbers.
+
+- `npm run db:seed:demo` fills one farm with sample birds, eggs, machines, jobs, feed, money, and two workers. It will not run when `NODE_ENV` is `production`. The demo owner password is short only for that one account.
+- The home screen shows live birds, roosters and hens, flock age in days, eggs, jobs, and vaccine or medicine days the owner set. A bell and a coloured strip show late jobs, low feed, and due care. Hatch day stays "not set". Writing the medicine for that same page marks the open job done.
+- Every list a person may add to has a large add button in the header. An empty list shows the same button inside the empty card.
+
 ## 0.29.0 — 2026-10-14
 
 Worker sign-in by mobile number, and ports from the environment.

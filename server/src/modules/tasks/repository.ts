@@ -258,6 +258,31 @@ export async function findTask(db: Db, farmId: string, taskId: string, assigneeU
   return task ?? null;
 }
 
+export async function completeOpenCareTasks(
+  db: Db,
+  input: { farmId: string; userId: string; sourceFile: string; sourcePage: number; batchId: string | null; note: string },
+): Promise<number> {
+  const rows = await many<RowDataPacket & { id: string }>(
+    db,
+    `SELECT t.id
+     FROM tasks t
+     JOIN audit_logs a ON a.farm_id = t.farm_id AND a.entity_type = 'task' AND a.entity_id = t.id AND a.action = 'health.vaccine_task_created'
+     WHERE t.farm_id = ? AND t.status = 'open'
+       AND JSON_UNQUOTE(JSON_EXTRACT(a.summary, '$.sourceFile')) = ?
+       AND CAST(JSON_UNQUOTE(JSON_EXTRACT(a.summary, '$.sourcePage')) AS UNSIGNED) = ?
+       AND (
+         (? IS NULL AND JSON_EXTRACT(a.summary, '$.batchId') IS NULL)
+         OR (? IS NOT NULL AND (JSON_EXTRACT(a.summary, '$.batchId') IS NULL OR JSON_UNQUOTE(JSON_EXTRACT(a.summary, '$.batchId')) = ?))
+       )`,
+    [input.farmId, input.sourceFile, input.sourcePage, input.batchId, input.batchId, input.batchId],
+  );
+  let done = 0;
+  for (const row of rows) {
+    if (await completeTask(db, input.farmId, row.id, input.note, input.userId)) done += 1;
+  }
+  return done;
+}
+
 export async function completeTask(db: Db, farmId: string, taskId: string, note: string | null, userId: string): Promise<boolean> {
   const result = await exec(
     db,

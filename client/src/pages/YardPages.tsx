@@ -5,6 +5,7 @@ import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
 import { z } from 'zod';
+import { JumpAdd } from '@/components/JumpAdd';
 import { Alert, Button, Card, Field, Input, TextArea } from '@/components/ui';
 import { ApiError, api, errorKey } from '@/lib/api';
 import { localToday } from '@/lib/today';
@@ -47,20 +48,24 @@ export function YardPageView() {
     },
   });
 
-  if (yard.isLoading) return <p>{t('common.loading')}</p>;
+  if (yard.isLoading || farms.isLoading) return <p>{t('common.loading')}</p>;
   if (yard.isError || !yard.data) return <Alert>{explain(yard.error, t)}</Alert>;
 
   return (
     <div className="grid gap-4">
-      <div>
-        <h1 data-tour="screen-title" className="font-display text-3xl font-semibold">{t('yard.title')}</h1>
-        <p data-tour="screen-body" className="mt-1 text-ink-soft">{t('yard.body')}</p>
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <div>
+          <h1 data-tour="screen-title" className="font-display text-3xl font-semibold">{t('yard.title')}</h1>
+          <p data-tour="screen-body" className="mt-1 text-ink-soft">{t('yard.body')}</p>
+        </div>
+        {canRecord ? <JumpAdd add="yard" target="create-yard">{t('yard.add')}</JumpAdd> : null}
       </div>
       <p className="rounded-xl bg-gold/30 px-3 py-2 text-sm">{t('yard.noClock')}</p>
       {yard.data.notes.length === 0 ? (
         <Card>
           <h2 className="font-display text-2xl">{t('yard.emptyTitle')}</h2>
           <p className="text-ink-soft">{t('yard.emptyBody')}</p>
+          {canRecord ? <JumpAdd add="yard" target="create-yard">{t('yard.add')}</JumpAdd> : null}
         </Card>
       ) : (
         yard.data.notes.map((note) => (
@@ -75,6 +80,7 @@ export function YardPageView() {
       )}
       {canRecord ? (
         <Card>
+          <div id="create-yard" />
           <form className="grid gap-3" onSubmit={form.handleSubmit((values) => mutation.mutate(values))} noValidate>
             <h2 data-tour="screen-action" className="font-display text-2xl">{t('yard.add')}</h2>
             <Field id="yard-date" label={t('yard.date')} hint={t('fieldHint.yard-date')} error={text(t, form.formState.errors.notedOn?.message)}>

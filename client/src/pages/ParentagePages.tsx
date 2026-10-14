@@ -5,6 +5,7 @@ import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
 import { z } from 'zod';
+import { JumpAdd } from '@/components/JumpAdd';
 import { Alert, Button, Card, Field, Input, TextArea } from '@/components/ui';
 import { ApiError, api, errorKey } from '@/lib/api';
 import type { Batch, FarmSummary, ParentagePage } from '@/lib/types';
@@ -43,20 +44,24 @@ export function ParentagePageView() {
     },
   });
 
-  if (page.isLoading) return <p>{t('common.loading')}</p>;
+  if (page.isLoading || farms.isLoading) return <p>{t('common.loading')}</p>;
   if (page.isError || !page.data) return <Alert>{explain(page.error, t)}</Alert>;
 
   return (
     <div className="grid gap-4">
-      <div>
-        <h1 className="font-display text-3xl font-semibold">{t('parentage.title')}</h1>
-        <p className="mt-1 text-ink-soft">{t('parentage.body')}</p>
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <div>
+          <h1 className="font-display text-3xl font-semibold">{t('parentage.title')}</h1>
+          <p className="mt-1 text-ink-soft">{t('parentage.body')}</p>
+        </div>
+        {canRecord ? <JumpAdd add="parentage" target="create-parentage">{t('parentage.add')}</JumpAdd> : null}
       </div>
       <p className="rounded-xl bg-gold/30 px-3 py-2 text-sm">{t('parentage.noRule')}</p>
       {page.data.records.length === 0 ? (
         <Card>
           <h2 className="font-display text-2xl">{t('parentage.emptyTitle')}</h2>
           <p className="text-ink-soft">{t('parentage.emptyBody')}</p>
+          {canRecord ? <JumpAdd add="parentage" target="create-parentage">{t('parentage.add')}</JumpAdd> : null}
         </Card>
       ) : (
         page.data.records.map((row) => (
@@ -71,6 +76,7 @@ export function ParentagePageView() {
       )}
       {canRecord ? (
         <Card>
+          <div id="create-parentage" />
           <form className="grid gap-3" onSubmit={form.handleSubmit((values) => mutation.mutate(values))}>
             <h2 className="font-display text-2xl">{t('parentage.add')}</h2>
             <Field id="par-date" label={t('parentage.date')} hint={t('fieldHint.par-date')}>

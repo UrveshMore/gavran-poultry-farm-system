@@ -12,6 +12,7 @@ import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
 import { z } from 'zod';
+import { JumpAdd } from '@/components/JumpAdd';
 import { Alert, Button, Card, Field, Input, TextArea } from '@/components/ui';
 import { ApiError, api, errorKey } from '@/lib/api';
 import type { Batch, BirdType, FarmSummary, GrowthTarget, Shed, StockItem, StockMovement, WaterRecord, Weighing } from '@/lib/types';
@@ -59,7 +60,7 @@ export function StockPage() {
   const canManage = Boolean(access?.permissions.includes('stock.manage'));
   const canRecord = Boolean(access?.permissions.includes('stock.record'));
 
-  if (items.isLoading || movements.isLoading || water.isLoading || targets.isLoading || weighings.isLoading) return <p>{t('common.loading')}</p>;
+  if (items.isLoading || movements.isLoading || water.isLoading || targets.isLoading || weighings.isLoading || farms.isLoading) return <p>{t('common.loading')}</p>;
   if (items.isError || !items.data) return <Alert>{explain(items.error, t)}</Alert>;
   if (movements.isError || !movements.data) return <Alert>{explain(movements.error, t)}</Alert>;
   if (water.isError || !water.data) return <Alert>{explain(water.error, t)}</Alert>;
@@ -68,9 +69,12 @@ export function StockPage() {
 
   return (
     <div className="grid gap-6">
-      <div>
-        <h1 className="font-display text-3xl font-semibold">{t('stock.title')}</h1>
-        <p className="mt-1 text-ink-soft">{t('stock.body')}</p>
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <div>
+          <h1 className="font-display text-3xl font-semibold">{t('stock.title')}</h1>
+          <p className="mt-1 text-ink-soft">{t('stock.body')}</p>
+        </div>
+        {canManage ? <JumpAdd add="stock" target="create-stock">{t('stock.addItem')}</JumpAdd> : null}
       </div>
       <p className="rounded-xl bg-gold/30 px-3 py-2 text-sm">{t('stock.noValue')}</p>
       <section className="grid gap-3">
@@ -169,6 +173,7 @@ function ItemForm({ farmId }: { farmId: string }) {
   });
   return (
     <Card>
+      <div id="create-stock" />
       <form
         className="grid gap-3"
         onSubmit={form.handleSubmit((values) => mutation.mutate({ ...values, reorderLevel: numberOrNull(form.getValues('reorderLevel')) }))}

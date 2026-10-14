@@ -30,6 +30,7 @@ import {
 import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { Link, Navigate, useParams } from 'react-router-dom';
+import { DashboardCards, type DashboardData } from '@/components/DashboardCards';
 import { HomeTour, startHomeTour } from '@/components/Tour';
 import { Alert, Card } from '@/components/ui';
 import { api } from '@/lib/api';
@@ -101,12 +102,19 @@ export function FarmHomePage() {
   const { t } = useTranslation();
   const farms = useQuery({ queryKey: ['farms'], queryFn: () => api<FarmSummary[]>('/api/v1/farms') });
   const farm = farms.data?.find((item) => item.id === farmId);
+  const board = useQuery({
+    queryKey: ['dashboard', farmId],
+    queryFn: () => api<DashboardData>(`/api/v1/farms/${farmId}/dashboard`),
+    enabled: Boolean(farmId),
+  });
   if (farms.isLoading) return <p>{t('common.loading')}</p>;
   if (!farm) return <Alert>{t('farm.notFound')}</Alert>;
   const groups = visibleGroups(farm.permissions);
   return (
     <div className="grid gap-4">
       <HomeTour role={farm.role} />
+      {board.data ? <DashboardCards farmId={farmId} data={board.data} /> : null}
+      {board.isError ? <Alert>{t('common.errorGeneric')}</Alert> : null}
       <div className="flex items-start justify-between gap-3">
         <div>
           <h1 className="font-display text-3xl font-semibold">{farm.name}</h1>

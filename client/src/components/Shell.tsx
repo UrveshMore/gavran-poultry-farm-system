@@ -1,4 +1,5 @@
 import {
+  Bell,
   Bird,
   CircleHelp,
   ClipboardList,
@@ -16,6 +17,8 @@ import {
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom';
+import { alertCount, type DashboardData } from '@/components/DashboardCards';
+import { PageExplain } from '@/components/Tour';
 import { api } from '@/lib/api';
 import { useQuery } from '@tanstack/react-query';
 import { useQueryClient } from '@tanstack/react-query';
@@ -50,6 +53,12 @@ export function AppShell() {
   const farmId = farmMatch && farmMatch[1] !== 'new' ? farmMatch[1] : undefined;
   const farms = useQuery({ queryKey: ['farms'], queryFn: () => api<FarmSummary[]>('/api/v1/farms'), enabled: Boolean(farmId) });
   const farm = farms.data?.find((item) => item.id === farmId);
+  const board = useQuery({
+    queryKey: ['dashboard', farmId],
+    queryFn: () => api<DashboardData>(`/api/v1/farms/${farmId}/dashboard`),
+    enabled: Boolean(farmId && farm),
+  });
+  const alerts = alertCount(board.data?.alerts ?? []);
   const groups = farm ? visibleGroups(farm.permissions) : [];
 
   useEffect(() => {
@@ -115,6 +124,14 @@ export function AppShell() {
         <header className="sticky top-0 z-20 flex items-center justify-between gap-3 border-b border-line bg-paper/95 px-4 py-3 backdrop-blur">
           <Brand compact />
           <div className="flex items-center gap-2">
+            {farmId ? (
+              <NavLink to={`/farms/${farmId}#alerts`} className="relative inline-flex min-h-11 min-w-11 items-center justify-center rounded-xl hover:bg-paper-deep" aria-label={t('alerts.bell')}>
+                <Bell aria-hidden="true" size={20} />
+                {alerts > 0 ? (
+                  <span className="absolute right-1 top-1 min-w-5 rounded-full bg-clay px-1 text-center text-xs font-semibold text-ink">{alerts}</span>
+                ) : null}
+              </NavLink>
+            ) : null}
             <InstallPrompt />
             <LanguageSwitcher />
             <NavLink to="/account" className="min-h-11 rounded-xl px-3 py-2 text-sm font-semibold hover:bg-paper-deep">
@@ -132,6 +149,7 @@ export function AppShell() {
           </p>
         ) : null}
         <main id="content" className="mx-auto grid w-full max-w-3xl gap-4 px-4 pb-28 pt-5 md:max-w-5xl md:pb-10">
+          {farmId ? <PageExplain /> : null}
           <Outlet />
         </main>
       </div>

@@ -23,6 +23,7 @@
     "db:migrate": "npm run migrate -w @gavran/server",
     "db:rollback": "npm run rollback -w @gavran/server",
     "db:seed": "SEED_DEV=true npm run seed -w @gavran/server",
+    "db:seed:demo": "npm run seed:demo -w @gavran/server",
     "check": "npm run typecheck && npm run lint && npm test && npm run build"
   },
   "devDependencies": {

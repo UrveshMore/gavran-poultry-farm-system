@@ -47,7 +47,7 @@ export function EggsPage() {
   const canRecord = Boolean(access?.permissions.includes('egg.record'));
   const active = (categories.data ?? []).filter((item) => item.status === 'active');
 
-  if (categories.isLoading || collections.isLoading) return <p>{t('common.loading')}</p>;
+  if (categories.isLoading || collections.isLoading || farms.isLoading) return <p>{t('common.loading')}</p>;
   if (categories.isError || !categories.data) return <Alert>{explain(categories.error, t)}</Alert>;
   if (collections.isError || !collections.data) return <Alert>{explain(collections.error, t)}</Alert>;
 
@@ -60,7 +60,7 @@ export function EggsPage() {
           <ScreenTour screen="eggs" />
         </div>
         {canRecord && active.length > 0 ? (
-          <Button data-tour="screen-action" type="button" variant="outline" onClick={() => setOpen((value) => !value)}>
+          <Button data-tour="screen-action" data-add="eggs" type="button" className="min-h-14" onClick={() => setOpen((value) => !value)}>
             {open ? t('eggs.hideForm') : t('eggs.record')}
           </Button>
         ) : null}
@@ -93,6 +93,11 @@ export function EggsPage() {
         <Card>
           <h2 className="font-display text-2xl">{t('eggs.emptyCollections')}</h2>
           <p className="text-ink-soft">{t('eggs.emptyCollectionsBody')}</p>
+          {canRecord && active.length > 0 ? (
+            <Button type="button" className="mt-3 min-h-14" data-add="eggs" onClick={() => setOpen(true)}>
+              {t('eggs.record')}
+            </Button>
+          ) : null}
         </Card>
       ) : (
         <div className="grid gap-3">

@@ -37,7 +37,7 @@ export function IncubationPage() {
   const access = farms.data?.find((farm) => farm.id === farmId);
   const sittings = useQuery({ queryKey: ['incubation', farmId], queryFn: () => api<Sitting[]>(`/api/v1/farms/${farmId}/incubation`) });
   const canRecord = Boolean(access?.permissions.includes('incubation.record'));
-  if (sittings.isLoading) return <p>{t('common.loading')}</p>;
+  if (sittings.isLoading || farms.isLoading) return <p>{t('common.loading')}</p>;
   if (sittings.isError || !sittings.data) return <Alert>{explain(sittings.error, t)}</Alert>;
   return (
     <div className="grid gap-4">
@@ -47,7 +47,7 @@ export function IncubationPage() {
           <p className="mt-1 text-ink-soft">{t('incubation.body')}</p>
         </div>
         {canRecord ? (
-          <Button type="button" variant="outline" onClick={() => setOpen((value) => !value)}>
+          <Button type="button" className="min-h-14" data-add="incubation" onClick={() => setOpen((value) => !value)}>
             {open ? t('incubation.hideForm') : t('incubation.add')}
           </Button>
         ) : null}
@@ -66,6 +66,11 @@ export function IncubationPage() {
         <Card>
           <h2 className="font-display text-2xl">{t('incubation.emptyTitle')}</h2>
           <p className="text-ink-soft">{t('incubation.emptyBody')}</p>
+          {canRecord ? (
+            <Button type="button" className="mt-3 min-h-14" data-add="incubation" onClick={() => setOpen(true)}>
+              {t('incubation.add')}
+            </Button>
+          ) : null}
         </Card>
       ) : (
         <div className="grid gap-3">

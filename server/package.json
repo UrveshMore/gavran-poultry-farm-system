@@ -12,6 +12,7 @@
     "migrate": "tsx src/cli.ts migrate",
     "rollback": "tsx src/cli.ts rollback",
     "seed": "tsx src/cli.ts seed",
+    "seed:demo": "tsx src/cli.ts seed-demo",
     "restore-drill": "tsx src/cli.ts restore-drill"
   },
   "dependencies": {

@@ -5,6 +5,7 @@ import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
 import { z } from 'zod';
+import { JumpAdd } from '@/components/JumpAdd';
 import { Alert, Button, Card, Field, Input, TextArea } from '@/components/ui';
 import { ApiError, api, errorKey } from '@/lib/api';
 import type { FarmSummary, SupplierPage } from '@/lib/types';
@@ -78,7 +79,7 @@ export function SuppliersPage() {
     onSuccess: () => { payForm.reset({ supplierId: '', paidOn: localToday(), amount: 0, unitLabel: '', referenceNote: '', notes: '' }); refresh(); },
   });
 
-  if (page.isLoading) return <p>{t('common.loading')}</p>;
+  if (page.isLoading || farms.isLoading) return <p>{t('common.loading')}</p>;
   if (page.isError || !page.data) return <Alert>{explain(page.error, t)}</Alert>;
   const data = page.data;
   const options = data.suppliers.map((supplier) => (
@@ -87,15 +88,19 @@ export function SuppliersPage() {
 
   return (
     <div className="grid gap-4">
-      <div>
-        <h1 className="font-display text-3xl font-semibold">{t('suppliers.title')}</h1>
-        <p className="mt-1 text-ink-soft">{t('suppliers.body')}</p>
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <div>
+          <h1 className="font-display text-3xl font-semibold">{t('suppliers.title')}</h1>
+          <p className="mt-1 text-ink-soft">{t('suppliers.body')}</p>
+        </div>
+        {canRecord ? <JumpAdd add="suppliers" target="create-suppliers">{t('suppliers.add')}</JumpAdd> : null}
       </div>
       <p className="rounded-xl bg-gold/30 px-3 py-2 text-sm">{t('suppliers.noStock')}</p>
       {data.suppliers.length === 0 ? (
         <Card>
           <h2 className="font-display text-2xl">{t('suppliers.emptyTitle')}</h2>
           <p className="text-ink-soft">{t('suppliers.emptyBody')}</p>
+          {canRecord ? <JumpAdd add="suppliers" target="create-suppliers">{t('suppliers.add')}</JumpAdd> : null}
         </Card>
       ) : (
         data.suppliers.map((supplier) => (
@@ -133,6 +138,7 @@ export function SuppliersPage() {
       {canRecord ? (
         <>
           <Card>
+            <div id="create-suppliers" />
             <form className="grid gap-3" onSubmit={supplierForm.handleSubmit((values) => saveSupplier.mutate(values))}>
               <h2 className="font-display text-2xl">{t('suppliers.add')}</h2>
               <Field id="sup-name" label={t('suppliers.name')} hint={t('fieldHint.sup-name')}><Input id="sup-name" {...supplierForm.register('name')}  placeholder={t('fieldPh.sup-name')}/></Field>

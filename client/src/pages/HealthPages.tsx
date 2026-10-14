@@ -7,6 +7,7 @@ import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
 import { z } from 'zod';
 import { ScreenTour } from '@/components/Tour';
+import { JumpAdd } from '@/components/JumpAdd';
 import { Alert, Button, Card, Field, Input, TextArea } from '@/components/ui';
 import { ApiError, api, errorKey } from '@/lib/api';
 import type { BiosecurityStep, FarmSummary, HealthObservation, KnowledgeEntry, MedicineRecord } from '@/lib/types';
@@ -67,17 +68,20 @@ export function HealthPage() {
   const canRecord = Boolean(access?.permissions.includes('health.record'));
   const canTreat = Boolean(access?.permissions.includes('health.treat'));
 
-  if (entries.isLoading || observations.isLoading || medicines.isLoading || steps.isLoading) return <p>{t('common.loading')}</p>;
+  if (entries.isLoading || observations.isLoading || medicines.isLoading || steps.isLoading || farms.isLoading) return <p>{t('common.loading')}</p>;
   if (entries.isError || !entries.data) return <Alert>{explain(entries.error, t)}</Alert>;
   const current = entries.data.find((entry) => entry.id === selected) ?? null;
   const approved = entries.data.filter((entry) => entry.approved);
 
   return (
     <div className="grid gap-6">
-      <div>
-        <h1 data-tour="screen-title" className="font-display text-3xl font-semibold">{t('health.title')}</h1>
-        <p data-tour="screen-body" className="mt-1 text-ink-soft">{t('health.body')}</p>
-        <ScreenTour screen="health" />
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <div>
+          <h1 data-tour="screen-title" className="font-display text-3xl font-semibold">{t('health.title')}</h1>
+          <p data-tour="screen-body" className="mt-1 text-ink-soft">{t('health.body')}</p>
+          <ScreenTour screen="health" />
+        </div>
+        {canRecord ? <JumpAdd add="health" target="create-health">{t('health.saveObservation')}</JumpAdd> : null}
       </div>
       <p className="rounded-xl bg-gold/30 px-3 py-2 text-sm">{t('health.verify')}</p>
       <section className="grid gap-3">
@@ -216,6 +220,7 @@ function ObservationForm({ farmId, entries }: { farmId: string; entries: Knowled
   });
   return (
     <Card>
+      <div id="create-health" />
       <form className="grid gap-3" onSubmit={form.handleSubmit((values) => mutation.mutate(values))}>
         <Field id="obs-date" label={t('health.date')} hint={t('fieldHint.obs-date')}>
           <Input id="obs-date" type="date" {...form.register('observedOn')} />
@@ -253,6 +258,8 @@ function MedicineForm({ farmId, entries }: { farmId: string; entries: KnowledgeE
     onSuccess: () => {
       form.reset();
       void queryClient.invalidateQueries({ queryKey: ['medicine-records', farmId] });
+      void queryClient.invalidateQueries({ queryKey: ['tasks', farmId] });
+      void queryClient.invalidateQueries({ queryKey: ['dashboard', farmId] });
     },
   });
   return (

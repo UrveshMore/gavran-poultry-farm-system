@@ -46,7 +46,7 @@ export function BatchesPage() {
   const sheds = useQuery({ queryKey: ['sheds', farmId], queryFn: () => api<Shed[]>(`/api/v1/farms/${farmId}/sheds`) });
   const canCreate = Boolean(access?.permissions.includes('batch.create'));
 
-  if (batches.isLoading || types.isLoading) return <p>{t('common.loading')}</p>;
+  if (batches.isLoading || types.isLoading || farms.isLoading) return <p>{t('common.loading')}</p>;
   if (batches.isError || !batches.data) return <Alert>{explain(batches.error, t)}</Alert>;
 
   return (
@@ -58,7 +58,7 @@ export function BatchesPage() {
           <ScreenTour screen="batches" />
         </div>
         {canCreate ? (
-          <Button data-tour="screen-action" type="button" variant="outline" onClick={() => setOpen((value) => !value)}>
+          <Button data-tour="screen-action" data-add="batches" type="button" className="min-h-14" onClick={() => setOpen((value) => !value)}>
             {open ? t('batches.hideForm') : t('batches.add')}
           </Button>
         ) : null}
@@ -80,6 +80,11 @@ export function BatchesPage() {
         <Card>
           <h2 className="font-display text-2xl">{t('batches.emptyTitle')}</h2>
           <p className="text-ink-soft">{t('batches.emptyBody')}</p>
+          {canCreate ? (
+            <Button type="button" className="mt-3 min-h-14" data-add="batches" onClick={() => setOpen(true)}>
+              {t('batches.add')}
+            </Button>
+          ) : null}
         </Card>
       ) : (
         <div className="grid gap-3">

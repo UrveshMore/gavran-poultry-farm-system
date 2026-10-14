@@ -6,6 +6,7 @@ import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
 import { z } from 'zod';
+import { JumpAdd } from '@/components/JumpAdd';
 import { Alert, Button, Card, Field, Input, TextArea } from '@/components/ui';
 import { ApiError, api, errorKey } from '@/lib/api';
 import { localToday } from '@/lib/today';
@@ -82,15 +83,19 @@ export function SchedulesPage() {
 
   return (
     <div className="grid gap-4">
-      <div>
-        <h1 className="font-display text-3xl font-semibold">{t('schedules.title')}</h1>
-        <p className="mt-1 text-ink-soft">{t('schedules.body')}</p>
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <div>
+          <h1 className="font-display text-3xl font-semibold">{t('schedules.title')}</h1>
+          <p className="mt-1 text-ink-soft">{t('schedules.body')}</p>
+        </div>
+        <JumpAdd add="schedules" target="create-schedules">{t('schedules.add')}</JumpAdd>
       </div>
       <p className="rounded-xl bg-gold/30 px-3 py-2 text-sm">{t('schedules.notSent')}</p>
       {page.data.schedules.length === 0 ? (
         <Card>
           <h2 className="font-display text-2xl">{t('schedules.emptyTitle')}</h2>
           <p className="text-ink-soft">{t('schedules.emptyBody')}</p>
+          <JumpAdd add="schedules" target="create-schedules">{t('schedules.add')}</JumpAdd>
         </Card>
       ) : (
         page.data.schedules.map((schedule) => (
@@ -103,6 +108,7 @@ export function SchedulesPage() {
         ))
       )}
       <Card>
+        <div id="create-schedules" />
         <form className="grid gap-3" onSubmit={form.handleSubmit((values) => save.mutate(values))}>
           <h2 className="font-display text-2xl">{t('schedules.add')}</h2>
           <Field id="sch-name" label={t('schedules.name')} hint={t('fieldHint.sch-name')}>

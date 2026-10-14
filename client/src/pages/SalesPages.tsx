@@ -5,6 +5,7 @@ import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
 import { z } from 'zod';
+import { JumpAdd } from '@/components/JumpAdd';
 import { Alert, Button, Card, Field, Input, TextArea } from '@/components/ui';
 import { ApiError, api, errorKey } from '@/lib/api';
 import type { Customer, FarmOrder, FarmSummary, MarketPrice, OrdersPage } from '@/lib/types';
@@ -39,16 +40,19 @@ export function SalesPage() {
   const customers = useQuery({ queryKey: ['customers', farmId], queryFn: () => api<Customer[]>(`/api/v1/farms/${farmId}/customers`) });
   const orders = useQuery({ queryKey: ['orders', farmId], queryFn: () => api<OrdersPage>(`/api/v1/farms/${farmId}/orders`) });
 
-  if (prices.isLoading || customers.isLoading || orders.isLoading) return <p>{t('common.loading')}</p>;
+  if (prices.isLoading || customers.isLoading || orders.isLoading || farms.isLoading) return <p>{t('common.loading')}</p>;
   if (prices.isError || customers.isError || orders.isError || !prices.data || !customers.data || !orders.data) {
     return <Alert>{explain(prices.error ?? customers.error ?? orders.error, t)}</Alert>;
   }
 
   return (
     <div className="grid gap-4">
-      <div>
-        <h1 className="font-display text-3xl font-semibold">{t('sales.title')}</h1>
-        <p className="mt-1 text-ink-soft">{t('sales.body')}</p>
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <div>
+          <h1 className="font-display text-3xl font-semibold">{t('sales.title')}</h1>
+          <p className="mt-1 text-ink-soft">{t('sales.body')}</p>
+        </div>
+        {canRecord ? <JumpAdd add="sales" target="create-sales">{t('sales.savePrice')}</JumpAdd> : null}
       </div>
       <p className="rounded-xl bg-gold/30 px-3 py-2 text-sm" role="status">
         {t('sales.invoiceOff')}
@@ -100,6 +104,7 @@ function PriceList({ prices, canRecord, farmId, onSaved }: { prices: MarketPrice
       )}
       {canRecord ? (
         <Card>
+          <div id="create-sales" />
           <form className="grid gap-3" onSubmit={form.handleSubmit((values) => mutation.mutate({ ...values, amount: Number(values.amount) }))}>
             <h3 className="font-display text-xl">{t('sales.savePrice')}</h3>
             <Field id="price-item" label={t('sales.item')} error={text(t, form.formState.errors.itemName?.message)} hint={t('fieldHint.price-item')}>

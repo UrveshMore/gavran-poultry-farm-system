@@ -5,6 +5,7 @@ import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
 import { z } from 'zod';
+import { JumpAdd } from '@/components/JumpAdd';
 import { Alert, Button, Card, Field, Input, TextArea } from '@/components/ui';
 import { ApiError, api, errorKey } from '@/lib/api';
 import type { Batch, ExpenseEntry, ExpensesPageData, FarmSummary } from '@/lib/types';
@@ -39,14 +40,17 @@ export function ExpensesPage() {
   const batches = useQuery({ queryKey: ['batches', farmId], queryFn: () => api<Batch[]>(`/api/v1/farms/${farmId}/batches`) });
   const refresh = () => void queryClient.invalidateQueries({ queryKey: ['expenses', farmId] });
 
-  if (page.isLoading) return <p>{t('common.loading')}</p>;
+  if (page.isLoading || farms.isLoading) return <p>{t('common.loading')}</p>;
   if (page.isError || !page.data) return <Alert>{explain(page.error, t)}</Alert>;
 
   return (
     <div className="grid gap-4">
-      <div>
-        <h1 className="font-display text-3xl font-semibold">{t('expenses.title')}</h1>
-        <p className="mt-1 text-ink-soft">{t('expenses.body')}</p>
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <div>
+          <h1 className="font-display text-3xl font-semibold">{t('expenses.title')}</h1>
+          <p className="mt-1 text-ink-soft">{t('expenses.body')}</p>
+        </div>
+        {canRecord ? <JumpAdd add="expenses" target="create-expenses">{t('expenses.saveCategory')}</JumpAdd> : null}
       </div>
       <p className="rounded-xl bg-gold/30 px-3 py-2 text-sm" role="status">
         {t('expenses.noBasis')}
@@ -97,6 +101,7 @@ function CategoryBlock({
       )}
       {canRecord ? (
         <Card>
+          <div id="create-expenses" />
           <form className="grid gap-3" onSubmit={form.handleSubmit((values) => mutation.mutate(values))}>
             <Field id="expense-category" label={t('expenses.category')} error={text(t, form.formState.errors.name?.message)} hint={t('fieldHint.expense-category')}>
               <Input id="expense-category" {...form.register('name')}  placeholder={t('fieldPh.expense-category')}/>

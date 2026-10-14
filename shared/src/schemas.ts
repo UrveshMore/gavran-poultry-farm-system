@@ -603,7 +603,8 @@ export const medicineRecordSchema = z.object({
 
 export const vaccineTaskSchema = z.object({
   dueOn: calendarDateSchema,
-  assigneeUserId: z.union([z.string().uuid('invalid_format'), z.literal('')]),
+  assigneeUserId: z.union([z.string().uuid('invalid_format'), z.literal('')]).default(''),
+  batchId: z.union([z.string().uuid('invalid_format'), z.literal('')]).default(''),
 });
 
 export const biosecurityStepSchema = z

@@ -2,9 +2,22 @@
 
 Gavran is the farm book for a Desi backyard flock. This guide matches the Help screen in the program. Each screen says what it is, where to find it, why it is there, and how to use it.
 
-Hindi and Marathi in the program are provisional until a fluent speaker reviews them. The name Gavran stays in Latin letters.
+Hindi and Marathi words still need a person who speaks them well to check the wording. The name Gavran stays in Latin letters.
 
 Open the program, sign in, and tap the farm name. The first visit starts a short tour. An owner, a manager, and a worker each see only their own tiles. Eggs, Flocks, Incubator machines, and Sick birds and medicines explain themselves once. Tap **Explain this screen** there, or **Show me around** on Help, to play a tour again.
+
+## Sample farm on your computer
+
+`npm run db:seed:demo` fills one local farm. It refuses to run when `NODE_ENV` is `production`. Run it again and it keeps the same farm. Every sample row is marked Sample.
+
+| Who | Sign in |
+|---|---|
+| Owner | `admin@gmail.com` and `admin@123` (choose **I am the owner**) |
+| Manager | `meera.demo@gmail.com` and `manager-demo-1` |
+| Worker Lata | mobile `9811100011`, PIN `2468` |
+| Worker Raju | mobile `9811100022`, PIN `1357` |
+
+The owner password is short only for this demo account. A new account still needs 10 characters. The same steps are in `docs/WINDOWS_SETUP.md`.
 
 ## Sign in
 
@@ -29,17 +42,19 @@ These are not 4317, 4318, or 3307, because Cursor on the owner's Windows PC alre
 
 ![Home](../client/public/guide/home.png)
 
-**What it is.** The first screen after you open a farm. Big tiles for the main jobs.
+**What it is.** The first screen after you open a farm. Cards show birds, roosters and hens, each flock's age in days, eggs, eggs set to hatch, jobs, care days, feed, and money. A coloured band lists late jobs, care that is due, and low feed. Tiles for the main jobs sit under the cards.
 
-**Where it is.** Tap the farm name on the farm list.
+**Where it is.** Tap the farm name on the farm list. The bell at the top opens the same coloured band.
 
-**Why it is used.** So you can see the whole farm without a long menu.
+**Why it is used.** So you see today's farm before you open a long menu. A worker does not see the money card.
 
 **How to use it.**
 
-1. Tap a tile.
-2. A tile with one job opens that job.
-3. A tile with many jobs opens those jobs.
+1. Read the coloured band. Tap a line to open that page.
+2. Tap a card to open flocks, eggs, hatch sets, jobs, care, feed, or sales.
+3. Tap **Tell me on this phone** if you want this browser to show a notice. The program asks first. It does not send a notice overnight.
+4. When you write the medicine for a care day you set, that job is marked done.
+5. Tap a tile under the cards. A tile with one job opens that job. A tile with many jobs opens those jobs.
 
 ## Today
 

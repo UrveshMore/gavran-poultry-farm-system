@@ -322,7 +322,7 @@ export function ShedsPage() {
   const sheds = useQuery({ queryKey: ['sheds', farmId], queryFn: () => api<Shed[]>(`/api/v1/farms/${farmId}/sheds`) });
   const canEdit = Boolean(access?.permissions.includes('shed.create'));
 
-  if (sheds.isLoading) return <p>{t('common.loading')}</p>;
+  if (sheds.isLoading || farms.isLoading) return <p>{t('common.loading')}</p>;
   if (sheds.isError || !sheds.data) return <Alert>{explain(sheds.error, t)}</Alert>;
 
   return (
@@ -333,7 +333,7 @@ export function ShedsPage() {
           <p className="mt-1 text-ink-soft">{t('sheds.body')}</p>
         </div>
         {canEdit ? (
-          <Button type="button" variant="outline" onClick={() => { setEditing(null); setOpen((value) => !value); }}>
+          <Button type="button" className="min-h-14" data-add="sheds" onClick={() => { setEditing(null); setOpen((value) => !value); }}>
             {open ? t('sheds.hideForm') : t('sheds.add')}
           </Button>
         ) : null}
@@ -356,6 +356,11 @@ export function ShedsPage() {
         <Card>
           <h2 className="font-display text-2xl">{t('sheds.emptyTitle')}</h2>
           <p className="text-ink-soft">{t('sheds.emptyBody')}</p>
+          {canEdit ? (
+            <Button type="button" className="mt-3 min-h-14" data-add="sheds" onClick={() => { setEditing(null); setOpen(true); }}>
+              {t('sheds.add')}
+            </Button>
+          ) : null}
         </Card>
       ) : (
         <div className="grid gap-3">
@@ -465,7 +470,7 @@ export function PeoplePage() {
   const [open, setOpen] = useState(false);
   const [confirm, setConfirm] = useState<{ id: string; kind: 'revoke' | 'deactivate' } | null>(null);
 
-  if (members.isLoading) return <p>{t('common.loading')}</p>;
+  if (members.isLoading || farms.isLoading) return <p>{t('common.loading')}</p>;
   if (members.isError || !members.data) return <Alert>{explain(members.error, t)}</Alert>;
 
   async function update(id: string, json: Record<string, unknown>) {
@@ -483,7 +488,7 @@ export function PeoplePage() {
           <p className="mt-1 text-ink-soft">{t('people.body')}</p>
         </div>
         {access?.permissions.includes('user.manage') ? (
-          <Button type="button" variant="outline" onClick={() => setOpen((value) => !value)}>
+          <Button type="button" className="min-h-14" data-add="people" onClick={() => setOpen((value) => !value)}>
             {open ? t('people.hideForm') : t('people.invite')}
           </Button>
         ) : null}
@@ -498,6 +503,11 @@ export function PeoplePage() {
         <Card>
           <h2 className="font-display text-2xl">{t('people.emptyTitle')}</h2>
           <p className="text-ink-soft">{t('people.emptyBody')}</p>
+          {access?.permissions.includes('user.manage') ? (
+            <Button type="button" className="mt-3 min-h-14" data-add="people" onClick={() => setOpen(true)}>
+              {t('people.invite')}
+            </Button>
+          ) : null}
         </Card>
       ) : (
         <div className="grid gap-3">

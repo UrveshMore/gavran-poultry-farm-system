@@ -46,19 +46,19 @@ export function IncubatorsPage() {
   const incubators = useQuery({ queryKey: ['incubators', farmId], queryFn: () => api<Incubator[]>(`/api/v1/farms/${farmId}/incubators`) });
   const canManage = Boolean(access?.permissions.includes('incubator.manage'));
 
-  if (incubators.isLoading) return <p>{t('common.loading')}</p>;
+  if (incubators.isLoading || farms.isLoading) return <p>{t('common.loading')}</p>;
   if (incubators.isError || !incubators.data) return <Alert>{explain(incubators.error, t)}</Alert>;
 
   return (
     <div className="grid gap-4">
-      <div className="flex items-start justify-between gap-3">
+      <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <h1 data-tour="screen-title" className="font-display text-3xl font-semibold">{t('incubators.title')}</h1>
           <p data-tour="screen-body" className="mt-1 text-ink-soft">{t('incubators.body')}</p>
           <ScreenTour screen="incubators" />
         </div>
         {canManage ? (
-          <Button data-tour="screen-action" type="button" variant="outline" onClick={() => setOpen((value) => !value)}>
+          <Button data-tour="screen-action" data-add="incubators" type="button" className="min-h-14" onClick={() => setOpen((value) => !value)}>
             {open ? t('incubators.hideForm') : t('incubators.add')}
           </Button>
         ) : null}
@@ -77,6 +77,11 @@ export function IncubatorsPage() {
         <Card>
           <h2 className="font-display text-2xl">{t('incubators.emptyTitle')}</h2>
           <p className="text-ink-soft">{t('incubators.emptyBody')}</p>
+          {canManage ? (
+            <Button type="button" className="mt-3 min-h-14" data-add="incubators" onClick={() => setOpen(true)}>
+              {t('incubators.add')}
+            </Button>
+          ) : null}
         </Card>
       ) : (
         <div className="grid gap-3">

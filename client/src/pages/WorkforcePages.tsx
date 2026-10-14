@@ -6,6 +6,7 @@ import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
 import { z } from 'zod';
+import { JumpAdd } from '@/components/JumpAdd';
 import { Alert, Button, Card, Field, Input, TextArea } from '@/components/ui';
 import { ApiError, api, errorKey, fetchMe } from '@/lib/api';
 import { queueAttendance } from '@/lib/offlineQueue';
@@ -112,9 +113,12 @@ export function WorkforcePage() {
 
   return (
     <div className="grid gap-4">
-      <div>
-        <h1 className="font-display text-3xl font-semibold">{t('workforce.title')}</h1>
-        <p className="mt-1 text-ink-soft">{t('workforce.body')}</p>
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <div>
+          <h1 className="font-display text-3xl font-semibold">{t('workforce.title')}</h1>
+          <p className="mt-1 text-ink-soft">{t('workforce.body')}</p>
+        </div>
+        {canRecord ? <JumpAdd add="workforce" target="create-workforce">{t('workforce.saveAttendance')}</JumpAdd> : null}
       </div>
       {attendance.data ? (
         <p className="rounded-xl bg-gold/30 px-3 py-2 text-sm">{t('workforce.rowCount', { count: attendance.data.metric.rowCount })}</p>
@@ -138,6 +142,7 @@ export function WorkforcePage() {
         ))}
         {canRecord ? (
           <Card>
+            <div id="create-workforce" />
             <form
               className="grid gap-3"
               onSubmit={attendanceForm.handleSubmit((values) => {

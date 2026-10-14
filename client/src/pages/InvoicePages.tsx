@@ -6,6 +6,7 @@ import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
 import { z } from 'zod';
+import { JumpAdd } from '@/components/JumpAdd';
 import { Alert, Button, Card, Field, Input, TextArea } from '@/components/ui';
 import { ApiError, api, errorKey } from '@/lib/api';
 import type { Customer, FarmSummary } from '@/lib/types';
@@ -73,20 +74,24 @@ export function InvoiceDocumentsPage() {
     },
   });
 
-  if (page.isLoading) return <p>{t('common.loading')}</p>;
+  if (page.isLoading || farms.isLoading) return <p>{t('common.loading')}</p>;
   if (page.isError || !page.data) return <Alert>{explain(page.error, t)}</Alert>;
 
   return (
     <div className="grid gap-4">
-      <div>
-        <h1 className="font-display text-3xl font-semibold">{t('invoices.title')}</h1>
-        <p className="mt-1 text-ink-soft">{t('invoices.body')}</p>
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <div>
+          <h1 className="font-display text-3xl font-semibold">{t('invoices.title')}</h1>
+          <p className="mt-1 text-ink-soft">{t('invoices.body')}</p>
+        </div>
+        {canRecord ? <JumpAdd add="invoices" target="create-invoices">{t('invoices.add')}</JumpAdd> : null}
       </div>
       <p className="rounded-xl bg-gold/30 px-3 py-2 text-sm">{t('invoices.unposted')}</p>
       {page.data.documents.length === 0 ? (
         <Card>
           <h2 className="font-display text-2xl">{t('invoices.emptyTitle')}</h2>
           <p className="text-ink-soft">{t('invoices.emptyBody')}</p>
+          {canRecord ? <JumpAdd add="invoices" target="create-invoices">{t('invoices.add')}</JumpAdd> : null}
         </Card>
       ) : null}
       {page.data.documents.map((doc) => (
@@ -128,6 +133,7 @@ export function InvoiceDocumentsPage() {
       ) : null}
       {canRecord ? (
         <Card>
+          <div id="create-invoices" />
           <form className="grid gap-3" onSubmit={docForm.handleSubmit((values) => saveDoc.mutate(values))}>
             <h2 className="font-display text-2xl">{t('invoices.add')}</h2>
             <Field id="inv-customer" label={t('invoices.customer')} hint={t('fieldHint.inv-customer')}>

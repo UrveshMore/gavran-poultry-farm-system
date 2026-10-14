@@ -69,6 +69,29 @@ export function HomeTour({ role }: { role: string }) {
   return null;
 }
 
+export function explainThisPage(t: Translate) {
+  const steps: DriveStep[] = [
+    {
+      element: 'main h1',
+      popover: { title: t('tour.whyTitle'), description: t('tour.pageExplain') },
+    },
+    {
+      element: '[data-add], main form',
+      popover: { title: t('tour.tapTitle'), description: t('tour.pageTap') },
+    },
+  ];
+  driver({ ...buttons(t), steps, skipMissingElement: true }).drive();
+}
+
+export function PageExplain() {
+  const { t } = useTranslation();
+  return (
+    <button type="button" className="min-h-11 justify-self-start rounded-xl px-1 text-sm font-semibold text-grove underline" onClick={() => explainThisPage(t)}>
+      {t('tour.replayScreen')}
+    </button>
+  );
+}
+
 export function ScreenTour({ screen }: { screen: 'eggs' | 'incubators' | 'batches' | 'health' }) {
   const { t } = useTranslation();
   useEffect(() => {

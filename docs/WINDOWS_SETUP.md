@@ -73,6 +73,27 @@ npm run db:migrate
 
 You should see a list of applied migration files. Running it again later prints that migrations are already up to date.
 
+## 6b. Load the sample farm (optional)
+
+This fills a local farm so you can click around. It will not run if `NODE_ENV` is `production`.
+
+```powershell
+npm run db:seed:demo
+```
+
+Running it again does not add a second copy. Every sample row starts with the word Sample.
+
+Sign in as the owner with **I am the owner**:
+
+| Who | How to sign in |
+|---|---|
+| Sample Admin (owner) | `admin@gmail.com` / `admin@123` |
+| Sample Meera (manager) | `meera.demo@gmail.com` / `manager-demo-1` |
+| Sample Lata (worker) | mobile `9811100011`, PIN `2468` |
+| Sample Raju (worker) | mobile `9811100022`, PIN `1357` |
+
+`admin@123` is shorter than the 10 characters a new owner must choose. That short password exists only for this demo account. The sign-up page still asks for 10 characters.
+
 ## 7. Create the first owner account
 
 Start the app first (the next step), then open:

@@ -2,6 +2,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
+import { JumpAdd } from '@/components/JumpAdd';
 import { Alert, Button, Card, Field, Input } from '@/components/ui';
 
 const fileClass =
@@ -54,9 +55,12 @@ export function DocumentsPage() {
 
   return (
     <div className="grid gap-4">
-      <div>
-        <h1 className="font-display text-3xl font-semibold">{t('documents.title')}</h1>
-        <p className="mt-1 text-ink-soft">{t('documents.body')}</p>
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <div>
+          <h1 className="font-display text-3xl font-semibold">{t('documents.title')}</h1>
+          <p className="mt-1 text-ink-soft">{t('documents.body')}</p>
+        </div>
+        <JumpAdd add="documents" target="create-documents">{t('documents.add')}</JumpAdd>
       </div>
       <p className="rounded-xl bg-gold/30 px-3 py-2 text-sm">{t('documents.scan')}</p>
       <p className="rounded-xl bg-gold/30 px-3 py-2 text-sm">{t('documents.retention')}</p>
@@ -64,6 +68,7 @@ export function DocumentsPage() {
         <Card>
           <h2 className="font-display text-2xl">{t('documents.emptyTitle')}</h2>
           <p className="text-ink-soft">{t('documents.emptyBody')}</p>
+          <JumpAdd add="documents" target="create-documents">{t('documents.add')}</JumpAdd>
         </Card>
       ) : (
         page.data.files.map((file) => (
@@ -78,6 +83,7 @@ export function DocumentsPage() {
         ))
       )}
       <Card>
+        <div id="create-documents" />
         <form
           className="grid gap-3"
           onSubmit={(event) => {

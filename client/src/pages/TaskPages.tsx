@@ -67,7 +67,7 @@ export function TasksPage() {
     }
   }
 
-  if (templates.isLoading || tasks.isLoading) return <p>{t('common.loading')}</p>;
+  if (templates.isLoading || tasks.isLoading || farms.isLoading) return <p>{t('common.loading')}</p>;
   if (templates.isError || !templates.data) return <Alert>{explain(templates.error, t)}</Alert>;
   if (tasks.isError || !tasks.data) return <Alert>{explain(tasks.error, t)}</Alert>;
 
@@ -81,7 +81,7 @@ export function TasksPage() {
           <p className="mt-1 text-ink-soft">{t('tasks.body')}</p>
         </div>
         {canManage ? (
-          <Button type="button" variant={open ? 'outline' : 'default'} onClick={() => setOpen((value) => !value)}>
+          <Button type="button" className="min-h-14" data-add="tasks" variant={open ? 'outline' : 'default'} onClick={() => setOpen((value) => !value)}>
             {open ? t('tasks.hideForm') : t('tasks.add')}
           </Button>
         ) : null}
@@ -123,6 +123,11 @@ export function TasksPage() {
         <Card>
           <h2 className="font-display text-2xl">{t('tasks.emptyTitle')}</h2>
           <p className="text-ink-soft">{t('tasks.emptyBody')}</p>
+          {canManage ? (
+            <Button type="button" className="mt-3 min-h-14" data-add="tasks" onClick={() => setOpen(true)}>
+              {t('tasks.add')}
+            </Button>
+          ) : null}
         </Card>
       ) : (
         <div className="grid gap-3">

@@ -17,6 +17,7 @@ import { eggRoutes } from './modules/eggs/routes.js';
 import { hatchRoutes } from './modules/hatch/routes.js';
 import { incubationRoutes } from './modules/incubation/routes.js';
 import { incubatorRoutes } from './modules/incubators/routes.js';
+import { dashboardRoutes } from './modules/dashboard/routes.js';
 import { farmRoutes } from './modules/farms/routes.js';
 import { saleRoutes } from './modules/sales/routes.js';
 import { expenseRoutes } from './modules/expenses/routes.js';
@@ -66,6 +67,7 @@ export function createApp() {
   app.use('/api/v1', csrfProtection);
   app.use('/api/v1/auth', authRoutes);
   app.use('/api/v1/farms', farmRoutes);
+  app.use('/api/v1/farms', dashboardRoutes);
   app.use('/api/v1/farms', batchRoutes);
   app.use('/api/v1/farms', eggRoutes);
   app.use('/api/v1/farms', incubatorRoutes);

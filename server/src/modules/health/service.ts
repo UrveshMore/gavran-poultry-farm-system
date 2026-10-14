@@ -160,13 +160,23 @@ export async function createMedicine(actor: Actor, access: FarmAccess, body: unk
         throw new AppError(422, 'VALIDATION_ERROR', 'Choose a batch on this farm.', { fields: { batchId: 'invalid_format' } });
       }
     }
+    const batchId = blank(input.batchId);
     const id = await insertMedicine(conn, {
       farmId: access.farmId,
       entryId: input.entryId,
       givenOn: input.givenOn,
-      batchId: blank(input.batchId),
+      batchId,
       notes: input.notes,
       createdBy: actor.user.id,
+    });
+    const { completeOpenCareTasks } = await import('../tasks/repository.js');
+    await completeOpenCareTasks(conn, {
+      farmId: access.farmId,
+      userId: actor.user.id,
+      sourceFile: entry.sourceFile,
+      sourcePage: entry.sourcePage,
+      batchId,
+      note: 'Dose recorded',
     });
     await writeAudit(conn, {
       farmId: access.farmId,
@@ -205,6 +215,13 @@ export async function createVaccineTask(actor: Actor, access: FarmAccess, entryI
     if (assignee && !(await findActiveMember(conn, access.farmId, assignee))) {
       throw new AppError(422, 'VALIDATION_ERROR', 'Choose an active person on this farm.', { fields: { assigneeUserId: 'invalid_format' } });
     }
+    const batchId = blank(input.batchId);
+    if (batchId) {
+      const { findBatch } = await import('../stock/repository.js');
+      if (!(await findBatch(conn, access.farmId, batchId))) {
+        throw new AppError(422, 'VALIDATION_ERROR', 'Choose a batch on this farm.', { fields: { batchId: 'invalid_format' } });
+      }
+    }
     const taskId = await insertTask(conn, {
       farmId: access.farmId,
       templateId: null,
@@ -222,7 +239,7 @@ export async function createVaccineTask(actor: Actor, access: FarmAccess, entryI
       entityType: 'task',
       entityId: taskId,
       requestId: actor.requestId,
-      summary: { sourceFile: entry.sourceFile, sourcePage: entry.sourcePage },
+      summary: { sourceFile: entry.sourceFile, sourcePage: entry.sourcePage, batchId },
     });
     const data = { taskId, title: entry.title.slice(0, 160), sourceFile: entry.sourceFile, sourcePage: entry.sourcePage };
     if (reserved.mode === 'new') await finishIdempotency(conn, reserved.id, 201, data);
