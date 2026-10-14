@@ -274,7 +274,7 @@ export function SaathiPage() {
               {photo.matches.map((match) => (
                 <li key={`${match.sourceFile}-${match.sourcePage}-${match.title}`} className="rounded-xl border border-line p-3 text-sm">
                   <p className="font-semibold">{match.title}</p>
-                  <p>{match.sourceFile} {t('saathi.page', { page: String(match.sourcePage) })}</p>
+                  <p>{match.sourcePage > 0 ? `${match.sourceFile} ${t('saathi.page', { page: String(match.sourcePage) })}` : match.sourceFile}</p>
                   <p>{match.amountOnPage ? match.howToGive : t('saathi.noAmount')}</p>
                   <p className="font-semibold">{t('saathi.vet')}</p>
                 </li>

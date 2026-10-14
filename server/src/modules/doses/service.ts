@@ -12,6 +12,7 @@ import { writeAudit } from '../audit/repository.js';
 import { todayInTimeZone } from '../batches/service.js';
 import { findFarmById } from '../farms/repository.js';
 import type { FarmAccess } from '../farms/access.js';
+import { ownerGroupsToday, ownerLinesForBatch, markOwnerDose, readOwnerPhoto } from '../medicines/service.js';
 import {
   DOSE_SOURCE,
   DOSE_TEMPLATE_ID,
@@ -55,6 +56,7 @@ export type DoseLine = {
   amountPage: number | null;
   medicineKeys: string[];
   given: boolean;
+  origin: 'paper' | 'owner';
 };
 
 const slotOrder: Record<DoseSlot, number> = { morning: 0, evening: 1, full_day: 2 };
@@ -123,6 +125,7 @@ function line(row: Row, day: number | null, date: string | null, given: Set<stri
     amountPage: row.amountPage,
     medicineKeys: row.medicineKeys,
     given: given.has(key),
+    origin: 'paper',
   };
 }
 
@@ -164,6 +167,10 @@ export async function getBatchDoses(farmId: string, batchId: string) {
     for (let n = row.dayFrom; n <= (row.dayTo ?? row.dayFrom); n += 1) dated.add(n);
   }
   if (day !== null) dated.add(day);
+  const extra = await ownerLinesForBatch(farmId, batchId);
+  for (const line of extra) {
+    if (line.day !== null) dated.add(line.day);
+  }
   const days = [...dated]
     .sort((a, b) => a - b)
     .map((n) => {
@@ -172,9 +179,13 @@ export async function getBatchDoses(farmId: string, batchId: string) {
         .filter((row) => covers(row, n))
         .sort((a, b) => slotOrder[a.slot] - slotOrder[b.slot] || a.sort - b.sort)
         .map((row) => line(row, n, date, given));
+      lines.push(...extra.filter((line) => line.day === n));
       return { day: n, date, today: n === day, lines };
     });
   const on = (n: number | null) => (n === null ? [] : (days.find((item) => item.day === n)?.lines ?? []));
+  const floating = extra.filter((line) => line.day === null);
+  const tomorrow = shiftDate(today, 1);
+  const weekEnd = shiftDate(today, 6);
   return {
     approved: await approval(farmId),
     batchCode: batch.code,
@@ -183,9 +194,12 @@ export async function getBatchDoses(farmId: string, batchId: string) {
     paperDay: day,
     today,
     sourceFile: DOSE_SOURCE,
-    todayLines: on(day),
-    tomorrowLines: on(day === null ? null : day + 1),
-    weekLines: day === null ? [] : days.filter((item) => item.day >= day && item.day <= day + 6).flatMap((item) => item.lines),
+    todayLines: [...on(day), ...floating.filter((line) => line.date === today)],
+    tomorrowLines: [...on(day === null ? null : day + 1), ...floating.filter((line) => line.date === tomorrow)],
+    weekLines: [
+      ...(day === null ? [] : days.filter((item) => item.day >= day && item.day <= day + 6).flatMap((item) => item.lines)),
+      ...floating.filter((line) => line.date !== null && line.date >= today && line.date <= weekEnd),
+    ],
     undated: rows.filter((row) => row.dayFrom === null).map((row) => line(row, null, null, new Set())),
     days,
   };
@@ -193,8 +207,9 @@ export async function getBatchDoses(farmId: string, batchId: string) {
 
 export async function medicineToday(farmId: string) {
   const checked = await approval(farmId);
-  if (!checked) return { approved: false as const, groups: [] as DoseGroup[] };
   const { today } = await farmToday(farmId);
+  const owned = await ownerGroupsToday(farmId, today);
+  if (!checked) return { approved: false as const, groups: owned };
   const batches = await many<RowDataPacket & { id: string; code: string; hatch_date: Date | string | null; status: string }>(
     pool,
     `SELECT id, code, hatch_date, status FROM batches WHERE farm_id = ? AND status = 'open' ORDER BY code`,
@@ -216,8 +231,12 @@ export async function medicineToday(farmId: string) {
       .filter((row) => covers(row, day))
       .sort((a, b) => slotOrder[a.slot] - slotOrder[b.slot] || a.sort - b.sort)
       .map((row) => ({ ...line(row, day, today, new Set(given.has(`${batch.id}|${row.id}`) ? [`${row.id}|${today}`] : [])), given: given.has(`${batch.id}|${row.id}`) }));
+    for (const extra of owned.find((group) => group.batchId === batch.id)?.lines ?? []) lines.push(extra);
     if (lines.length === 0) continue;
     groups.push({ batchId: batch.id, batchCode: batch.code, paperDay: day, lines });
+  }
+  for (const group of owned) {
+    if (!groups.some((item) => item.batchId === group.batchId)) groups.push(group);
   }
   return { approved: true as const, groups };
 }
@@ -225,7 +244,7 @@ export async function medicineToday(farmId: string) {
 export type DoseGroup = {
   batchId: string;
   batchCode: string;
-  paperDay: number;
+  paperDay: number | null;
   lines: DoseLine[];
 };
 
@@ -257,13 +276,15 @@ export async function approveSchedule(actor: Actor, access: FarmAccess, body: un
 }
 
 export async function markDose(actor: Actor, access: FarmAccess, batchId: string, body: unknown) {
-  if (!(await approval(access.farmId))) {
-    throw new AppError(409, 'ENTRY_UNAPPROVED', 'That paper is not checked yet.');
-  }
   const rowId = typeof body === 'object' && body && 'rowId' in body ? String((body as { rowId: unknown }).rowId ?? '') : '';
   const givenOn = typeof body === 'object' && body && 'givenOn' in body ? String((body as { givenOn: unknown }).givenOn ?? '') : '';
   if (!/^[0-9a-f-]{36}$/i.test(rowId) || !/^\d{4}-\d{2}-\d{2}$/.test(givenOn)) {
     throw new AppError(422, 'VALIDATION_ERROR', 'Choose a line and a day.', { fields: { rowId: 'invalid_format' } });
+  }
+  const owned = await markOwnerDose(actor, access, batchId, rowId, givenOn);
+  if (owned) return owned;
+  if (!(await approval(access.farmId))) {
+    throw new AppError(409, 'ENTRY_UNAPPROVED', 'That paper is not checked yet.');
   }
   const { today } = await farmToday(access.farmId);
   if (givenOn > today) {
@@ -357,6 +378,8 @@ export async function openMedicinePhoto(farmId: string, medicineKey: string): Pr
     const bytes = await readFile(path.join(uploads, farmId, row.stored_name));
     return { bytes, mediaType: row.media_type };
   }
+  const owned = await readOwnerPhoto(farmId, medicineKey);
+  if (owned) return owned;
   try {
     const bytes = await readFile(path.join(defaults, `${medicineKey}.png`));
     return { bytes, mediaType: 'image/png' };

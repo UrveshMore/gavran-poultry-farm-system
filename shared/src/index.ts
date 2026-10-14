@@ -58,6 +58,19 @@ export {
   withField,
 } from './saathi.js';
 export type { DueDose, Intent, KbEntry, KbMatch, PhotoAi, SaathiAction, SaathiCard, SaathiContext, SaathiReply } from './saathi.js';
+export {
+  MEDICINE_ROUTES,
+  MEDICINE_SOURCES,
+  OWNER_CITE,
+  ownerCourse,
+  ownerDiseaseInputSchema,
+  ownerDoseSentence,
+  ownerMedicineInputSchema,
+  ownerPhotoKey,
+  ownerPlanInputSchema,
+  ownerScheduleText,
+} from './ownerMedicines.js';
+export type { CoursePoint, DoseSlot, MedicineRoute, MedicineSource, OwnerMedicineInput } from './ownerMedicines.js';
 export { likePattern } from './search.js';
 export {
   batchInputSchema,

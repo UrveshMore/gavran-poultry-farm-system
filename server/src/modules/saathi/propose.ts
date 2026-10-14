@@ -1,4 +1,4 @@
-import { blankIntent, interpret, resolveIntent, stripInventedCare, type Intent, type SaathiReply } from '@gavran/shared';
+import { blankIntent, interpret, OWNER_CITE, resolveIntent, stripInventedCare, type Intent, type SaathiReply } from '@gavran/shared';
 import type { RowDataPacket } from 'mysql2';
 import { z } from 'zod';
 import { one } from '../../db/sql.js';
@@ -140,7 +140,11 @@ async function answerLookup(actor: Actor, access: FarmAccess, lookup: 'doses' | 
   }
   if (lookup === 'doses') {
     if (!board.doses) return { type: 'denied', speechKey: 'saathi.denied', vars: {} };
-    const lines = board.doses.groups.flatMap((group) => group.lines.filter((line) => !line.given).map((line) => `${group.batchCode} ${line.slot} ${line.itemName}`));
+    const lines = board.doses.groups.flatMap((group) =>
+      group.lines
+        .filter((line) => !line.given)
+        .map((line) => `${group.batchCode} ${line.slot} ${line.itemName}${line.origin === 'owner' ? ` ${OWNER_CITE}` : ''}`),
+    );
     return { type: 'answer', speechKey: lines.length ? 'saathi.say.doses' : 'saathi.say.noDoses', vars: { list: lines.join('. ') } };
   }
   const due = [...(board.health?.vaccines.overdue ?? []), ...(board.health?.vaccines.dueToday ?? [])];

@@ -263,6 +263,24 @@ These are not 4317, 4318, or 3307, because Cursor on the owner's Windows PC alre
 2. Read what it is for, the signs, how it was written to give, and the caution.
 3. Do not treat from an unchecked note.
 
+## My medicines
+
+![My medicines](../client/public/guide/medicines.png)
+
+**What it is.** Medicines you type yourself. Each one is labelled Added by owner. They are not copied from the training papers.
+
+**Where it is.** Health, then My medicines. The owner and a manager see this form.
+
+**Why it is used.** So a dose you already use can sit on the flock day list, on today's medicine, and on the alert, with the amount you typed.
+
+**How to use it.**
+
+1. Type the name, the amount, and the unit. Example: tulsi water, 5 ml.
+2. Tick a disease from the papers, or add one with the signs you saw. A photo of the bottle is optional. A white background is cleared when the tool on this computer can do it.
+3. Choose water, feed, an eye drop, or an injection, and how many days. Write where it came from: your experience, a vet's name, or a paper.
+4. Add it to a flock from a date or an age day. 1 means every day. 2 means every other day.
+5. Mark given on that flock when you have given it. Change or remove the medicine later. The change list keeps that.
+
 ## Feed and stock
 
 ![Feed and stock](../client/public/guide/stock.png)

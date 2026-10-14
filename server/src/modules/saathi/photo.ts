@@ -8,6 +8,7 @@ import { AppError } from '../../http/errors.js';
 import { writeAudit } from '../audit/repository.js';
 import type { AuthUser } from '../auth/types.js';
 import { detectKind, saveFarmFile } from '../documents/storage.js';
+import { loadCareEntries } from '../medicines/service.js';
 import { geminiJson } from './gemini.js';
 import { decryptSecret } from './secret.js';
 
@@ -68,13 +69,14 @@ export async function readPhoto(farmId: string, photoId: string, file: { buffer:
     ai = parsePhotoAi(model) ?? emptyAi();
     if ((ai.confidence ?? 0) < 0.6) ai = { ...ai, count: ai.count };
   }
-  const entries = await many<RowDataPacket & KbEntry>(
+  const papers = await many<RowDataPacket & KbEntry>(
     pool,
     `SELECT id, title, source_file AS sourceFile, source_page AS sourcePage,
             COALESCE(symptoms, '') AS symptoms, COALESCE(used_for, '') AS usedFor,
             COALESCE(how_to_give, '') AS howToGive, COALESCE(schedule_text, '') AS scheduleText
      FROM knowledge_entries WHERE kind IN ('disease', 'medicine', 'care')`,
   );
+  const entries = [...papers, ...(await loadCareEntries(farmId))];
   const matches = kind === 'sick' || kind === 'bird' ? matchKnowledge(ai.signs.join(' '), entries) : [];
   const id = randomUUID();
   const storedName = await saveFarmFile(farmId, file.buffer, media);

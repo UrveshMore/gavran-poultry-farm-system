@@ -39,6 +39,7 @@ import { notificationRoutes } from './modules/notifications/routes.js';
 import { documentRoutes } from './modules/documents/routes.js';
 import { searchRoutes } from './modules/search/routes.js';
 import { scheduleRoutes } from './modules/schedules/routes.js';
+import { medicineRoutes } from './modules/medicines/routes.js';
 import { saathiRoutes } from './modules/saathi/routes.js';
 import { yardRoutes } from './modules/yard/routes.js';
 
@@ -97,6 +98,7 @@ export function createApp() {
   app.use('/api/v1/farms', scheduleRoutes);
   app.use('/api/v1/farms', yardRoutes);
   app.use('/api/v1/farms', saathiRoutes);
+  app.use('/api/v1/farms', medicineRoutes);
   app.use('/api/v1/farms', stockRoutes);
   app.use('/api/v1/farms', healthRoutes);
   app.use('/api/v1/farms', lossRoutes);

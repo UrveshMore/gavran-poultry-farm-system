@@ -16,6 +16,7 @@ export type ScreenId =
   | 'incubators'
   | 'incubation'
   | 'health'
+  | 'medicines'
   | 'stock'
   | 'sales'
   | 'expenses'
@@ -55,6 +56,7 @@ export const SCREENS: ScreenDef[] = [
   { id: 'incubators', group: 'incubator', path: 'incubators', anyPermission: ['incubator.read'] },
   { id: 'incubation', group: 'incubator', path: 'incubation', anyPermission: ['incubation.read'] },
   { id: 'health', group: 'health', path: 'health', anyPermission: ['health.read'] },
+  { id: 'medicines', group: 'health', path: 'medicines', anyPermission: ['health.approve'] },
   { id: 'stock', group: 'feed', path: 'stock', anyPermission: ['stock.read'] },
   { id: 'sales', group: 'money', path: 'sales', anyPermission: ['sale.read'] },
   { id: 'expenses', group: 'money', path: 'expenses', anyPermission: ['expense.read'] },

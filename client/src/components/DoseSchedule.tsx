@@ -23,6 +23,7 @@ export type DoseLine = {
   amountPage: number | null;
   medicineKeys: string[];
   given: boolean;
+  origin: 'paper' | 'owner';
 };
 
 export type DoseDay = { day: number; date: string | null; today: boolean; lines: DoseLine[] };
@@ -42,7 +43,7 @@ export type BatchDoses = {
   days: DoseDay[];
 };
 
-export type DoseGroup = { batchId: string; batchCode: string; paperDay: number; lines: DoseLine[] };
+export type DoseGroup = { batchId: string; batchCode: string; paperDay: number | null; lines: DoseLine[] };
 
 function explain(error: unknown, t: (key: string) => string) {
   if (error instanceof ApiError) {
@@ -132,14 +133,14 @@ export function DoseLineRow({
       </p>
       <p className="text-sm">{line.unclear ? t('doses.checkVet') : line.amountText}</p>
       <p className="text-xs text-ink-soft">
-        {t('doses.source', { file: line.sourceFile, page: line.sourcePage })}
+        {line.origin === 'owner' ? t('medicines.addedByOwner') : t('doses.source', { file: line.sourceFile, page: line.sourcePage })}
         {line.amountPage ? ` · ${t('doses.amountFrom', { page: line.amountPage })}` : ''}
       </p>
       <div className="flex flex-wrap items-end gap-3">
         {line.medicineKeys.map((key) => (
-          <MedicinePhoto key={key} farmId={farmId} medicineKey={key} canUpload={canUpload} />
+          <MedicinePhoto key={key} farmId={farmId} medicineKey={key} canUpload={canUpload && line.origin !== 'owner'} />
         ))}
-        {canRecord && approved && line.date ? (
+        {canRecord && line.date && (approved || line.origin === 'owner') ? (
           <Button
             type="button"
             variant={line.given ? 'outline' : 'default'}
@@ -218,7 +219,7 @@ export function MedicineToday({
         {doses.groups.map((group) => (
           <div key={group.batchId}>
             <Link className="font-semibold text-grove underline" to={`/farms/${farmId}/batches/${group.batchId}`}>
-              {t('doses.batchPaper', { code: group.batchCode, day: group.paperDay })}
+              {group.paperDay ? t('doses.batchPaper', { code: group.batchCode, day: group.paperDay }) : group.batchCode}
             </Link>
             {group.lines.map((line) => (
               <DoseLineRow
@@ -272,6 +273,14 @@ export function BatchDosePanel({
   if (doses.isError || !doses.data) return <Alert>{explain(doses.error, t)}</Alert>;
   const data = doses.data;
   const paperDay = data.paperDay;
+  const looseSeen = new Set<string>();
+  const loose = [...data.todayLines, ...data.tomorrowLines, ...data.weekLines].filter((line) => {
+    if (line.origin !== 'owner' || line.day !== null) return false;
+    const key = `${line.rowId}|${line.date ?? ''}`;
+    if (looseSeen.has(key)) return false;
+    looseSeen.add(key);
+    return true;
+  });
   const week = paperDay === null ? [] : data.days.filter((day) => day.day >= paperDay && day.day <= paperDay + 6);
   const earlier = paperDay === null ? [] : data.days.filter((day) => day.day < paperDay);
   const later = paperDay === null ? data.days : data.days.filter((day) => day.day > paperDay + 6);
@@ -353,6 +362,24 @@ export function BatchDosePanel({
             ))}
           </div>
         </details>
+      ) : null}
+      {loose.length > 0 ? (
+        <div className="mt-4 grid gap-3">
+          <h3 className="font-display text-xl">{t('doses.today')}</h3>
+          {loose.map((line) => (
+            <div key={`${line.rowId}-${line.date ?? ''}`}>
+              {line.date ? <p className="text-sm text-ink-soft">{line.date}</p> : null}
+              <DoseLineRow
+                farmId={farmId}
+                batchId={batchId}
+                line={line}
+                approved={data.approved}
+                canRecord={canRecord}
+                canUpload={false}
+              />
+            </div>
+          ))}
+        </div>
       ) : null}
       {data.undated.length > 0 ? (
         <div className="mt-4">

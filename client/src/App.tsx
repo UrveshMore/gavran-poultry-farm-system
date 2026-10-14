@@ -16,6 +16,7 @@ import { SafeguardsPage } from '@/pages/SafeguardPages';
 import { LossesPage } from '@/pages/LossPages';
 import { SalesPage } from '@/pages/SalesPages';
 import { HealthPage } from '@/pages/HealthPages';
+import { MedicinesPage } from '@/pages/MedicinesPage';
 import { StockPage } from '@/pages/StockPages';
 import { TaskDetailPage, TasksPage } from '@/pages/TaskPages';
 import { WorkforcePage } from '@/pages/WorkforcePages';
@@ -89,6 +90,7 @@ export function App() {
         <Route path="farms/:farmId/tasks/:taskId" element={<TaskDetailPage />} />
         <Route path="farms/:farmId/stock" element={<StockPage />} />
         <Route path="farms/:farmId/health" element={<HealthPage />} />
+        <Route path="farms/:farmId/medicines" element={<MedicinesPage />} />
         <Route path="farms/:farmId/losses" element={<LossesPage />} />
         <Route path="farms/:farmId/sales" element={<SalesPage />} />
         <Route path="farms/:farmId/expenses" element={<ExpensesPage />} />

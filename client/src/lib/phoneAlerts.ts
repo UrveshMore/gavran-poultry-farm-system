@@ -19,7 +19,7 @@ function bodyFor(kind: PhoneAlertKind, count: number): string {
 
 export async function schedulePhoneAlerts(data: DashboardData): Promise<void> {
   if (!isNativeApp()) return;
-  const lines = data.doses?.approved ? data.doses.groups.flatMap((group) => group.lines) : [];
+  const lines = data.doses?.groups.flatMap((group) => group.lines) ?? [];
   const plans = planPhoneAlerts({
     now: new Date(),
     morningDue: lines.filter((line) => !line.given && (line.slot === 'morning' || line.slot === 'full_day')).length,

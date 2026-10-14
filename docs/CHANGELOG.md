@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.34.0 — 2026-10-14
+
+My medicines. The owner or a manager types the dose.
+
+- A medicine has a name, a photo, the diseases it treats, an amount and a unit, how to give it, the days, a note, a precaution, and where it came from. A new disease can be added with signs and a photo. Every line is labelled Added by owner. The amount is only what was typed.
+- Adding it to a flock, from a date or an age day, puts it on that flock's day list, on Today's medicine, on the alert, and on Mark given. The training-paper schedule can stay unchecked.
+- Gavran Saathi reads these lines. A sick-bird photo match cites Added by owner and still says possible - confirm with vet. A change or a removal is kept in the change list.
+
 ## 0.33.0 — 2026-10-14
 
 Gavran Saathi. Speak or type, then tap Save.
