@@ -8,6 +8,7 @@ import { z } from 'zod';
 import { Alert, Button, Card, Field, Input, TextArea } from '@/components/ui';
 import { ApiError, api, errorKey } from '@/lib/api';
 import type { FarmSummary, LossPage } from '@/lib/types';
+import { localToday } from '@/lib/today';
 
 const selectClass = 'min-h-11 w-full rounded-xl border border-line bg-white px-3';
 
@@ -31,12 +32,12 @@ export function LossesPage() {
   const canRecord = Boolean(access?.permissions.includes('loss.record'));
   const form = useForm<z.infer<typeof lossIncidentSchema>>({
     resolver: zodResolver(lossIncidentSchema),
-    defaultValues: { occurredOn: '', birdCount: 0, note: '', movementId: '' },
+    defaultValues: { occurredOn: localToday(), birdCount: 0, note: '', movementId: '' },
   });
   const mutation = useMutation({
     mutationFn: (values: z.infer<typeof lossIncidentSchema>) => api(`/api/v1/farms/${farmId}/losses`, { method: 'POST', json: values }),
     onSuccess: () => {
-      form.reset({ occurredOn: '', birdCount: 0, note: '', movementId: '' });
+      form.reset({ occurredOn: localToday(), birdCount: 0, note: '', movementId: '' });
       void queryClient.invalidateQueries({ queryKey: ['losses', farmId] });
     },
   });
@@ -72,16 +73,16 @@ export function LossesPage() {
         <Card>
           <form className="grid gap-3" onSubmit={form.handleSubmit((values) => mutation.mutate({ ...values, birdCount: Number(values.birdCount) }))}>
             <h2 className="font-display text-2xl">{t('losses.add')}</h2>
-            <Field id="loss-date" label={t('losses.date')}>
+            <Field id="loss-date" label={t('losses.date')} hint={t('fieldHint.loss-date')}>
               <Input id="loss-date" type="date" {...form.register('occurredOn')} />
             </Field>
-            <Field id="loss-count" label={t('losses.birds')}>
-              <Input id="loss-count" type="number" min={0} {...form.register('birdCount', { valueAsNumber: true })} />
+            <Field id="loss-count" label={t('losses.birds')} hint={t('fieldHint.loss-count')}>
+              <Input id="loss-count" type="number" min={0} {...form.register('birdCount', { valueAsNumber: true })}  placeholder={t('fieldPh.loss-count')}/>
             </Field>
-            <Field id="loss-note" label={t('losses.note')}>
-              <TextArea id="loss-note" {...form.register('note')} />
+            <Field id="loss-note" label={t('losses.note')} hint={t('fieldHint.loss-note')}>
+              <TextArea id="loss-note" {...form.register('note')}  placeholder={t('fieldPh.loss-note')}/>
             </Field>
-            <Field id="loss-movement" label={`${t('losses.movement')} (${t('common.optional')})`}>
+            <Field id="loss-movement" label={`${t('losses.movement')} (${t('common.optional')})`} hint={t('fieldHint.loss-movement')}>
               <select id="loss-movement" className={selectClass} {...form.register('movementId')}>
                 <option value="">{t('losses.none')}</option>
                 {page.mortalityMovements.map((movement) => (

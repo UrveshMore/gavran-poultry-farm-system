@@ -8,6 +8,7 @@ import { z } from 'zod';
 import { Alert, Button, Card, Field, Input, TextArea } from '@/components/ui';
 import { ApiError, api, errorKey } from '@/lib/api';
 import type { Customer, FarmOrder, FarmSummary, MarketPrice, OrdersPage } from '@/lib/types';
+import { localToday } from '@/lib/today';
 
 const selectClass = 'min-h-11 w-full rounded-xl border border-line bg-white px-3';
 
@@ -69,12 +70,12 @@ function PriceList({ prices, canRecord, farmId, onSaved }: { prices: MarketPrice
   const { t } = useTranslation();
   const form = useForm<z.infer<typeof marketPriceInputSchema>>({
     resolver: zodResolver(marketPriceInputSchema),
-    defaultValues: { itemName: '', amount: '' as unknown as number, unitLabel: '', effectiveOn: '' },
+    defaultValues: { itemName: '', amount: '' as unknown as number, unitLabel: '', effectiveOn: localToday() },
   });
   const mutation = useMutation({
     mutationFn: (values: z.infer<typeof marketPriceInputSchema>) => api(`/api/v1/farms/${farmId}/market-prices`, { method: 'POST', json: values }),
     onSuccess: () => {
-      form.reset({ itemName: '', amount: '' as unknown as number, unitLabel: '', effectiveOn: '' });
+      form.reset({ itemName: '', amount: '' as unknown as number, unitLabel: '', effectiveOn: localToday() });
       onSaved();
     },
   });
@@ -101,16 +102,16 @@ function PriceList({ prices, canRecord, farmId, onSaved }: { prices: MarketPrice
         <Card>
           <form className="grid gap-3" onSubmit={form.handleSubmit((values) => mutation.mutate({ ...values, amount: Number(values.amount) }))}>
             <h3 className="font-display text-xl">{t('sales.savePrice')}</h3>
-            <Field id="price-item" label={t('sales.item')} error={text(t, form.formState.errors.itemName?.message)}>
-              <Input id="price-item" {...form.register('itemName')} />
+            <Field id="price-item" label={t('sales.item')} error={text(t, form.formState.errors.itemName?.message)} hint={t('fieldHint.price-item')}>
+              <Input id="price-item" {...form.register('itemName')}  placeholder={t('fieldPh.price-item')}/>
             </Field>
-            <Field id="price-amount" label={t('sales.amount')} error={text(t, form.formState.errors.amount?.message)}>
-              <Input id="price-amount" type="number" min={0} step="0.01" {...form.register('amount', { valueAsNumber: true })} />
+            <Field id="price-amount" label={t('sales.amount')} error={text(t, form.formState.errors.amount?.message)} hint={t('fieldHint.price-amount')}>
+              <Input id="price-amount" type="number" min={0} step="0.01" {...form.register('amount', { valueAsNumber: true })}  placeholder={t('fieldPh.price-amount')}/>
             </Field>
-            <Field id="price-unit" label={t('sales.unit')} error={text(t, form.formState.errors.unitLabel?.message)}>
-              <Input id="price-unit" {...form.register('unitLabel')} />
+            <Field id="price-unit" label={t('sales.unit')} error={text(t, form.formState.errors.unitLabel?.message)} hint={t('fieldHint.price-unit')}>
+              <Input id="price-unit" {...form.register('unitLabel')}  placeholder={t('fieldPh.price-unit')}/>
             </Field>
-            <Field id="price-date" label={t('sales.date')} error={text(t, form.formState.errors.effectiveOn?.message)}>
+            <Field id="price-date" label={t('sales.date')} error={text(t, form.formState.errors.effectiveOn?.message)} hint={t('fieldHint.price-date')}>
               <Input id="price-date" type="date" {...form.register('effectiveOn')} />
             </Field>
             {mutation.isError ? <Alert>{explain(mutation.error, t)}</Alert> : null}
@@ -149,14 +150,14 @@ function CustomerList({ customers, canRecord, farmId, onSaved }: { customers: Cu
         <Card>
           <form className="grid gap-3" onSubmit={form.handleSubmit((values) => mutation.mutate(values))}>
             <h3 className="font-display text-xl">{t('sales.saveCustomer')}</h3>
-            <Field id="customer-name" label={t('sales.name')} error={text(t, form.formState.errors.name?.message)}>
-              <Input id="customer-name" {...form.register('name')} />
+            <Field id="customer-name" label={t('sales.name')} error={text(t, form.formState.errors.name?.message)} hint={t('fieldHint.customer-name')}>
+              <Input id="customer-name" {...form.register('name')}  placeholder={t('fieldPh.customer-name')}/>
             </Field>
-            <Field id="customer-phone" label={`${t('sales.phone')} (${t('common.optional')})`}>
-              <Input id="customer-phone" {...form.register('phone')} />
+            <Field id="customer-phone" label={`${t('sales.phone')} (${t('common.optional')})`} hint={t('fieldHint.customer-phone')}>
+              <Input id="customer-phone" {...form.register('phone')}  placeholder={t('fieldPh.customer-phone')}/>
             </Field>
-            <Field id="customer-notes" label={`${t('sales.notes')} (${t('common.optional')})`}>
-              <TextArea id="customer-notes" {...form.register('notes')} />
+            <Field id="customer-notes" label={`${t('sales.notes')} (${t('common.optional')})`} hint={t('fieldHint.customer-notes')}>
+              <TextArea id="customer-notes" {...form.register('notes')}  placeholder={t('fieldPh.customer-notes')}/>
             </Field>
             {mutation.isError ? <Alert>{explain(mutation.error, t)}</Alert> : null}
             <Button type="submit">{mutation.isPending ? t('sales.saving') : t('sales.saveCustomer')}</Button>
@@ -185,7 +186,7 @@ function OrderList({
     resolver: zodResolver(orderInputSchema),
     defaultValues: {
       customerId: '',
-      orderedOn: '',
+      orderedOn: localToday(),
       lines: [{ description: '', quantity: '' as unknown as number, unitPrice: '' as unknown as number }],
     },
   });
@@ -194,7 +195,7 @@ function OrderList({
     onSuccess: () => {
       form.reset({
         customerId: '',
-        orderedOn: '',
+        orderedOn: localToday(),
         lines: [{ description: '', quantity: '' as unknown as number, unitPrice: '' as unknown as number }],
       });
       onSaved();
@@ -230,7 +231,7 @@ function OrderList({
             )}
           >
             <h3 className="font-display text-xl">{t('sales.saveOrder')}</h3>
-            <Field id="order-customer" label={t('sales.customer')} error={text(t, form.formState.errors.customerId?.message)}>
+            <Field id="order-customer" label={t('sales.customer')} error={text(t, form.formState.errors.customerId?.message)} hint={t('fieldHint.order-customer')}>
               <select id="order-customer" className={selectClass} {...form.register('customerId')}>
                 <option value="">{t('sales.chooseCustomer')}</option>
                 {customers.map((customer) => (
@@ -240,17 +241,17 @@ function OrderList({
                 ))}
               </select>
             </Field>
-            <Field id="order-date" label={t('sales.date')} error={text(t, form.formState.errors.orderedOn?.message)}>
+            <Field id="order-date" label={t('sales.date')} error={text(t, form.formState.errors.orderedOn?.message)} hint={t('fieldHint.order-date')}>
               <Input id="order-date" type="date" {...form.register('orderedOn')} />
             </Field>
-            <Field id="order-description" label={t('sales.description')} error={text(t, form.formState.errors.lines?.[0]?.description?.message)}>
-              <Input id="order-description" {...form.register('lines.0.description')} />
+            <Field id="order-description" label={t('sales.description')} error={text(t, form.formState.errors.lines?.[0]?.description?.message)} hint={t('fieldHint.order-description')}>
+              <Input id="order-description" {...form.register('lines.0.description')}  placeholder={t('fieldPh.order-description')}/>
             </Field>
-            <Field id="order-quantity" label={t('sales.quantity')} error={text(t, form.formState.errors.lines?.[0]?.quantity?.message)}>
-              <Input id="order-quantity" type="number" min={0} step="0.001" {...form.register('lines.0.quantity', { valueAsNumber: true })} />
+            <Field id="order-quantity" label={t('sales.quantity')} error={text(t, form.formState.errors.lines?.[0]?.quantity?.message)} hint={t('fieldHint.order-quantity')}>
+              <Input id="order-quantity" type="number" min={0} step="0.001" {...form.register('lines.0.quantity', { valueAsNumber: true })}  placeholder={t('fieldPh.order-quantity')}/>
             </Field>
-            <Field id="order-price" label={t('sales.unitPrice')} error={text(t, form.formState.errors.lines?.[0]?.unitPrice?.message)}>
-              <Input id="order-price" type="number" min={0} step="0.01" {...form.register('lines.0.unitPrice', { valueAsNumber: true })} />
+            <Field id="order-price" label={t('sales.unitPrice')} error={text(t, form.formState.errors.lines?.[0]?.unitPrice?.message)} hint={t('fieldHint.order-price')}>
+              <Input id="order-price" type="number" min={0} step="0.01" {...form.register('lines.0.unitPrice', { valueAsNumber: true })}  placeholder={t('fieldPh.order-price')}/>
             </Field>
             {mutation.isError ? <Alert>{explain(mutation.error, t)}</Alert> : null}
             <Button type="submit">{mutation.isPending ? t('sales.saving') : t('sales.saveOrder')}</Button>

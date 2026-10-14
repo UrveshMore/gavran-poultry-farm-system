@@ -1,5 +1,19 @@
 # Changelog
 
+## 0.28.0 — 2026-10-14
+
+Farmer navigation, knowledge notes, and a guided tour.
+
+- Home is a few large tiles: daily work, birds and eggs, incubator, health, feed, sales and money, counts, people, farm setup, and help.
+- A worker does not see money or people. Technical tools sit under farm setup.
+- A hatch day after the day the flock opened says so, in English, Hindi, and Marathi.
+- Disease and medicine notes are one name each, with signs, use, how the paper said to give it, and the source page. Broken page titles were removed. Amounts are only those written on the paper.
+- The first visit starts a short tour. Help replays it and explains every screen.
+- Today lists jobs that are due and links to eggs, losses, feed, who came, and the yard book.
+- The yard book stores when the birds went out, when they were shut in, and a free note. No clock time is suggested.
+- Every field has an example or a short hint. A date picker cannot go before 2000 or, unless the field allows it, after today.
+- Help explains every screen. The same words are in `docs/USER_GUIDE.md` and `docs/USER_GUIDE.pdf`, with a picture of each screen.
+
 ## 0.27.0 — 2026-10-13
 
 Phase 26 named reports.

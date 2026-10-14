@@ -53,7 +53,7 @@ export async function recordAttendance(actor: Actor, access: FarmAccess, body: u
   const farm = await findFarmById(pool, access.farmId, false);
   if (!farm) throw new AppError(404, 'NOT_FOUND', 'Not found.');
   if (input.attendedOn > todayInTimeZone(farm.timezone)) {
-    throw new AppError(422, 'VALIDATION_ERROR', 'That date is in the future.', { fields: { attendedOn: 'too_big' } });
+    throw new AppError(422, 'VALIDATION_ERROR', 'That date is in the future.', { fields: { attendedOn: 'future_date' } });
   }
   const target = input.userId === '' ? actor.user.id : input.userId;
   if (target !== actor.user.id && !canRecordOthers(access)) {

@@ -6,9 +6,11 @@ import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { Link, useParams } from 'react-router-dom';
 import { z } from 'zod';
+import { ScreenTour } from '@/components/Tour';
 import { Alert, Button, Card, Field, Input, TextArea } from '@/components/ui';
 import { ApiError, api, errorKey } from '@/lib/api';
 import type { FarmSummary, Incubator, IncubatorMaintenance, IncubatorReading } from '@/lib/types';
+import { localToday } from '@/lib/today';
 
 function text(t: (key: string, options?: { defaultValue?: string }) => string, code?: string) {
   if (!code) return undefined;
@@ -51,11 +53,12 @@ export function IncubatorsPage() {
     <div className="grid gap-4">
       <div className="flex items-start justify-between gap-3">
         <div>
-          <h1 className="font-display text-3xl font-semibold">{t('incubators.title')}</h1>
-          <p className="mt-1 text-ink-soft">{t('incubators.body')}</p>
+          <h1 data-tour="screen-title" className="font-display text-3xl font-semibold">{t('incubators.title')}</h1>
+          <p data-tour="screen-body" className="mt-1 text-ink-soft">{t('incubators.body')}</p>
+          <ScreenTour screen="incubators" />
         </div>
         {canManage ? (
-          <Button type="button" variant="outline" onClick={() => setOpen((value) => !value)}>
+          <Button data-tour="screen-action" type="button" variant="outline" onClick={() => setOpen((value) => !value)}>
             {open ? t('incubators.hideForm') : t('incubators.add')}
           </Button>
         ) : null}
@@ -118,11 +121,11 @@ function IncubatorForm({ farmId, onDone }: { farmId: string; onDone: () => void 
           mutation.mutate({ ...values, capacityEggs: raw === null || Number.isNaN(raw) ? null : raw });
         })}
       >
-        <Field id="inc-code" label={t('incubators.code')} error={text(t, errors.code?.message)}>
-          <Input id="inc-code" {...form.register('code')} />
+        <Field id="inc-code" label={t('incubators.code')} error={text(t, errors.code?.message)} hint={t('fieldHint.inc-code')}>
+          <Input id="inc-code" {...form.register('code')}  placeholder={t('fieldPh.inc-code')}/>
         </Field>
-        <Field id="inc-name" label={t('incubators.name')} error={text(t, errors.name?.message)}>
-          <Input id="inc-name" {...form.register('name')} />
+        <Field id="inc-name" label={t('incubators.name')} error={text(t, errors.name?.message)} hint={t('fieldHint.inc-name')}>
+          <Input id="inc-name" {...form.register('name')}  placeholder={t('fieldPh.inc-name')}/>
         </Field>
         <Field id="inc-capacity" label={`${t('incubators.capacity')} (${t('common.optional')})`} hint={t('incubators.capacityHint')} error={text(t, errors.capacityEggs?.message)}>
           <Input
@@ -132,8 +135,8 @@ function IncubatorForm({ farmId, onDone }: { farmId: string; onDone: () => void 
             {...form.register('capacityEggs', { setValueAs: (value) => (value === '' || value === null ? null : Number(value)) })}
           />
         </Field>
-        <Field id="inc-notes" label={`${t('incubators.notes')} (${t('common.optional')})`} error={text(t, errors.notes?.message)}>
-          <TextArea id="inc-notes" {...form.register('notes')} />
+        <Field id="inc-notes" label={`${t('incubators.notes')} (${t('common.optional')})`} error={text(t, errors.notes?.message)} hint={t('fieldHint.inc-notes')}>
+          <TextArea id="inc-notes" {...form.register('notes')}  placeholder={t('fieldPh.inc-notes')}/>
         </Field>
         {mutation.isError ? <Alert>{explain(mutation.error, t)}</Alert> : null}
         <Button type="submit" disabled={mutation.isPending}>
@@ -228,7 +231,7 @@ export function IncubatorDetailPage() {
 
 function ReadingForm({ farmId, incubatorId, onDone }: { farmId: string; incubatorId: string; onDone: () => void }) {
   const { t } = useTranslation();
-  const today = new Date().toISOString().slice(0, 10);
+  const today = localToday();
   const form = useForm<z.infer<typeof incubatorReadingInputSchema>>({
     resolver: zodResolver(incubatorReadingInputSchema),
     defaultValues: {
@@ -261,15 +264,15 @@ function ReadingForm({ farmId, incubatorId, onDone }: { farmId: string; incubato
     <Card>
       <form className="grid gap-3" noValidate onSubmit={form.handleSubmit((values) => mutation.mutate(values))}>
         <h2 className="font-display text-2xl">{t('incubators.reading')}</h2>
-        <Field id="read-date" label={t('incubators.date')} error={text(t, form.formState.errors.recordedOn?.message)}>
+        <Field id="read-date" label={t('incubators.date')} error={text(t, form.formState.errors.recordedOn?.message)} hint={t('fieldHint.read-date')}>
           <Input id="read-date" type="date" {...form.register('recordedOn')} />
         </Field>
-        <Field id="read-time" label={`${t('incubators.time')} (${t('common.optional')})`} error={text(t, form.formState.errors.recordedTime?.message)}>
+        <Field id="read-time" label={`${t('incubators.time')} (${t('common.optional')})`} error={text(t, form.formState.errors.recordedTime?.message)} hint={t('fieldHint.read-time')}>
           <Input id="read-time" type="time" {...form.register('recordedTime')} />
         </Field>
         <MeasureFields form={form} name="temperature" label={t('incubators.temperature')} />
         <MeasureFields form={form} name="humidity" label={t('incubators.humidity')} />
-        <Field id="read-power" label={t('incubators.powerLabel')}>
+        <Field id="read-power" label={t('incubators.powerLabel')} hint={t('fieldHint.read-power')}>
           <select id="read-power" className={selectClass} {...form.register('powerStatus')}>
             {(['unknown', 'on', 'off'] as const).map((item) => (
               <option key={item} value={item}>
@@ -278,7 +281,7 @@ function ReadingForm({ farmId, incubatorId, onDone }: { farmId: string; incubato
             ))}
           </select>
         </Field>
-        <Field id="read-source" label={t('incubators.sourceLabel')}>
+        <Field id="read-source" label={t('incubators.sourceLabel')} hint={t('fieldHint.read-source')}>
           <select id="read-source" className={selectClass} {...form.register('source')}>
             {(['manual', 'sensor'] as const).map((item) => (
               <option key={item} value={item}>
@@ -287,8 +290,8 @@ function ReadingForm({ farmId, incubatorId, onDone }: { farmId: string; incubato
             ))}
           </select>
         </Field>
-        <Field id="read-notes" label={`${t('incubators.notes')} (${t('common.optional')})`}>
-          <TextArea id="read-notes" {...form.register('notes')} />
+        <Field id="read-notes" label={`${t('incubators.notes')} (${t('common.optional')})`} hint={t('fieldHint.read-notes')}>
+          <TextArea id="read-notes" {...form.register('notes')}  placeholder={t('fieldPh.read-notes')}/>
         </Field>
         {mutation.isError ? <Alert>{explain(mutation.error, t)}</Alert> : null}
         <Button type="submit" disabled={mutation.isPending}>
@@ -313,16 +316,17 @@ function MeasureFields({
   const unitError = form.formState.errors[name]?.unit?.message;
   return (
     <div className="grid gap-3 sm:grid-cols-2">
-      <Field id={`${name}-value`} label={`${label} (${t('common.optional')})`} error={text(t, valueError)}>
+      <Field id={`${name}-value`} label={`${label} (${t('common.optional')})`} error={text(t, valueError)} hint={t('fieldHint.reading-value')}>
         <Input
           id={`${name}-value`}
           type="number"
           step="0.01"
+          placeholder={t('fieldPh.reading-value')}
           {...form.register(`${name}.value`, { setValueAs: (value) => (value === '' || value === null ? null : Number(value)) })}
         />
       </Field>
-      <Field id={`${name}-unit`} label={t('incubators.unit')} error={text(t, unitError)}>
-        <Input id={`${name}-unit`} {...form.register(`${name}.unit`)} />
+      <Field id={`${name}-unit`} label={t('incubators.unit')} error={text(t, unitError)} hint={t('fieldHint.reading-unit')}>
+        <Input id={`${name}-unit`} {...form.register(`${name}.unit`)}  placeholder={t('fieldPh.reading-unit')}/>
       </Field>
     </div>
   );
@@ -330,7 +334,7 @@ function MeasureFields({
 
 function MaintenanceForm({ farmId, incubatorId, onDone }: { farmId: string; incubatorId: string; onDone: () => void }) {
   const { t } = useTranslation();
-  const today = new Date().toISOString().slice(0, 10);
+  const today = localToday();
   const form = useForm<z.infer<typeof incubatorMaintenanceInputSchema>>({
     resolver: zodResolver(incubatorMaintenanceInputSchema),
     defaultValues: { occurredOn: today, status: 'out_of_service', notes: '' },
@@ -344,17 +348,17 @@ function MaintenanceForm({ farmId, incubatorId, onDone }: { farmId: string; incu
     <Card>
       <form className="grid gap-3" noValidate onSubmit={form.handleSubmit((values) => mutation.mutate(values))}>
         <h2 className="font-display text-2xl">{t('incubators.maintenance')}</h2>
-        <Field id="maint-date" label={t('incubators.date')}>
+        <Field id="maint-date" label={t('incubators.date')} hint={t('fieldHint.maint-date')}>
           <Input id="maint-date" type="date" {...form.register('occurredOn')} />
         </Field>
-        <Field id="maint-status" label={t('incubators.statusLabel')}>
+        <Field id="maint-status" label={t('incubators.statusLabel')} hint={t('fieldHint.maint-status')}>
           <select id="maint-status" className={selectClass} {...form.register('status')}>
             <option value="out_of_service">{t('incubators.status.out_of_service')}</option>
             <option value="in_service">{t('incubators.status.in_service')}</option>
           </select>
         </Field>
-        <Field id="maint-notes" label={`${t('incubators.notes')} (${t('common.optional')})`}>
-          <TextArea id="maint-notes" {...form.register('notes')} />
+        <Field id="maint-notes" label={`${t('incubators.notes')} (${t('common.optional')})`} hint={t('fieldHint.maint-notes')}>
+          <TextArea id="maint-notes" {...form.register('notes')}  placeholder={t('fieldPh.maint-notes')}/>
         </Field>
         {mutation.isError ? <Alert>{explain(mutation.error, t)}</Alert> : null}
         <Button type="submit" variant="outline" disabled={mutation.isPending}>

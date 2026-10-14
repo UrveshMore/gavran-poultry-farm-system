@@ -49,6 +49,9 @@ Dated 2026-10-13. Technical choices below are provisional engineering defaults f
 | T41 | `document.documentElement.lang` follows `gavran.locale`. Hindi and Marathi strings are provisional. The screen says a fluent review is still needed. | No fluent review is claimed. |
 | T42 | Search uses `LIKE ? ESCAPE '!'` on the current farm. The pattern escapes `!`, `%`, and `_`. Sections run only when the caller has that read permission. Amount columns are not selected. | Workers must not see prices. |
 | T43 | A named report stores the name, note, and date the farm types. `cadence.status` is `not_chosen`. A run calls the existing report with `from` and `to` typed at that moment. `delivery` is `not_sent`. | No clock and no outbound message. |
+| T44 | Knowledge rows are one disease, medicine, or care note. Columns are use, signs, how the paper said to give it, when, and care. Photo slides store the name and say the amount was not on the page. Unreadable brooding temperatures are not stored. Old fragment rows, and approvals or medicine rows that pointed at them, were removed. | The PDF text layer dropped vowel signs. Doses are not invented. |
+| T45 | The farm home is ten tiles. Screens the role cannot open are hidden. Setup holds sheds, papers, saved count names, the spare-copy check, and the change list. A first visit starts a driver.js tour per role. Help replays it. Each screen's guide says what it is, where it is, why it is used, and how to use it. | A worker should not hunt through money screens. |
+| T46 | A yard note is `let_out`, `shut_in`, or `note`, with an optional clock time. No time is suggested. Workers may write one. It is not queued offline. | A backyard day starts and ends at the gate. Decision 10 stays open. |
 
 ## Still open (blueprint section 18)
 

@@ -8,6 +8,7 @@ import { z } from 'zod';
 import { Alert, Button, Card, Field, Input, TextArea } from '@/components/ui';
 import { ApiError, api, errorKey } from '@/lib/api';
 import type { Batch, FarmSummary, ParentagePage } from '@/lib/types';
+import { localToday } from '@/lib/today';
 
 const selectClass = 'min-h-11 w-full rounded-xl border border-line bg-white px-3';
 
@@ -32,12 +33,12 @@ export function ParentagePageView() {
   const canRecord = Boolean(access?.permissions.includes('breeding.record'));
   const form = useForm<z.infer<typeof parentageInputSchema>>({
     resolver: zodResolver(parentageInputSchema),
-    defaultValues: { recordedOn: '', offspringBatchId: '', sireNote: '', damNote: '', sireBatchId: '', damBatchId: '', note: '' },
+    defaultValues: { recordedOn: localToday(), offspringBatchId: '', sireNote: '', damNote: '', sireBatchId: '', damBatchId: '', note: '' },
   });
   const mutation = useMutation({
     mutationFn: (values: z.infer<typeof parentageInputSchema>) => api(`/api/v1/farms/${farmId}/parentage`, { method: 'POST', json: values }),
     onSuccess: () => {
-      form.reset({ recordedOn: '', offspringBatchId: '', sireNote: '', damNote: '', sireBatchId: '', damBatchId: '', note: '' });
+      form.reset({ recordedOn: localToday(), offspringBatchId: '', sireNote: '', damNote: '', sireBatchId: '', damBatchId: '', note: '' });
       void queryClient.invalidateQueries({ queryKey: ['parentage', farmId] });
     },
   });
@@ -72,10 +73,10 @@ export function ParentagePageView() {
         <Card>
           <form className="grid gap-3" onSubmit={form.handleSubmit((values) => mutation.mutate(values))}>
             <h2 className="font-display text-2xl">{t('parentage.add')}</h2>
-            <Field id="par-date" label={t('parentage.date')}>
+            <Field id="par-date" label={t('parentage.date')} hint={t('fieldHint.par-date')}>
               <Input id="par-date" type="date" {...form.register('recordedOn')} />
             </Field>
-            <Field id="par-offspring" label={`${t('parentage.offspring')} (${t('common.optional')})`}>
+            <Field id="par-offspring" label={`${t('parentage.offspring')} (${t('common.optional')})`} hint={t('fieldHint.par-offspring')}>
               <select id="par-offspring" className={selectClass} {...form.register('offspringBatchId')}>
                 <option value="">{t('parentage.none')}</option>
                 {(batches.data ?? []).map((batch) => (
@@ -84,9 +85,9 @@ export function ParentagePageView() {
               </select>
             </Field>
             <Field id="par-sire" label={t('parentage.sire')} hint={t('parentage.parentHint')}>
-              <Input id="par-sire" {...form.register('sireNote')} />
+              <Input id="par-sire" {...form.register('sireNote')}  placeholder={t('fieldPh.par-sire')}/>
             </Field>
-            <Field id="par-sire-batch" label={`${t('parentage.sireBatch')} (${t('common.optional')})`}>
+            <Field id="par-sire-batch" label={`${t('parentage.sireBatch')} (${t('common.optional')})`} hint={t('fieldHint.par-sire-batch')}>
               <select id="par-sire-batch" className={selectClass} {...form.register('sireBatchId')}>
                 <option value="">{t('parentage.none')}</option>
                 {(batches.data ?? []).map((batch) => (
@@ -94,10 +95,10 @@ export function ParentagePageView() {
                 ))}
               </select>
             </Field>
-            <Field id="par-dam" label={t('parentage.dam')}>
-              <Input id="par-dam" {...form.register('damNote')} />
+            <Field id="par-dam" label={t('parentage.dam')} hint={t('fieldHint.par-dam')}>
+              <Input id="par-dam" {...form.register('damNote')}  placeholder={t('fieldPh.par-dam')}/>
             </Field>
-            <Field id="par-dam-batch" label={`${t('parentage.damBatch')} (${t('common.optional')})`}>
+            <Field id="par-dam-batch" label={`${t('parentage.damBatch')} (${t('common.optional')})`} hint={t('fieldHint.par-dam-batch')}>
               <select id="par-dam-batch" className={selectClass} {...form.register('damBatchId')}>
                 <option value="">{t('parentage.none')}</option>
                 {(batches.data ?? []).map((batch) => (
@@ -105,8 +106,8 @@ export function ParentagePageView() {
                 ))}
               </select>
             </Field>
-            <Field id="par-note" label={`${t('parentage.note')} (${t('common.optional')})`}>
-              <TextArea id="par-note" {...form.register('note')} />
+            <Field id="par-note" label={`${t('parentage.note')} (${t('common.optional')})`} hint={t('fieldHint.par-note')}>
+              <TextArea id="par-note" {...form.register('note')}  placeholder={t('fieldPh.par-note')}/>
             </Field>
             {mutation.isError ? <Alert>{explain(mutation.error, t)}</Alert> : null}
             <Button type="submit">{mutation.isPending ? t('parentage.saving') : t('parentage.save')}</Button>

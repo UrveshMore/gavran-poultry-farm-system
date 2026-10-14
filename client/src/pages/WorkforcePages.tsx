@@ -10,6 +10,7 @@ import { Alert, Button, Card, Field, Input, TextArea } from '@/components/ui';
 import { ApiError, api, errorKey, fetchMe } from '@/lib/api';
 import { queueAttendance } from '@/lib/offlineQueue';
 import type { AttendancePage, FarmSummary, Member, TrainingPage } from '@/lib/types';
+import { localToday } from '@/lib/today';
 
 const selectClass = 'min-h-11 w-full rounded-xl border border-line bg-white px-3';
 
@@ -52,7 +53,7 @@ export function WorkforcePage() {
 
   const attendanceForm = useForm<z.infer<typeof attendanceInputSchema>>({
     resolver: zodResolver(attendanceInputSchema),
-    defaultValues: { userId: '', attendedOn: '', attendedTime: '', methodLabel: '', note: '' },
+    defaultValues: { userId: '', attendedOn: localToday(), attendedTime: '', methodLabel: '', note: '' },
   });
   const itemForm = useForm<z.infer<typeof trainingItemInputSchema>>({
     resolver: zodResolver(trainingItemInputSchema),
@@ -60,7 +61,7 @@ export function WorkforcePage() {
   });
   const assignForm = useForm<z.infer<typeof trainingAssignmentInputSchema>>({
     resolver: zodResolver(trainingAssignmentInputSchema),
-    defaultValues: { itemId: '', userId: '', dueOn: '' },
+    defaultValues: { itemId: '', userId: '', dueOn: localToday() },
   });
   const completeForm = useForm<z.infer<typeof trainingCompletionSchema>>({
     resolver: zodResolver(trainingCompletionSchema),
@@ -71,7 +72,7 @@ export function WorkforcePage() {
     mutationFn: (values: z.infer<typeof attendanceInputSchema>) =>
       api(`/api/v1/farms/${farmId}/attendance`, { method: 'POST', json: values }),
     onSuccess: () => {
-      attendanceForm.reset({ userId: '', attendedOn: '', attendedTime: '', methodLabel: '', note: '' });
+      attendanceForm.reset({ userId: '', attendedOn: localToday(), attendedTime: '', methodLabel: '', note: '' });
       void queryClient.invalidateQueries({ queryKey: ['attendance', farmId] });
     },
   });
@@ -87,7 +88,7 @@ export function WorkforcePage() {
     mutationFn: (values: z.infer<typeof trainingAssignmentInputSchema>) =>
       api(`/api/v1/farms/${farmId}/training-assignments`, { method: 'POST', json: values }),
     onSuccess: () => {
-      assignForm.reset({ itemId: '', userId: '', dueOn: '' });
+      assignForm.reset({ itemId: '', userId: '', dueOn: localToday() });
       void queryClient.invalidateQueries({ queryKey: ['training', farmId] });
     },
   });
@@ -144,7 +145,7 @@ export function WorkforcePage() {
                   const outcome = queueAttendance(farmId, values);
                   if (outcome === 'queued') {
                     setHeld(true);
-                    attendanceForm.reset({ userId: '', attendedOn: '', attendedTime: '', methodLabel: '', note: '' });
+                    attendanceForm.reset({ userId: '', attendedOn: localToday(), attendedTime: '', methodLabel: '', note: '' });
                   }
                   return;
                 }
@@ -154,7 +155,7 @@ export function WorkforcePage() {
             >
               <h3 className="font-display text-xl">{t('workforce.saveAttendance')}</h3>
               {people.length > 0 ? (
-                <Field id="att-person" label={t('workforce.person')}>
+                <Field id="att-person" label={t('workforce.person')} hint={t('fieldHint.att-person')}>
                   <select id="att-person" className={selectClass} {...attendanceForm.register('userId')}>
                     <option value="">{t('workforce.self')}</option>
                     {people.map((member) => (
@@ -165,17 +166,17 @@ export function WorkforcePage() {
                   </select>
                 </Field>
               ) : null}
-              <Field id="att-date" label={t('workforce.date')}>
+              <Field id="att-date" label={t('workforce.date')} hint={t('fieldHint.att-date')}>
                 <Input id="att-date" type="date" {...attendanceForm.register('attendedOn')} />
               </Field>
               <Field id="att-time" label={`${t('workforce.time')} (${t('common.optional')})`} hint={t('workforce.timeHint')}>
                 <Input id="att-time" type="time" {...attendanceForm.register('attendedTime')} />
               </Field>
               <Field id="att-method" label={t('workforce.method')} hint={t('workforce.methodHint')}>
-                <Input id="att-method" {...attendanceForm.register('methodLabel')} />
+                <Input id="att-method" {...attendanceForm.register('methodLabel')}  placeholder={t('fieldPh.att-method')}/>
               </Field>
-              <Field id="att-note" label={`${t('workforce.note')} (${t('common.optional')})`}>
-                <TextArea id="att-note" {...attendanceForm.register('note')} />
+              <Field id="att-note" label={`${t('workforce.note')} (${t('common.optional')})`} hint={t('fieldHint.att-note')}>
+                <TextArea id="att-note" {...attendanceForm.register('note')}  placeholder={t('fieldPh.att-note')}/>
               </Field>
               {held ? <Alert tone="ok">{t('offline.held')}</Alert> : null}
               {saveAttendance.isError ? <Alert>{explain(saveAttendance.error, t)}</Alert> : null}
@@ -212,8 +213,8 @@ export function WorkforcePage() {
                 className="mt-3 grid gap-3"
                 onSubmit={completeForm.handleSubmit((values) => finish.mutate({ assignmentId: row.id, note: values.note }))}
               >
-                <Field id={`done-${row.id}`} label={`${t('workforce.completeNote')} (${t('common.optional')})`}>
-                  <TextArea id={`done-${row.id}`} {...completeForm.register('note')} />
+                <Field id={`done-${row.id}`} label={`${t('workforce.completeNote')} (${t('common.optional')})`} hint={t('fieldHint.done')}>
+                  <TextArea id={`done-${row.id}`} {...completeForm.register('note')}  placeholder={t('fieldPh.done')}/>
                 </Field>
                 {finish.isError ? <Alert>{explain(finish.error, t)}</Alert> : null}
                 <Button type="submit">{finish.isPending ? t('workforce.saving') : t('workforce.complete')}</Button>
@@ -225,14 +226,14 @@ export function WorkforcePage() {
           <Card>
             <form className="grid gap-3" onSubmit={itemForm.handleSubmit((values) => saveItem.mutate(values))}>
               <h3 className="font-display text-xl">{t('workforce.saveItem')}</h3>
-              <Field id="tr-title" label={t('workforce.itemTitle')}>
-                <Input id="tr-title" {...itemForm.register('title')} />
+              <Field id="tr-title" label={t('workforce.itemTitle')} hint={t('fieldHint.tr-title')}>
+                <Input id="tr-title" {...itemForm.register('title')}  placeholder={t('fieldPh.tr-title')}/>
               </Field>
-              <Field id="tr-body" label={t('workforce.itemBody')}>
-                <TextArea id="tr-body" {...itemForm.register('body')} />
+              <Field id="tr-body" label={t('workforce.itemBody')} hint={t('fieldHint.tr-body')}>
+                <TextArea id="tr-body" {...itemForm.register('body')}  placeholder={t('fieldPh.tr-body')}/>
               </Field>
               <Field id="tr-version" label={t('workforce.version')} hint={t('workforce.versionHint')}>
-                <Input id="tr-version" {...itemForm.register('versionLabel')} />
+                <Input id="tr-version" {...itemForm.register('versionLabel')}  placeholder={t('fieldPh.tr-version')}/>
               </Field>
               {saveItem.isError ? <Alert>{explain(saveItem.error, t)}</Alert> : null}
               <Button type="submit">{saveItem.isPending ? t('workforce.saving') : t('workforce.saveItem')}</Button>
@@ -243,7 +244,7 @@ export function WorkforcePage() {
           <Card>
             <form className="grid gap-3" onSubmit={assignForm.handleSubmit((values) => saveAssignment.mutate(values))}>
               <h3 className="font-display text-xl">{t('workforce.assign')}</h3>
-              <Field id="as-item" label={t('workforce.itemTitle')}>
+              <Field id="as-item" label={t('workforce.itemTitle')} hint={t('fieldHint.as-item')}>
                 <select id="as-item" className={selectClass} {...assignForm.register('itemId')}>
                   <option value="">{t('common.optional')}</option>
                   {training.data.items.map((item) => (
@@ -253,7 +254,7 @@ export function WorkforcePage() {
                   ))}
                 </select>
               </Field>
-              <Field id="as-person" label={t('workforce.person')}>
+              <Field id="as-person" label={t('workforce.person')} hint={t('fieldHint.as-person')}>
                 <select id="as-person" className={selectClass} {...assignForm.register('userId')}>
                   <option value="">{t('common.optional')}</option>
                   {people.map((member) => (
@@ -264,7 +265,7 @@ export function WorkforcePage() {
                 </select>
               </Field>
               <Field id="as-due" label={`${t('workforce.due')} (${t('common.optional')})`} hint={t('workforce.dueHint')}>
-                <Input id="as-due" type="date" {...assignForm.register('dueOn')} />
+                <Input id="as-due" type="date" allowFuture {...assignForm.register('dueOn')} />
               </Field>
               {saveAssignment.isError ? <Alert>{explain(saveAssignment.error, t)}</Alert> : null}
               <Button type="submit">{saveAssignment.isPending ? t('workforce.saving') : t('workforce.saveAssignment')}</Button>

@@ -27,6 +27,7 @@ export function LanguageSwitcher() {
       <select
         className="min-h-11 rounded-xl border border-line bg-white px-3"
         value={current}
+        data-tour="language"
         aria-label={t('lang.label')}
         onChange={(event) => {
           const value = event.target.value;

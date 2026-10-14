@@ -55,25 +55,25 @@ export function ReportsPage() {
             setRange({ from, to, shedId, batchId, categoryId });
           }}
         >
-          <Field id="report-from" label={t('reports.from')}>
+          <Field id="report-from" label={t('reports.from')} hint={t('fieldHint.report-from')}>
             <Input id="report-from" type="date" value={from} onChange={(event) => setFrom(event.target.value)} />
           </Field>
-          <Field id="report-to" label={t('reports.to')}>
+          <Field id="report-to" label={t('reports.to')} hint={t('fieldHint.report-to')}>
             <Input id="report-to" type="date" value={to} onChange={(event) => setTo(event.target.value)} />
           </Field>
-          <Field id="report-shed" label={`${t('reports.shed')} (${t('common.optional')})`}>
+          <Field id="report-shed" label={`${t('reports.shed')} (${t('common.optional')})`} hint={t('fieldHint.report-shed')}>
             <select id="report-shed" className="min-h-11 w-full rounded-xl border border-line bg-white px-3" value={shedId} onChange={(event) => setShedId(event.target.value)}>
               <option value="">{t('reports.any')}</option>
               {(sheds.data ?? []).map((shed) => <option key={shed.id} value={shed.id}>{shed.code}</option>)}
             </select>
           </Field>
-          <Field id="report-batch" label={`${t('reports.batch')} (${t('common.optional')})`}>
+          <Field id="report-batch" label={`${t('reports.batch')} (${t('common.optional')})`} hint={t('fieldHint.report-batch')}>
             <select id="report-batch" className="min-h-11 w-full rounded-xl border border-line bg-white px-3" value={batchId} onChange={(event) => setBatchId(event.target.value)}>
               <option value="">{t('reports.any')}</option>
               {(batches.data ?? []).map((batch) => <option key={batch.id} value={batch.id}>{batch.code}</option>)}
             </select>
           </Field>
-          <Field id="report-category" label={`${t('reports.category')} (${t('common.optional')})`}>
+          <Field id="report-category" label={`${t('reports.category')} (${t('common.optional')})`} hint={t('fieldHint.report-category')}>
             <select id="report-category" className="min-h-11 w-full rounded-xl border border-line bg-white px-3" value={categoryId} onChange={(event) => setCategoryId(event.target.value)}>
               <option value="">{t('reports.any')}</option>
               {(eggCategories.data ?? []).map((category) => <option key={category.id} value={category.id}>{category.name}</option>)}

@@ -28,7 +28,7 @@ export async function createInvoiceDocument(actor: Actor, access: FarmAccess, bo
   const farm = await findFarmById(pool, access.farmId, false);
   if (!farm) throw new AppError(404, 'NOT_FOUND', 'Not found.');
   if (input.issuedOn > todayInTimeZone(farm.timezone)) {
-    throw new AppError(422, 'VALIDATION_ERROR', 'That date is in the future.', { fields: { issuedOn: 'too_big' } });
+    throw new AppError(422, 'VALIDATION_ERROR', 'That date is in the future.', { fields: { issuedOn: 'future_date' } });
   }
   if (!(await customerExists(pool, access.farmId, input.customerId))) {
     throw new AppError(422, 'VALIDATION_ERROR', 'Choose a customer on this farm.', { fields: { customerId: 'invalid_format' } });
@@ -55,7 +55,7 @@ export async function createSaleReturn(actor: Actor, access: FarmAccess, documen
   const farm = await findFarmById(pool, access.farmId, false);
   if (!farm) throw new AppError(404, 'NOT_FOUND', 'Not found.');
   if (input.returnedOn > todayInTimeZone(farm.timezone)) {
-    throw new AppError(422, 'VALIDATION_ERROR', 'That date is in the future.', { fields: { returnedOn: 'too_big' } });
+    throw new AppError(422, 'VALIDATION_ERROR', 'That date is in the future.', { fields: { returnedOn: 'future_date' } });
   }
   if (!(await documentOnFarm(pool, access.farmId, documentId))) throw new AppError(404, 'NOT_FOUND', 'Not found.');
   const path = requestPath(idempotency.path);

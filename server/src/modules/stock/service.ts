@@ -93,7 +93,7 @@ export async function createMovement(actor: Actor, access: FarmAccess, body: unk
   const input = stockMovementInputSchema.parse(body);
   const today = await farmToday(access.farmId);
   if (input.occurredOn > today) {
-    throw new AppError(422, 'VALIDATION_ERROR', 'That date is in the future.', { fields: { occurredOn: 'too_big' } });
+    throw new AppError(422, 'VALIDATION_ERROR', 'That date is in the future.', { fields: { occurredOn: 'future_date' } });
   }
   const path = requestPath(idempotency.path);
   return withTransaction(async (conn) => {
@@ -158,7 +158,7 @@ export async function createWater(actor: Actor, access: FarmAccess, body: unknow
   const input = waterInputSchema.parse(body);
   const today = await farmToday(access.farmId);
   if (input.recordedOn > today) {
-    throw new AppError(422, 'VALIDATION_ERROR', 'That date is in the future.', { fields: { recordedOn: 'too_big' } });
+    throw new AppError(422, 'VALIDATION_ERROR', 'That date is in the future.', { fields: { recordedOn: 'future_date' } });
   }
   const path = requestPath(idempotency.path);
   return withTransaction(async (conn) => {
@@ -253,7 +253,7 @@ export async function createWeighing(actor: Actor, access: FarmAccess, body: unk
   const input = weighingInputSchema.parse(body);
   const today = await farmToday(access.farmId);
   if (input.weighedOn > today) {
-    throw new AppError(422, 'VALIDATION_ERROR', 'That date is in the future.', { fields: { weighedOn: 'too_big' } });
+    throw new AppError(422, 'VALIDATION_ERROR', 'That date is in the future.', { fields: { weighedOn: 'future_date' } });
   }
   const path = requestPath(idempotency.path);
   return withTransaction(async (conn) => {

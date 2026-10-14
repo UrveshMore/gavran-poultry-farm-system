@@ -22,7 +22,7 @@ export async function createParentage(actor: Actor, access: FarmAccess, body: un
   const farm = await findFarmById(pool, access.farmId, false);
   if (!farm) throw new AppError(404, 'NOT_FOUND', 'Not found.');
   if (input.recordedOn > todayInTimeZone(farm.timezone)) {
-    throw new AppError(422, 'VALIDATION_ERROR', 'That date is in the future.', { fields: { recordedOn: 'too_big' } });
+    throw new AppError(422, 'VALIDATION_ERROR', 'That date is in the future.', { fields: { recordedOn: 'future_date' } });
   }
   const offspringBatchId = input.offspringBatchId === '' ? null : input.offspringBatchId;
   const sireBatchId = input.sireBatchId === '' ? null : input.sireBatchId;

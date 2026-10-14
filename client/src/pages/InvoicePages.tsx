@@ -9,6 +9,7 @@ import { z } from 'zod';
 import { Alert, Button, Card, Field, Input, TextArea } from '@/components/ui';
 import { ApiError, api, errorKey } from '@/lib/api';
 import type { Customer, FarmSummary } from '@/lib/types';
+import { localToday } from '@/lib/today';
 
 const selectClass = 'min-h-11 w-full rounded-xl border border-line bg-white px-3';
 
@@ -49,16 +50,16 @@ export function InvoiceDocumentsPage() {
   const refresh = () => void queryClient.invalidateQueries({ queryKey: ['invoice-documents', farmId] });
   const docForm = useForm<z.infer<typeof invoiceDocumentInputSchema>>({
     resolver: zodResolver(invoiceDocumentInputSchema),
-    defaultValues: { customerId: '', orderId: '', issuedOn: '', notes: '', lines: [{ description: '', quantity: 1, unitLabel: '', unitPrice: null, priceUnit: '' }] },
+    defaultValues: { customerId: '', orderId: '', issuedOn: localToday(), notes: '', lines: [{ description: '', quantity: 1, unitLabel: '', unitPrice: null, priceUnit: '' }] },
   });
   const returnForm = useForm<z.infer<typeof saleReturnInputSchema>>({
     resolver: zodResolver(saleReturnInputSchema),
-    defaultValues: { returnedOn: '', description: '', quantity: 0, amount: null, unitLabel: '', note: '' },
+    defaultValues: { returnedOn: localToday(), description: '', quantity: 0, amount: null, unitLabel: '', note: '' },
   });
   const saveDoc = useMutation({
     mutationFn: (values: z.infer<typeof invoiceDocumentInputSchema>) => api(`/api/v1/farms/${farmId}/invoice-documents`, { method: 'POST', json: values }),
     onSuccess: () => {
-      docForm.reset({ customerId: '', orderId: '', issuedOn: '', notes: '', lines: [{ description: '', quantity: 1, unitLabel: '', unitPrice: null, priceUnit: '' }] });
+      docForm.reset({ customerId: '', orderId: '', issuedOn: localToday(), notes: '', lines: [{ description: '', quantity: 1, unitLabel: '', unitPrice: null, priceUnit: '' }] });
       refresh();
     },
   });
@@ -66,7 +67,7 @@ export function InvoiceDocumentsPage() {
     mutationFn: (values: z.infer<typeof saleReturnInputSchema>) =>
       api(`/api/v1/farms/${farmId}/invoice-documents/${returnFor}/returns`, { method: 'POST', json: values }),
     onSuccess: () => {
-      returnForm.reset({ returnedOn: '', description: '', quantity: 0, amount: null, unitLabel: '', note: '' });
+      returnForm.reset({ returnedOn: localToday(), description: '', quantity: 0, amount: null, unitLabel: '', note: '' });
       setReturnFor('');
       refresh();
     },
@@ -112,14 +113,14 @@ export function InvoiceDocumentsPage() {
         <Card>
           <form className="grid gap-3" onSubmit={returnForm.handleSubmit((values) => saveReturn.mutate(values))}>
             <h2 className="font-display text-2xl">{t('invoices.addReturn')}</h2>
-            <Field id="ret-date" label={t('invoices.date')}><Input id="ret-date" type="date" {...returnForm.register('returnedOn')} /></Field>
-            <Field id="ret-desc" label={t('invoices.what')}><Input id="ret-desc" {...returnForm.register('description')} /></Field>
-            <Field id="ret-qty" label={t('invoices.quantity')}><Input id="ret-qty" type="number" min={0} step="any" {...returnForm.register('quantity', { valueAsNumber: true })} /></Field>
+            <Field id="ret-date" label={t('invoices.date')} hint={t('fieldHint.ret-date')}><Input id="ret-date" type="date" {...returnForm.register('returnedOn')} /></Field>
+            <Field id="ret-desc" label={t('invoices.what')} hint={t('fieldHint.ret-desc')}><Input id="ret-desc" {...returnForm.register('description')}  placeholder={t('fieldPh.ret-desc')}/></Field>
+            <Field id="ret-qty" label={t('invoices.quantity')} hint={t('fieldHint.ret-qty')}><Input id="ret-qty" type="number" min={0} step="any" {...returnForm.register('quantity', { valueAsNumber: true })}  placeholder={t('fieldPh.ret-qty')}/></Field>
             <Field id="ret-amount" label={`${t('invoices.amount')} (${t('common.optional')})`} hint={t('invoices.amountHint')}>
               <Input id="ret-amount" type="number" min={0} step="any" {...returnForm.register('amount', { setValueAs: (value) => (value === '' || value === null ? null : Number(value)) })} />
             </Field>
-            <Field id="ret-unit" label={`${t('invoices.moneyUnit')} (${t('common.optional')})`}><Input id="ret-unit" {...returnForm.register('unitLabel')} /></Field>
-            <Field id="ret-note" label={`${t('invoices.note')} (${t('common.optional')})`}><TextArea id="ret-note" {...returnForm.register('note')} /></Field>
+            <Field id="ret-unit" label={`${t('invoices.moneyUnit')} (${t('common.optional')})`} hint={t('fieldHint.ret-unit')}><Input id="ret-unit" {...returnForm.register('unitLabel')}  placeholder={t('fieldPh.ret-unit')}/></Field>
+            <Field id="ret-note" label={`${t('invoices.note')} (${t('common.optional')})`} hint={t('fieldHint.ret-note')}><TextArea id="ret-note" {...returnForm.register('note')}  placeholder={t('fieldPh.ret-note')}/></Field>
             {saveReturn.isError ? <Alert>{explain(saveReturn.error, t)}</Alert> : null}
             <Button type="submit">{saveReturn.isPending ? t('invoices.saving') : t('invoices.saveReturn')}</Button>
           </form>
@@ -129,21 +130,21 @@ export function InvoiceDocumentsPage() {
         <Card>
           <form className="grid gap-3" onSubmit={docForm.handleSubmit((values) => saveDoc.mutate(values))}>
             <h2 className="font-display text-2xl">{t('invoices.add')}</h2>
-            <Field id="inv-customer" label={t('invoices.customer')}>
+            <Field id="inv-customer" label={t('invoices.customer')} hint={t('fieldHint.inv-customer')}>
               <select id="inv-customer" className={selectClass} {...docForm.register('customerId')}>
                 <option value="">{t('invoices.choose')}</option>
                 {(customers.data ?? []).map((customer) => <option key={customer.id} value={customer.id}>{customer.name}</option>)}
               </select>
             </Field>
-            <Field id="inv-date" label={t('invoices.date')}><Input id="inv-date" type="date" {...docForm.register('issuedOn')} /></Field>
-            <Field id="inv-desc" label={t('invoices.what')}><Input id="inv-desc" {...docForm.register('lines.0.description')} /></Field>
-            <Field id="inv-qty" label={t('invoices.quantity')}><Input id="inv-qty" type="number" min={0} step="any" {...docForm.register('lines.0.quantity', { valueAsNumber: true })} /></Field>
-            <Field id="inv-unit" label={t('invoices.unit')}><Input id="inv-unit" {...docForm.register('lines.0.unitLabel')} /></Field>
+            <Field id="inv-date" label={t('invoices.date')} hint={t('fieldHint.inv-date')}><Input id="inv-date" type="date" {...docForm.register('issuedOn')} /></Field>
+            <Field id="inv-desc" label={t('invoices.what')} hint={t('fieldHint.inv-desc')}><Input id="inv-desc" {...docForm.register('lines.0.description')}  placeholder={t('fieldPh.inv-desc')}/></Field>
+            <Field id="inv-qty" label={t('invoices.quantity')} hint={t('fieldHint.inv-qty')}><Input id="inv-qty" type="number" min={0} step="any" {...docForm.register('lines.0.quantity', { valueAsNumber: true })}  placeholder={t('fieldPh.inv-qty')}/></Field>
+            <Field id="inv-unit" label={t('invoices.unit')} hint={t('fieldHint.inv-unit')}><Input id="inv-unit" {...docForm.register('lines.0.unitLabel')}  placeholder={t('fieldPh.inv-unit')}/></Field>
             <Field id="inv-price" label={`${t('invoices.price')} (${t('common.optional')})`} hint={t('invoices.priceHint')}>
               <Input id="inv-price" type="number" min={0} step="any" {...docForm.register('lines.0.unitPrice', { setValueAs: (value) => (value === '' || value === null ? null : Number(value)) })} />
             </Field>
-            <Field id="inv-price-unit" label={`${t('invoices.moneyUnit')} (${t('common.optional')})`}><Input id="inv-price-unit" {...docForm.register('lines.0.priceUnit')} /></Field>
-            <Field id="inv-note" label={`${t('invoices.note')} (${t('common.optional')})`}><TextArea id="inv-note" {...docForm.register('notes')} /></Field>
+            <Field id="inv-price-unit" label={`${t('invoices.moneyUnit')} (${t('common.optional')})`} hint={t('fieldHint.inv-price-unit')}><Input id="inv-price-unit" {...docForm.register('lines.0.priceUnit')}  placeholder={t('fieldPh.inv-price-unit')}/></Field>
+            <Field id="inv-note" label={`${t('invoices.note')} (${t('common.optional')})`} hint={t('fieldHint.inv-note')}><TextArea id="inv-note" {...docForm.register('notes')}  placeholder={t('fieldPh.inv-note')}/></Field>
             {saveDoc.isError ? <Alert>{explain(saveDoc.error, t)}</Alert> : null}
             <Button type="submit">{saveDoc.isPending ? t('invoices.saving') : t('invoices.save')}</Button>
           </form>

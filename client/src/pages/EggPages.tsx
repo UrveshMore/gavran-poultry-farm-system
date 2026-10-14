@@ -6,9 +6,11 @@ import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
 import { z } from 'zod';
+import { ScreenTour } from '@/components/Tour';
 import { Alert, Button, Card, Field, Input, TextArea } from '@/components/ui';
 import { ApiError, api, errorKey } from '@/lib/api';
 import type { Batch, EggCategory, EggCollection, FarmSummary, Shed } from '@/lib/types';
+import { localToday } from '@/lib/today';
 
 function text(t: (key: string, options?: { defaultValue?: string }) => string, code?: string) {
   if (!code) return undefined;
@@ -53,11 +55,12 @@ export function EggsPage() {
     <div className="grid gap-4">
       <div className="flex items-start justify-between gap-3">
         <div>
-          <h1 className="font-display text-3xl font-semibold">{t('eggs.title')}</h1>
-          <p className="mt-1 text-ink-soft">{t('eggs.body')}</p>
+          <h1 data-tour="screen-title" className="font-display text-3xl font-semibold">{t('eggs.title')}</h1>
+          <p data-tour="screen-body" className="mt-1 text-ink-soft">{t('eggs.body')}</p>
+          <ScreenTour screen="eggs" />
         </div>
         {canRecord && active.length > 0 ? (
-          <Button type="button" variant="outline" onClick={() => setOpen((value) => !value)}>
+          <Button data-tour="screen-action" type="button" variant="outline" onClick={() => setOpen((value) => !value)}>
             {open ? t('eggs.hideForm') : t('eggs.record')}
           </Button>
         ) : null}
@@ -157,8 +160,8 @@ function SortTools({ farmId, categories, onDone }: { farmId: string; categories:
           {t('eggs.addSorts')}
         </Button>
         <form className="grid gap-3" onSubmit={form.handleSubmit((values) => mutation.mutate(values))} noValidate>
-          <Field id="egg-sort" label={t('eggs.sortName')} error={text(t, form.formState.errors.name?.message)}>
-            <Input id="egg-sort" {...form.register('name')} />
+          <Field id="egg-sort" label={t('eggs.sortName')} error={text(t, form.formState.errors.name?.message)} hint={t('fieldHint.egg-sort')}>
+            <Input id="egg-sort" {...form.register('name')}  placeholder={t('fieldPh.egg-sort')}/>
           </Field>
           {error ? <Alert>{error}</Alert> : null}
           {mutation.isError ? <Alert>{explain(mutation.error, t)}</Alert> : null}
@@ -173,7 +176,7 @@ function SortTools({ farmId, categories, onDone }: { farmId: string; categories:
 
 function CollectionForm({ farmId, categories, onDone }: { farmId: string; categories: EggCategory[]; onDone: () => void }) {
   const { t } = useTranslation();
-  const today = new Date().toISOString().slice(0, 10);
+  const today = localToday();
   const batches = useQuery({ queryKey: ['batches', farmId], queryFn: () => api<Batch[]>(`/api/v1/farms/${farmId}/batches`) });
   const sheds = useQuery({ queryKey: ['sheds', farmId], queryFn: () => api<Shed[]>(`/api/v1/farms/${farmId}/sheds`) });
   const [collectedOn, setCollectedOn] = useState(today);
@@ -215,10 +218,10 @@ function CollectionForm({ farmId, categories, onDone }: { farmId: string; catego
     <Card>
       <form className="grid gap-3" onSubmit={submit} noValidate>
         <p className="text-sm text-ink-soft">{t('eggs.backyard')}</p>
-        <Field id="egg-date" label={t('eggs.date')}>
+        <Field id="egg-date" label={t('eggs.date')} hint={t('fieldHint.egg-date')}>
           <Input id="egg-date" type="date" value={collectedOn} onChange={(event) => setCollectedOn(event.target.value)} />
         </Field>
-        <Field id="egg-batch" label={`${t('eggs.batch')} (${t('common.optional')})`}>
+        <Field id="egg-batch" label={`${t('eggs.batch')} (${t('common.optional')})`} hint={t('fieldHint.egg-batch')}>
           <select id="egg-batch" className={selectClass} value={batchId} onChange={(event) => setBatchId(event.target.value)}>
             <option value="">{t('eggs.batchNone')}</option>
             {openBatches.map((batch) => (
@@ -228,7 +231,7 @@ function CollectionForm({ farmId, categories, onDone }: { farmId: string; catego
             ))}
           </select>
         </Field>
-        <Field id="egg-shed" label={`${t('eggs.shed')} (${t('common.optional')})`}>
+        <Field id="egg-shed" label={`${t('eggs.shed')} (${t('common.optional')})`} hint={t('fieldHint.egg-shed')}>
           <select id="egg-shed" className={selectClass} value={shedId} onChange={(event) => setShedId(event.target.value)}>
             <option value="">{t('eggs.shedNone')}</option>
             {(sheds.data ?? []).map((shed) => (
@@ -238,23 +241,24 @@ function CollectionForm({ farmId, categories, onDone }: { farmId: string; catego
             ))}
           </select>
         </Field>
-        <Field id="egg-shift" label={`${t('eggs.shift')} (${t('common.optional')})`}>
-          <Input id="egg-shift" value={shiftLabel} maxLength={40} onChange={(event) => setShiftLabel(event.target.value)} />
+        <Field id="egg-shift" label={`${t('eggs.shift')} (${t('common.optional')})`} hint={t('fieldHint.egg-shift')}>
+          <Input id="egg-shift" value={shiftLabel} maxLength={40} placeholder={t('fieldPh.egg-shift')} onChange={(event) => setShiftLabel(event.target.value)} />
         </Field>
         {categories.map((category) => (
-          <Field key={category.id} id={`egg-count-${category.id}`} label={category.name}>
+          <Field key={category.id} id={`egg-count-${category.id}`} label={category.name} hint={t('fieldHint.egg-count')}>
             <Input
               id={`egg-count-${category.id}`}
               type="number"
               min={0}
               inputMode="numeric"
               value={counts[category.id] ?? ''}
+              placeholder={t('fieldPh.egg-count')}
               onChange={(event) => setCounts((current) => ({ ...current, [category.id]: event.target.value }))}
             />
           </Field>
         ))}
-        <Field id="egg-notes" label={`${t('eggs.notes')} (${t('common.optional')})`}>
-          <TextArea id="egg-notes" value={notes} maxLength={500} onChange={(event) => setNotes(event.target.value)} />
+        <Field id="egg-notes" label={`${t('eggs.notes')} (${t('common.optional')})`} hint={t('fieldHint.egg-notes')}>
+          <TextArea id="egg-notes" value={notes} maxLength={500} placeholder={t('fieldPh.egg-notes')} onChange={(event) => setNotes(event.target.value)} />
         </Field>
         {fieldError ? <Alert>{fieldError}</Alert> : null}
         {mutation.isError ? <Alert>{explain(mutation.error, t)}</Alert> : null}

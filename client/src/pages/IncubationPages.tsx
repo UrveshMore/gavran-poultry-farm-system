@@ -9,6 +9,7 @@ import { z } from 'zod';
 import { Alert, Button, Card, Field, Input, TextArea } from '@/components/ui';
 import { ApiError, api, errorKey } from '@/lib/api';
 import type { BirdType, CandlingRecord, FarmSummary, HatchRecord, Incubator, ProposedHatchRate, Shed, Sitting } from '@/lib/types';
+import { localToday } from '@/lib/today';
 
 function text(t: (key: string, options?: { defaultValue?: string }) => string, code?: string) {
   if (!code) return undefined;
@@ -88,7 +89,7 @@ export function IncubationPage() {
 
 function SittingForm({ farmId, onDone }: { farmId: string; onDone: () => void }) {
   const { t } = useTranslation();
-  const today = new Date().toISOString().slice(0, 10);
+  const today = localToday();
   const machines = useQuery({ queryKey: ['incubators', farmId], queryFn: () => api<Incubator[]>(`/api/v1/farms/${farmId}/incubators`) });
   const form = useForm<z.infer<typeof incubationInputSchema>>({
     resolver: zodResolver(incubationInputSchema),
@@ -103,21 +104,21 @@ function SittingForm({ farmId, onDone }: { farmId: string; onDone: () => void })
   return (
     <Card>
       <form className="grid gap-3" noValidate onSubmit={form.handleSubmit((values) => mutation.mutate(values))}>
-        <Field id="sit-code" label={t('incubation.code')} error={text(t, form.formState.errors.code?.message)}>
-          <Input id="sit-code" {...form.register('code')} />
+        <Field id="sit-code" label={t('incubation.code')} error={text(t, form.formState.errors.code?.message)} hint={t('fieldHint.sit-code')}>
+          <Input id="sit-code" {...form.register('code')}  placeholder={t('fieldPh.sit-code')}/>
         </Field>
-        <Field id="sit-mode" label={t('incubation.where')}>
+        <Field id="sit-mode" label={t('incubation.where')} hint={t('fieldHint.sit-mode')}>
           <select id="sit-mode" className={selectClass} {...form.register('mode')}>
             <option value="broody_hen">{t('incubation.mode.broody_hen')}</option>
             <option value="incubator">{t('incubation.mode.incubator')}</option>
           </select>
         </Field>
         {mode === 'broody_hen' ? (
-          <Field id="sit-hen" label={t('incubation.hen')} error={text(t, form.formState.errors.henName?.message)}>
-            <Input id="sit-hen" {...form.register('henName')} />
+          <Field id="sit-hen" label={t('incubation.hen')} error={text(t, form.formState.errors.henName?.message)} hint={t('fieldHint.sit-hen')}>
+            <Input id="sit-hen" {...form.register('henName')}  placeholder={t('fieldPh.sit-hen')}/>
           </Field>
         ) : (
-          <Field id="sit-machine" label={t('incubation.machine')} error={text(t, form.formState.errors.incubatorId?.message)}>
+          <Field id="sit-machine" label={t('incubation.machine')} error={text(t, form.formState.errors.incubatorId?.message)} hint={t('fieldHint.sit-machine')}>
             <select id="sit-machine" className={selectClass} {...form.register('incubatorId')}>
               <option value="">{t('incubation.chooseMachine')}</option>
               {inService.map((item) => (
@@ -128,14 +129,14 @@ function SittingForm({ farmId, onDone }: { farmId: string; onDone: () => void })
             </select>
           </Field>
         )}
-        <Field id="sit-date" label={t('incubation.started')} error={text(t, form.formState.errors.startedOn?.message)}>
+        <Field id="sit-date" label={t('incubation.started')} error={text(t, form.formState.errors.startedOn?.message)} hint={t('fieldHint.sit-date')}>
           <Input id="sit-date" type="date" {...form.register('startedOn')} />
         </Field>
-        <Field id="sit-count" label={t('incubation.eggCount')} error={text(t, form.formState.errors.eggCount?.message)}>
-          <Input id="sit-count" type="number" min={1} {...form.register('eggCount', { valueAsNumber: true })} />
+        <Field id="sit-count" label={t('incubation.eggCount')} error={text(t, form.formState.errors.eggCount?.message)} hint={t('fieldHint.sit-count')}>
+          <Input id="sit-count" type="number" min={1} {...form.register('eggCount', { valueAsNumber: true })}  placeholder={t('fieldPh.sit-count')}/>
         </Field>
-        <Field id="sit-notes" label={`${t('incubators.notes')} (${t('common.optional')})`}>
-          <TextArea id="sit-notes" {...form.register('notes')} />
+        <Field id="sit-notes" label={`${t('incubators.notes')} (${t('common.optional')})`} hint={t('fieldHint.sit-notes')}>
+          <TextArea id="sit-notes" {...form.register('notes')}  placeholder={t('fieldPh.sit-notes')}/>
         </Field>
         {mutation.isError ? <Alert>{explain(mutation.error, t)}</Alert> : null}
         <Button type="submit" disabled={mutation.isPending}>
@@ -231,7 +232,7 @@ export function IncubationDetailPage() {
 
 function HatchForm({ farmId, sittingId, onDone }: { farmId: string; sittingId: string; onDone: () => void }) {
   const { t } = useTranslation();
-  const today = new Date().toISOString().slice(0, 10);
+  const today = localToday();
   const types = useQuery({ queryKey: ['bird-types', farmId], queryFn: () => api<BirdType[]>(`/api/v1/farms/${farmId}/bird-types`) });
   const sheds = useQuery({ queryKey: ['sheds', farmId], queryFn: () => api<Shed[]>(`/api/v1/farms/${farmId}/sheds`) });
   const [rate, setRate] = useState<ProposedHatchRate | null>(null);
@@ -265,30 +266,30 @@ function HatchForm({ farmId, sittingId, onDone }: { farmId: string; sittingId: s
     <Card>
       <form className="grid gap-3" noValidate onSubmit={form.handleSubmit((values) => mutation.mutate(values))}>
         <h2 className="font-display text-2xl">{t('hatch.record')}</h2>
-        <Field id="hatch-date" label={t('hatch.date')}>
+        <Field id="hatch-date" label={t('hatch.date')} hint={t('fieldHint.hatch-date')}>
           <Input id="hatch-date" type="date" {...form.register('hatchedOn')} />
         </Field>
-        <Field id="hatch-set" label={t('hatch.eggsSet')} error={text(t, form.formState.errors.eggsSet?.message)}>
-          <Input id="hatch-set" type="number" min={0} {...form.register('eggsSet', { valueAsNumber: true })} />
+        <Field id="hatch-set" label={t('hatch.eggsSet')} error={text(t, form.formState.errors.eggsSet?.message)} hint={t('fieldHint.hatch-set')}>
+          <Input id="hatch-set" type="number" min={0} {...form.register('eggsSet', { valueAsNumber: true })}  placeholder={t('fieldPh.hatch-set')}/>
         </Field>
-        <Field id="hatch-live" label={t('hatch.liveChicks')} error={text(t, form.formState.errors.liveChicks?.message)}>
-          <Input id="hatch-live" type="number" min={0} {...form.register('liveChicks', { valueAsNumber: true })} />
+        <Field id="hatch-live" label={t('hatch.liveChicks')} error={text(t, form.formState.errors.liveChicks?.message)} hint={t('fieldHint.hatch-live')}>
+          <Input id="hatch-live" type="number" min={0} {...form.register('liveChicks', { valueAsNumber: true })}  placeholder={t('fieldPh.hatch-live')}/>
         </Field>
-        <Field id="hatch-losses" label={t('hatch.losses')}>
-          <Input id="hatch-losses" type="number" min={0} {...form.register('losses', { valueAsNumber: true })} />
+        <Field id="hatch-losses" label={t('hatch.losses')} hint={t('fieldHint.hatch-losses')}>
+          <Input id="hatch-losses" type="number" min={0} {...form.register('losses', { valueAsNumber: true })}  placeholder={t('fieldPh.hatch-losses')}/>
         </Field>
-        <Field id="hatch-other" label={t('hatch.other')}>
-          <Input id="hatch-other" type="number" min={0} {...form.register('otherCount', { valueAsNumber: true })} />
+        <Field id="hatch-other" label={t('hatch.other')} hint={t('fieldHint.hatch-other')}>
+          <Input id="hatch-other" type="number" min={0} {...form.register('otherCount', { valueAsNumber: true })}  placeholder={t('fieldPh.hatch-other')}/>
         </Field>
         <Field id="hatch-note" label={t('hatch.difference')} hint={t('hatch.differenceHint')} error={text(t, form.formState.errors.differenceNote?.message)}>
-          <TextArea id="hatch-note" {...form.register('differenceNote')} />
+          <TextArea id="hatch-note" {...form.register('differenceNote')}  placeholder={t('fieldPh.hatch-note')}/>
         </Field>
         {live > 0 ? (
           <>
-            <Field id="hatch-code" label={t('batches.code')} error={text(t, form.formState.errors.batchCode?.message)}>
-              <Input id="hatch-code" {...form.register('batchCode')} />
+            <Field id="hatch-code" label={t('batches.code')} error={text(t, form.formState.errors.batchCode?.message)} hint={t('fieldHint.hatch-code')}>
+              <Input id="hatch-code" {...form.register('batchCode')}  placeholder={t('fieldPh.hatch-code')}/>
             </Field>
-            <Field id="hatch-type" label={t('batches.birdType')} error={text(t, form.formState.errors.birdTypeId?.message)}>
+            <Field id="hatch-type" label={t('batches.birdType')} error={text(t, form.formState.errors.birdTypeId?.message)} hint={t('fieldHint.hatch-type')}>
               <select id="hatch-type" className={selectClass} {...form.register('birdTypeId')}>
                 <option value="">{t('hatch.chooseType')}</option>
                 {(types.data ?? []).filter((item) => item.status === 'active').map((item) => (
@@ -298,7 +299,7 @@ function HatchForm({ farmId, sittingId, onDone }: { farmId: string; sittingId: s
                 ))}
               </select>
             </Field>
-            <Field id="hatch-shed" label={t('batches.shed')} error={text(t, form.formState.errors.shedId?.message)}>
+            <Field id="hatch-shed" label={t('batches.shed')} error={text(t, form.formState.errors.shedId?.message)} hint={t('fieldHint.hatch-shed')}>
               <select id="hatch-shed" className={selectClass} {...form.register('shedId')}>
                 <option value="">{t('hatch.chooseShed')}</option>
                 {(sheds.data ?? []).filter((item) => item.status === 'active').map((item) => (
@@ -326,7 +327,7 @@ function HatchForm({ farmId, sittingId, onDone }: { farmId: string; sittingId: s
 
 function CandlingForm({ farmId, sittingId, onDone }: { farmId: string; sittingId: string; onDone: () => void }) {
   const { t } = useTranslation();
-  const today = new Date().toISOString().slice(0, 10);
+  const today = localToday();
   const [lines, setLines] = useState([{ label: '', eggCount: '' }]);
   const [observedOn, setObservedOn] = useState(today);
   const [notes, setNotes] = useState('');
@@ -357,24 +358,26 @@ function CandlingForm({ farmId, sittingId, onDone }: { farmId: string; sittingId
       <form className="grid gap-3" noValidate onSubmit={submit}>
         <h2 className="font-display text-2xl">{t('incubation.recordCandling')}</h2>
         <p className="text-sm text-ink-soft">{t('incubation.candlingHint')}</p>
-        <Field id="candle-date" label={t('incubators.date')}>
+        <Field id="candle-date" label={t('incubators.date')} hint={t('fieldHint.candle-date')}>
           <Input id="candle-date" type="date" value={observedOn} onChange={(event) => setObservedOn(event.target.value)} />
         </Field>
         {lines.map((line, index) => (
           <div key={index} className="grid gap-3 sm:grid-cols-2">
-            <Field id={`candle-label-${index}`} label={t('incubation.outcome')}>
+            <Field id={`candle-label-${index}`} label={t('incubation.outcome')} hint={t('fieldHint.candle-label')}>
               <Input
                 id={`candle-label-${index}`}
                 value={line.label}
+                placeholder={t('fieldPh.candle-label')}
                 onChange={(event) => setLines((current) => current.map((item, itemIndex) => (itemIndex === index ? { ...item, label: event.target.value } : item)))}
               />
             </Field>
-            <Field id={`candle-count-${index}`} label={t('incubation.eggCount')}>
+            <Field id={`candle-count-${index}`} label={t('incubation.eggCount')} hint={t('fieldHint.candle-count')}>
               <Input
                 id={`candle-count-${index}`}
                 type="number"
                 min={0}
                 value={line.eggCount}
+                placeholder={t('fieldPh.candle-count')}
                 onChange={(event) => setLines((current) => current.map((item, itemIndex) => (itemIndex === index ? { ...item, eggCount: event.target.value } : item)))}
               />
             </Field>
@@ -383,8 +386,8 @@ function CandlingForm({ farmId, sittingId, onDone }: { farmId: string; sittingId
         <Button type="button" variant="outline" onClick={() => setLines((current) => [...current, { label: '', eggCount: '' }])}>
           {t('incubation.addLine')}
         </Button>
-        <Field id="candle-notes" label={`${t('incubators.notes')} (${t('common.optional')})`}>
-          <TextArea id="candle-notes" value={notes} onChange={(event) => setNotes(event.target.value)} />
+        <Field id="candle-notes" label={`${t('incubators.notes')} (${t('common.optional')})`} hint={t('fieldHint.candle-notes')}>
+          <TextArea id="candle-notes" value={notes} placeholder={t('fieldPh.candle-notes')} onChange={(event) => setNotes(event.target.value)} />
         </Field>
         {fieldError ? <Alert>{fieldError}</Alert> : null}
         {mutation.isError ? <Alert>{explain(mutation.error, t)}</Alert> : null}

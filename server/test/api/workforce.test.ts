@@ -36,7 +36,7 @@ beforeEach(async () => {
   try {
     await conn.query('SET FOREIGN_KEY_CHECKS = 0');
     for (const table of [
-      'report_schedules', 'farm_files', 'notifications', 'sale_returns', 'invoice_lines', 'invoice_documents', 'supplier_payments', 'supplier_bills', 'goods_receipts', 'purchase_order_lines', 'purchase_orders', 'suppliers', 'parentage_records', 'task_training_requirements', 'training_completions', 'training_assignments', 'training_items', 'attendance_records',
+      'yard_notes', 'report_schedules', 'farm_files', 'notifications', 'sale_returns', 'invoice_lines', 'invoice_documents', 'supplier_payments', 'supplier_bills', 'goods_receipts', 'purchase_order_lines', 'purchase_orders', 'suppliers', 'parentage_records', 'task_training_requirements', 'training_completions', 'training_assignments', 'training_items', 'attendance_records',
       'idempotency_keys', 'audit_logs', 'expense_entries', 'expense_categories', 'order_lines', 'orders', 'market_prices', 'customers',
       'loss_incidents', 'medicine_records', 'health_observations', 'biosecurity_steps', 'knowledge_approvals',
       'growth_weighings', 'growth_targets', 'water_records', 'stock_movements', 'stock_items',
@@ -73,7 +73,7 @@ describe('attendance and training', () => {
       userId: '', attendedOn: '2099-01-01', attendedTime: '', methodLabel: 'book', note: '',
     });
     expect(future.status).toBe(422);
-    expect(future.body.error.details.fields.attendedOn).toBe('too_big');
+    expect(future.body.error.details.fields.attendedOn).toBe('future_date');
 
     const saved = await send(http, 'post', `/api/v1/farms/${farmId}/attendance`, {
       userId: '', attendedOn: today, attendedTime: '06:30', methodLabel: 'names written in the yard book', note: 'Morning',

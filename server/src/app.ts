@@ -34,6 +34,7 @@ import { notificationRoutes } from './modules/notifications/routes.js';
 import { documentRoutes } from './modules/documents/routes.js';
 import { searchRoutes } from './modules/search/routes.js';
 import { scheduleRoutes } from './modules/schedules/routes.js';
+import { yardRoutes } from './modules/yard/routes.js';
 
 export function createApp() {
   const app = express();
@@ -79,6 +80,7 @@ export function createApp() {
   app.use('/api/v1/farms', documentRoutes);
   app.use('/api/v1/farms', searchRoutes);
   app.use('/api/v1/farms', scheduleRoutes);
+  app.use('/api/v1/farms', yardRoutes);
   app.use('/api/v1/farms', stockRoutes);
   app.use('/api/v1/farms', healthRoutes);
   app.use('/api/v1/farms', lossRoutes);

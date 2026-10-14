@@ -17,7 +17,7 @@ export async function buildReport(farmId: string, query: { from?: unknown; to?: 
   if (!farm) throw new AppError(404, 'NOT_FOUND', 'Not found.');
   const today = todayInTimeZone(farm.timezone);
   if (range.to > today) {
-    throw new AppError(422, 'VALIDATION_ERROR', 'That date is in the future.', { fields: { to: 'too_big' } });
+    throw new AppError(422, 'VALIDATION_ERROR', 'That date is in the future.', { fields: { to: 'future_date' } });
   }
   const filters = { shedId: range.shedId, batchId: range.batchId, categoryId: range.categoryId };
   const [eggs, hatches, losses, expenses, movements, attendance, parentage, receipts, invoiceDocuments, returns] = await Promise.all([

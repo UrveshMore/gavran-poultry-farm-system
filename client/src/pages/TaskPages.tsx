@@ -9,6 +9,7 @@ import { z } from 'zod';
 import { Alert, Button, Card, Field, Input, TextArea } from '@/components/ui';
 import { ApiError, api, errorKey } from '@/lib/api';
 import type { FarmSummary, FarmTask, Member, TaskSeason, TaskTemplate } from '@/lib/types';
+import { localToday } from '@/lib/today';
 
 const seasons: TaskSeason[] = ['summer_heat', 'monsoon', 'winter'];
 const selectClass = 'min-h-11 w-full rounded-xl border border-line bg-white px-3';
@@ -188,8 +189,8 @@ function TemplateCard({ farmId, template, canManage }: { farmId: string; templat
       {canManage ? (
         <form className="mt-2 flex flex-wrap items-end gap-2" onSubmit={rename.handleSubmit((values) => renameMutation.mutate(values))}>
           <div className="min-w-48 flex-1">
-            <Field id={`rename-${template.id}`} label={t('tasks.rename')} error={text(t, rename.formState.errors.name?.message)}>
-              <Input id={`rename-${template.id}`} {...rename.register('name')} />
+            <Field id={`rename-${template.id}`} label={t('tasks.rename')} error={text(t, rename.formState.errors.name?.message)} hint={t('fieldHint.rename')}>
+              <Input id={`rename-${template.id}`} {...rename.register('name')}  placeholder={t('fieldPh.rename')}/>
             </Field>
           </div>
           <Button type="submit" variant="outline">
@@ -219,8 +220,8 @@ function TemplateCard({ farmId, template, canManage }: { farmId: string; templat
       {error ? <Alert>{error}</Alert> : null}
       {canManage ? (
         <form className="mt-3 grid gap-2" onSubmit={step.handleSubmit((values) => stepMutation.mutate(values))}>
-          <Field id={`step-${template.id}`} label={t('tasks.stepBody')} error={text(t, step.formState.errors.body?.message)}>
-            <Input id={`step-${template.id}`} {...step.register('body')} />
+          <Field id={`step-${template.id}`} label={t('tasks.stepBody')} error={text(t, step.formState.errors.body?.message)} hint={t('fieldHint.step')}>
+            <Input id={`step-${template.id}`} {...step.register('body')}  placeholder={t('fieldPh.step')}/>
           </Field>
           <Button type="submit" variant="outline">
             {stepMutation.isPending ? t('tasks.saving') : t('tasks.addStep')}
@@ -246,7 +247,7 @@ function TaskForm({
   const { t } = useTranslation();
   const form = useForm<z.infer<typeof taskInputSchema>>({
     resolver: zodResolver(taskInputSchema),
-    defaultValues: { title: '', dueOn: '', instructions: '', assigneeUserId: '', proofRequired: false, templateId: '' },
+    defaultValues: { title: '', dueOn: localToday(), instructions: '', assigneeUserId: '', proofRequired: false, templateId: '' },
   });
   const mutation = useMutation({
     mutationFn: (values: z.infer<typeof taskInputSchema>) => api(`/api/v1/farms/${farmId}/tasks`, { method: 'POST', json: values }),
@@ -257,16 +258,16 @@ function TaskForm({
     <Card>
       <form className="grid gap-3" onSubmit={form.handleSubmit((values) => mutation.mutate(values))}>
         <h2 className="font-display text-2xl">{t('tasks.add')}</h2>
-        <Field id="task-title" label={t('tasks.titleField')} error={text(t, form.formState.errors.title?.message)}>
-          <Input id="task-title" {...form.register('title')} />
+        <Field id="task-title" label={t('tasks.titleField')} error={text(t, form.formState.errors.title?.message)} hint={t('fieldHint.task-title')}>
+          <Input id="task-title" {...form.register('title')}  placeholder={t('fieldPh.task-title')}/>
         </Field>
-        <Field id="task-due" label={t('tasks.due')} error={text(t, form.formState.errors.dueOn?.message)}>
-          <Input id="task-due" type="date" {...form.register('dueOn')} />
+        <Field id="task-due" label={t('tasks.due')} error={text(t, form.formState.errors.dueOn?.message)} hint={t('fieldHint.task-due')}>
+          <Input id="task-due" type="date" allowFuture {...form.register('dueOn')} />
         </Field>
-        <Field id="task-instructions" label={`${t('tasks.instructions')} (${t('common.optional')})`} error={text(t, form.formState.errors.instructions?.message)}>
-          <TextArea id="task-instructions" {...form.register('instructions')} />
+        <Field id="task-instructions" label={`${t('tasks.instructions')} (${t('common.optional')})`} error={text(t, form.formState.errors.instructions?.message)} hint={t('fieldHint.task-instructions')}>
+          <TextArea id="task-instructions" {...form.register('instructions')}  placeholder={t('fieldPh.task-instructions')}/>
         </Field>
-        <Field id="task-assignee" label={`${t('tasks.assignee')} (${t('common.optional')})`}>
+        <Field id="task-assignee" label={`${t('tasks.assignee')} (${t('common.optional')})`} hint={t('fieldHint.task-assignee')}>
           <select id="task-assignee" className={selectClass} {...form.register('assigneeUserId')}>
             <option value="">{t('tasks.unassigned')}</option>
             {people.map((person) => (
@@ -276,7 +277,7 @@ function TaskForm({
             ))}
           </select>
         </Field>
-        <Field id="task-template" label={`${t('tasks.template')} (${t('common.optional')})`}>
+        <Field id="task-template" label={`${t('tasks.template')} (${t('common.optional')})`} hint={t('fieldHint.task-template')}>
           <select id="task-template" className={selectClass} {...form.register('templateId')}>
             <option value="">{t('tasks.none')}</option>
             {templates.map((template) => (
@@ -360,8 +361,8 @@ export function TaskDetailPage() {
               id="task-note"
               label={item.proofRequired ? t('tasks.note') : `${t('tasks.note')} (${t('common.optional')})`}
               error={text(t, form.formState.errors.note?.message)}
-            >
-              <TextArea id="task-note" {...form.register('note')} />
+             hint={t('fieldHint.task-note')}>
+              <TextArea id="task-note" {...form.register('note')}  placeholder={t('fieldPh.task-note')}/>
             </Field>
             {item.proofRequired ? <p className="text-sm text-ink-soft">{t('tasks.noteRequired')}</p> : null}
             {mutation.isError ? <Alert>{explain(mutation.error, t)}</Alert> : null}

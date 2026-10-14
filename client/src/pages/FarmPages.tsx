@@ -241,14 +241,14 @@ function FarmForm({
         <p className="mt-1 text-ink-soft">{body}</p>
       </div>
       <form className="grid gap-3" onSubmit={form.handleSubmit(onSubmit)} noValidate>
-        <Field id="name" label={t('farm.name')} error={text(t, errors.name?.message)}>
-          <Input id="name" disabled={readOnly} {...form.register('name')} />
+        <Field id="name" label={t('farm.name')} error={text(t, errors.name?.message)} hint={t('fieldHint.name')}>
+          <Input id="name" disabled={readOnly} {...form.register('name')}  placeholder={t('fieldPh.name')}/>
         </Field>
         <Field id="code" label={t('farm.code')} hint={t('farm.codeHint')} error={text(t, errors.code?.message)}>
-          <Input id="code" disabled={readOnly} autoCapitalize="characters" {...form.register('code')} />
+          <Input id="code" disabled={readOnly} autoCapitalize="characters" {...form.register('code')}  placeholder={t('fieldPh.code')}/>
         </Field>
-        <Field id="timezone" label={t('farm.timezone')} error={text(t, errors.timezone?.message)}>
-          <Input id="timezone" list="timezones" disabled={readOnly} {...form.register('timezone')} />
+        <Field id="timezone" label={t('farm.timezone')} error={text(t, errors.timezone?.message)} hint={t('fieldHint.timezone')}>
+          <Input id="timezone" list="timezones" disabled={readOnly} {...form.register('timezone')}  placeholder={t('fieldPh.timezone')}/>
           <datalist id="timezones">
             <option value="Asia/Kolkata" />
             <option value="Asia/Kathmandu" />
@@ -256,27 +256,27 @@ function FarmForm({
             <option value="UTC" />
           </datalist>
         </Field>
-        <Field id="locale" label={t('farm.locale')} error={text(t, errors.locale?.message)}>
+        <Field id="locale" label={t('farm.locale')} error={text(t, errors.locale?.message)} hint={t('fieldHint.locale')}>
           <select id="locale" className="min-h-11 rounded-xl border border-line bg-white px-3" disabled={readOnly} {...form.register('locale')}>
             <option value="en">English</option>
             <option value="hi">हिन्दी</option>
             <option value="mr">मराठी</option>
           </select>
         </Field>
-        <Field id="contactName" label={t('farm.contactName')} error={text(t, errors.contactName?.message)}>
-          <Input id="contactName" disabled={readOnly} {...form.register('contactName')} />
+        <Field id="contactName" label={t('farm.contactName')} error={text(t, errors.contactName?.message)} hint={t('fieldHint.contactName')}>
+          <Input id="contactName" disabled={readOnly} {...form.register('contactName')}  placeholder={t('fieldPh.contactName')}/>
         </Field>
-        <Field id="contactPhone" label={t('farm.contactPhone')} error={text(t, errors.contactPhone?.message)}>
-          <Input id="contactPhone" inputMode="tel" disabled={readOnly} {...form.register('contactPhone')} />
+        <Field id="contactPhone" label={t('farm.contactPhone')} error={text(t, errors.contactPhone?.message)} hint={t('fieldHint.contactPhone')}>
+          <Input id="contactPhone" inputMode="tel" disabled={readOnly} {...form.register('contactPhone')}  placeholder={t('fieldPh.contactPhone')}/>
         </Field>
-        <Field id="contactEmail" label={t('farm.contactEmail')} error={text(t, errors.contactEmail?.message)}>
-          <Input id="contactEmail" type="email" disabled={readOnly} {...form.register('contactEmail')} />
+        <Field id="contactEmail" label={t('farm.contactEmail')} error={text(t, errors.contactEmail?.message)} hint={t('fieldHint.contactEmail')}>
+          <Input id="contactEmail" type="email" disabled={readOnly} {...form.register('contactEmail')}  placeholder={t('fieldPh.contactEmail')}/>
         </Field>
-        <Field id="addressLine" label={t('farm.address')} error={text(t, errors.addressLine?.message)}>
-          <Input id="addressLine" disabled={readOnly} {...form.register('addressLine')} />
+        <Field id="addressLine" label={t('farm.address')} error={text(t, errors.addressLine?.message)} hint={t('fieldHint.addressLine')}>
+          <Input id="addressLine" disabled={readOnly} {...form.register('addressLine')}  placeholder={t('fieldPh.addressLine')}/>
         </Field>
         <div className="grid gap-3 sm:grid-cols-2">
-          <Field id="weightUnit" label={t('farm.weightUnit')} error={text(t, errors.weightUnit?.message)}>
+          <Field id="weightUnit" label={t('farm.weightUnit')} error={text(t, errors.weightUnit?.message)} hint={t('fieldHint.weightUnit')}>
             <select id="weightUnit" className="min-h-11 rounded-xl border border-line bg-white px-3" disabled={readOnly} {...form.register('weightUnit')}>
               {WEIGHT_UNITS.map((unit) => (
                 <option key={unit} value={unit}>
@@ -285,7 +285,7 @@ function FarmForm({
               ))}
             </select>
           </Field>
-          <Field id="volumeUnit" label={t('farm.volumeUnit')} error={text(t, errors.volumeUnit?.message)}>
+          <Field id="volumeUnit" label={t('farm.volumeUnit')} error={text(t, errors.volumeUnit?.message)} hint={t('fieldHint.volumeUnit')}>
             <select id="volumeUnit" className="min-h-11 rounded-xl border border-line bg-white px-3" disabled={readOnly} {...form.register('volumeUnit')}>
               {VOLUME_UNITS.map((unit) => (
                 <option key={unit} value={unit}>
@@ -406,13 +406,13 @@ function ShedForm({ farmId, shed, onDone, onCancel }: { farmId: string; shed: Sh
   return (
     <Card>
       <form className="grid gap-3" onSubmit={form.handleSubmit((values) => mutation.mutate(values))} noValidate>
-        <Field id="shed-code" label={t('sheds.code')} error={text(t, errors.code?.message)}>
-          <Input id="shed-code" {...form.register('code')} />
+        <Field id="shed-code" label={t('sheds.code')} error={text(t, errors.code?.message)} hint={t('fieldHint.shed-code')}>
+          <Input id="shed-code" {...form.register('code')}  placeholder={t('fieldPh.shed-code')}/>
         </Field>
-        <Field id="shed-name" label={t('sheds.name')} error={text(t, errors.name?.message)}>
-          <Input id="shed-name" {...form.register('name')} />
+        <Field id="shed-name" label={t('sheds.name')} error={text(t, errors.name?.message)} hint={t('fieldHint.shed-name')}>
+          <Input id="shed-name" {...form.register('name')}  placeholder={t('fieldPh.shed-name')}/>
         </Field>
-        <Field id="shed-type" label={t('sheds.type')} error={text(t, errors.shedType?.message)}>
+        <Field id="shed-type" label={t('sheds.type')} error={text(t, errors.shedType?.message)} hint={t('fieldHint.shed-type')}>
           <select id="shed-type" className="min-h-11 rounded-xl border border-line bg-white px-3" {...form.register('shedType')}>
             {SHED_TYPES.map((type) => (
               <option key={type} value={type}>
@@ -424,7 +424,7 @@ function ShedForm({ farmId, shed, onDone, onCancel }: { farmId: string; shed: Sh
         <Field id="capacity" label={t('sheds.capacity')} hint={t('sheds.capacityBirds')} error={text(t, errors.usableCapacity?.message)}>
           <Input id="capacity" type="number" min={0} inputMode="numeric" {...form.register('usableCapacity', { valueAsNumber: true })} />
         </Field>
-        <Field id="status" label={t('sheds.status')} error={text(t, errors.status?.message)}>
+        <Field id="status" label={t('sheds.status')} error={text(t, errors.status?.message)} hint={t('fieldHint.status')}>
           <select id="status" className="min-h-11 rounded-xl border border-line bg-white px-3" {...form.register('status')}>
             {SHED_STATUSES.map((status) => (
               <option key={status} value={status}>
@@ -433,8 +433,8 @@ function ShedForm({ farmId, shed, onDone, onCancel }: { farmId: string; shed: Sh
             ))}
           </select>
         </Field>
-        <Field id="notes" label={`${t('sheds.notes')} (${t('common.optional')})`} error={text(t, errors.notes?.message)}>
-          <TextArea id="notes" {...form.register('notes')} />
+        <Field id="notes" label={`${t('sheds.notes')} (${t('common.optional')})`} error={text(t, errors.notes?.message)} hint={t('fieldHint.notes')}>
+          <TextArea id="notes" {...form.register('notes')}  placeholder={t('fieldPh.notes')}/>
         </Field>
         <p className="text-xs text-ink-soft">{CAPACITY_UNIT}</p>
         {mutation.isError ? <Alert>{explain(mutation.error, t)}</Alert> : null}
@@ -583,16 +583,16 @@ function InviteForm({ farmId, onDone }: { farmId: string; onDone: () => void }) 
   return (
     <Card>
       <form className="grid gap-3" onSubmit={form.handleSubmit((values) => mutation.mutate(values))} noValidate>
-        <Field id="person-name" label={t('people.name')} error={text(t, errors.displayName?.message)}>
-          <Input id="person-name" {...form.register('displayName')} />
+        <Field id="person-name" label={t('people.name')} error={text(t, errors.displayName?.message)} hint={t('fieldHint.person-name')}>
+          <Input id="person-name" {...form.register('displayName')}  placeholder={t('fieldPh.person-name')}/>
         </Field>
-        <Field id="person-email" label={t('people.email')} error={text(t, errors.email?.message)}>
-          <Input id="person-email" type="email" {...form.register('email')} />
+        <Field id="person-email" label={t('people.email')} error={text(t, errors.email?.message)} hint={t('fieldHint.person-email')}>
+          <Input id="person-email" type="email" {...form.register('email')}  placeholder={t('fieldPh.person-email')}/>
         </Field>
         <Field id="person-password" label={t('people.temporaryPassword')} hint={t('auth.passwordHint')} error={text(t, errors.password?.message)}>
-          <Input id="person-password" type="password" autoComplete="new-password" {...form.register('password')} />
+          <Input id="person-password" type="password" autoComplete="new-password" {...form.register('password')}  placeholder={t('fieldPh.person-password')}/>
         </Field>
-        <Field id="person-role" label={t('people.role')} error={text(t, errors.role?.message)}>
+        <Field id="person-role" label={t('people.role')} error={text(t, errors.role?.message)} hint={t('fieldHint.person-role')}>
           <select id="person-role" className="min-h-11 rounded-xl border border-line bg-white px-3" {...form.register('role')}>
             {(['owner', 'manager', 'worker', 'family_helper', 'vet_advisor'] as const).map((item) => (
               <option key={item} value={item}>

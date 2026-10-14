@@ -8,6 +8,7 @@ import { useParams } from 'react-router-dom';
 import { z } from 'zod';
 import { Alert, Button, Card, Field, Input, TextArea } from '@/components/ui';
 import { ApiError, api, errorKey } from '@/lib/api';
+import { localToday } from '@/lib/today';
 
 type Schedule = { id: string; name: string; note: string; namedOn: string };
 type SchedulePage = {
@@ -45,10 +46,10 @@ function RunForm({ farmId, scheduleId }: { farmId: string; scheduleId: string })
   const eggs = result?.report.sections.find((section) => section.id === 'eggs');
   return (
     <form className="mt-3 grid gap-3" onSubmit={form.handleSubmit((values) => run.mutate(values))}>
-      <Field id={`from-${scheduleId}`} label={t('schedules.from')}>
+      <Field id={`from-${scheduleId}`} label={t('schedules.from')} hint={t('fieldHint.from')}>
         <Input id={`from-${scheduleId}`} type="date" {...form.register('from')} />
       </Field>
-      <Field id={`to-${scheduleId}`} label={t('schedules.to')}>
+      <Field id={`to-${scheduleId}`} label={t('schedules.to')} hint={t('fieldHint.to')}>
         <Input id={`to-${scheduleId}`} type="date" {...form.register('to')} />
       </Field>
       {run.isError ? <Alert>{explain(run.error, t)}</Alert> : null}
@@ -65,13 +66,13 @@ export function SchedulesPage() {
   const page = useQuery({ queryKey: ['schedules', farmId], queryFn: () => api<SchedulePage>(`/api/v1/farms/${farmId}/report-schedules`) });
   const form = useForm<z.infer<typeof reportScheduleInputSchema>>({
     resolver: zodResolver(reportScheduleInputSchema),
-    defaultValues: { name: '', note: '', namedOn: '' },
+    defaultValues: { name: '', note: '', namedOn: localToday() },
   });
   const save = useMutation({
     mutationFn: (values: z.infer<typeof reportScheduleInputSchema>) =>
       api(`/api/v1/farms/${farmId}/report-schedules`, { method: 'POST', json: values }),
     onSuccess: () => {
-      form.reset({ name: '', note: '', namedOn: '' });
+      form.reset({ name: '', note: '', namedOn: localToday() });
       void queryClient.invalidateQueries({ queryKey: ['schedules', farmId] });
     },
   });
@@ -104,14 +105,14 @@ export function SchedulesPage() {
       <Card>
         <form className="grid gap-3" onSubmit={form.handleSubmit((values) => save.mutate(values))}>
           <h2 className="font-display text-2xl">{t('schedules.add')}</h2>
-          <Field id="sch-name" label={t('schedules.name')}>
-            <Input id="sch-name" {...form.register('name')} />
+          <Field id="sch-name" label={t('schedules.name')} hint={t('fieldHint.sch-name')}>
+            <Input id="sch-name" {...form.register('name')}  placeholder={t('fieldPh.sch-name')}/>
           </Field>
-          <Field id="sch-note" label={t('schedules.note')}>
-            <TextArea id="sch-note" {...form.register('note')} />
+          <Field id="sch-note" label={t('schedules.note')} hint={t('fieldHint.sch-note')}>
+            <TextArea id="sch-note" {...form.register('note')}  placeholder={t('fieldPh.sch-note')}/>
           </Field>
-          <Field id="sch-date" label={t('schedules.namedOn')}>
-            <Input id="sch-date" type="date" {...form.register('namedOn')} />
+          <Field id="sch-date" label={t('schedules.namedOn')} hint={t('fieldHint.sch-date')}>
+            <Input id="sch-date" type="date" allowFuture {...form.register('namedOn')} />
           </Field>
           {save.isError ? <Alert>{explain(save.error, t)}</Alert> : null}
           <Button type="submit">{save.isPending ? t('schedules.saving') : t('schedules.save')}</Button>

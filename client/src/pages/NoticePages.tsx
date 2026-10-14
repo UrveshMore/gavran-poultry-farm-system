@@ -85,7 +85,7 @@ export function NoticesPage() {
         <Card>
           <form className="grid gap-3" onSubmit={form.handleSubmit((values) => save.mutate(values))}>
             <h2 className="font-display text-2xl">{t('notices.add')}</h2>
-            <Field id="note-person" label={t('notices.person')}>
+            <Field id="note-person" label={t('notices.person')} hint={t('fieldHint.note-person')}>
               <select id="note-person" className={selectClass} {...form.register('userId')}>
                 <option value="">{t('notices.choose')}</option>
                 {(members.data ?? []).filter((member) => member.status === 'active').map((member) => (
@@ -93,8 +93,8 @@ export function NoticesPage() {
                 ))}
               </select>
             </Field>
-            <Field id="note-title" label={t('notices.subject')}><Input id="note-title" {...form.register('title')} /></Field>
-            <Field id="note-body" label={t('notices.message')}><TextArea id="note-body" {...form.register('body')} /></Field>
+            <Field id="note-title" label={t('notices.subject')} hint={t('fieldHint.note-title')}><Input id="note-title" {...form.register('title')}  placeholder={t('fieldPh.note-title')}/></Field>
+            <Field id="note-body" label={t('notices.message')} hint={t('fieldHint.note-body')}><TextArea id="note-body" {...form.register('body')}  placeholder={t('fieldPh.note-body')}/></Field>
             {save.isError ? <Alert>{explain(save.error, t)}</Alert> : null}
             <Button type="submit">{save.isPending ? t('notices.saving') : t('notices.save')}</Button>
           </form>

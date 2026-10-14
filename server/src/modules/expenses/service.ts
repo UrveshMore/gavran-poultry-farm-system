@@ -53,7 +53,7 @@ export async function createCategory(actor: Actor, access: FarmAccess, body: unk
 export async function createEntry(actor: Actor, access: FarmAccess, body: unknown, idempotency: IdempotencyInput) {
   const input = expenseEntryInputSchema.parse(body);
   if (input.occurredOn > (await today(access.farmId))) {
-    throw new AppError(422, 'VALIDATION_ERROR', 'That date is in the future.', { fields: { occurredOn: 'too_big' } });
+    throw new AppError(422, 'VALIDATION_ERROR', 'That date is in the future.', { fields: { occurredOn: 'future_date' } });
   }
   const path = requestPath(idempotency.path);
   return withTransaction(async (conn) => {
@@ -90,7 +90,7 @@ export async function createEntry(actor: Actor, access: FarmAccess, body: unknow
 export async function reverseEntry(actor: Actor, access: FarmAccess, entryId: string, body: unknown, idempotency: IdempotencyInput) {
   const input = expenseReversalSchema.parse(body);
   if (input.occurredOn > (await today(access.farmId))) {
-    throw new AppError(422, 'VALIDATION_ERROR', 'That date is in the future.', { fields: { occurredOn: 'too_big' } });
+    throw new AppError(422, 'VALIDATION_ERROR', 'That date is in the future.', { fields: { occurredOn: 'future_date' } });
   }
   const path = requestPath(idempotency.path);
   try {

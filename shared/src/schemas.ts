@@ -198,7 +198,7 @@ export const batchInputSchema = z
     birdCount: z.number({ invalid_type_error: 'invalid_format' }).int('invalid_format').min(1, 'too_small').max(1_000_000, 'too_big'),
   })
   .refine((value) => value.hatchDate === '' || value.hatchDate <= value.openedOn, {
-    message: 'invalid_format',
+    message: 'hatch_after_opened',
     path: ['hatchDate'],
   });
 
@@ -596,6 +596,15 @@ export const biosecurityStepSchema = z
     }
   });
 
+export const YARD_KINDS = ['note', 'let_out', 'shut_in'] as const;
+
+export const yardNoteSchema = z.object({
+  notedOn: calendarDateSchema,
+  kind: z.enum(YARD_KINDS),
+  notedTime: z.union([z.string().regex(/^([01]\d|2[0-3]):[0-5]\d$/, 'invalid_format'), z.literal('')]),
+  body: z.string().trim().min(1, 'too_small').max(1000, 'too_big'),
+});
+
 export const lossIncidentSchema = z.object({
   occurredOn: calendarDateSchema,
   birdCount: z.number({ invalid_type_error: 'invalid_format' }).int('invalid_format').min(0, 'too_small').max(1_000_000, 'too_big'),
@@ -901,6 +910,7 @@ export type HealthObservationInput = z.infer<typeof healthObservationSchema>;
 export type MedicineRecordInput = z.infer<typeof medicineRecordSchema>;
 export type VaccineTaskInput = z.infer<typeof vaccineTaskSchema>;
 export type BiosecurityStepInput = z.infer<typeof biosecurityStepSchema>;
+export type YardNoteInput = z.infer<typeof yardNoteSchema>;
 export type LossIncidentInput = z.infer<typeof lossIncidentSchema>;
 export type ReportRange = z.infer<typeof reportRangeSchema>;
 export type ExpenseCategoryInput = z.infer<typeof expenseCategoryInputSchema>;

@@ -2,7 +2,7 @@
 
 Enforcement is deny-by-default on the server. Missing membership is **404**. A member without the permission is **403**. The system administrator platform role is not a farm membership and receives none of these permissions.
 
-UI navigation inside a farm still shows Sheds, Batches, Eggs, People, and Activity. Those screens show the API error when the caller lacks permission. Hiding a link is not the security boundary.
+Inside a farm, the home tiles show only the groups that role can open. The server still returns 404 or 403. Hiding a tile is not the security boundary.
 
 ## Phase 1 keys
 
@@ -57,6 +57,8 @@ UI navigation inside a farm still shows Sheds, Batches, Eggs, People, and Activi
 | `notification.write` | Write an in-app notice for a farm member. |
 | `document.read` | View farm files. Owner and manager only. |
 | `document.record` | Store a JPEG, PNG, WebP, or PDF with a note. |
+| `yard.read` | View yard notes: let-out, shut-in, and free notes. |
+| `yard.record` | Write a yard note. No clock time is suggested. |
 
 `GET /api/v1/farms` lists farms the caller belongs to, including farms where they have zero permissions. It does not include contact details.
 
@@ -68,7 +70,7 @@ Pending owner confirmation. Seeded by the versioned migrations and mirrored in `
 |---|---|
 | Owner | All keys in the catalog. |
 | Manager | Farm operations in the catalog except `user.manage` and `farm.update`. |
-| Worker | `farm.read`, `shed.read`, `batch.read`, `egg.read`, `egg.record`, `incubator.read`, `incubator.record`, `incubation.read`, `incubation.record`, `hatch.record`, `task.read`, `task.complete`, `stock.read`, `stock.record`, `health.read`, `health.record`, `loss.read`, `loss.record`, `attendance.read`, `attendance.record`, `training.read`, `training.complete`, `breeding.read`, `breeding.record`, `notification.read`. A worker sees tasks assigned to them, their own attendance, their own training assignments, and notices addressed to them. |
+| Worker | `farm.read`, `shed.read`, `batch.read`, `egg.read`, `egg.record`, `incubator.read`, `incubator.record`, `incubation.read`, `incubation.record`, `hatch.record`, `task.read`, `task.complete`, `stock.read`, `stock.record`, `health.read`, `health.record`, `loss.read`, `loss.record`, `attendance.read`, `attendance.record`, `training.read`, `training.complete`, `breeding.read`, `breeding.record`, `notification.read`, `yard.read`, `yard.record`. A worker sees tasks assigned to them, their own attendance, their own training assignments, and notices addressed to them. |
 | Vet / advisor | `farm.read`, `shed.read`, `batch.read`, `egg.read`, `incubator.read`, `incubation.read`, `task.read`, `stock.read`, `health.read`, `health.record`, `loss.read`, `breeding.read`, `notification.read`. |
 | Family helper | None from the role. Optional grants on that membership only. |
 | System administrator | None. |

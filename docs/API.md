@@ -121,7 +121,7 @@ A random or foreign farm id is 404.
 
 ## Health
 
-`GET /farms/:farmId/knowledge` — `health.read`. One row per page of the three training PDFs (63). Each row has `sourceFile`, `sourcePage`, `textLayer`, `mustVerify`, and `verifyLabel` “owner/vet must verify before use”. `approved` starts false.
+`GET /farms/:farmId/knowledge` — `health.read`. One row per disease, medicine, or care note from the three training PDFs, not one broken fragment per page. Fields are `title`, `kind` (`disease`, `medicine`, or `care`), `usedFor`, `symptoms`, `howToGive`, `scheduleText`, `precautions`, `sourceFile`, `sourcePage`, and `textLayer`. Amounts are copied only where a page stated them. Photo-only slides have no amount. `mustVerify` and `verifyLabel` “owner/vet must verify before use”. `approved` starts false.
 
 `POST /farms/:farmId/knowledge/:entryId/approval` — `health.approve`. Approving requires `verificationNote`.
 
@@ -134,6 +134,10 @@ A random or foreign farm id is 404.
 `GET|POST /farms/:farmId/biosecurity-steps` — `health.read` / `health.record`. `origin` `owner` stores the typed step. `origin` `pdf` is allowed only for `patil-poultry-step-by-step-process.pdf` and stores that page's text layer, unapproved, ignoring any body the client sent.
 
 `POST /farms/:farmId/biosecurity-steps/:stepId/approve` — `health.approve`. Approves a copied PDF step.
+
+## Yard book
+
+`GET|POST /farms/:farmId/yard-notes` — `yard.read` / `yard.record`. A note is `let_out`, `shut_in`, or `note`. The clock time may be blank. No time is suggested, and there is no predator list. A date after the farm's today is refused.
 
 ## Losses
 

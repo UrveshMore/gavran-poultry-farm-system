@@ -57,7 +57,7 @@ export async function createEggCollection(actor: Actor, access: FarmAccess, body
   const farm = await findFarmById(pool, access.farmId, false);
   if (!farm) throw new AppError(404, 'NOT_FOUND', 'Not found.');
   if (input.collectedOn > todayInTimeZone(farm.timezone)) {
-    throw new AppError(422, 'VALIDATION_ERROR', 'That date is in the future.', { fields: { collectedOn: 'too_big' } });
+    throw new AppError(422, 'VALIDATION_ERROR', 'That date is in the future.', { fields: { collectedOn: 'future_date' } });
   }
   const path = requestPath(idempotency.path);
   return withTransaction(async (conn) => {

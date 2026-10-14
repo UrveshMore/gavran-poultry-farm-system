@@ -10,7 +10,13 @@ export type KnowledgeEntry = {
   sourceFile: string;
   sourcePage: number;
   title: string;
+  kind: 'disease' | 'medicine' | 'care';
   textLayer: string;
+  usedFor: string;
+  symptoms: string;
+  howToGive: string;
+  scheduleText: string;
+  precautions: string;
   mustVerify: true;
   verifyLabel: typeof VERIFY_LABEL;
   approved: boolean;
@@ -58,16 +64,22 @@ export async function listEntries(db: Db, farmId: string): Promise<KnowledgeEntr
       source_file: string;
       source_page: number;
       title: string;
+      kind: 'disease' | 'medicine' | 'care';
       text_layer: string;
+      used_for: string | null;
+      symptoms: string | null;
+      how_to_give: string | null;
+      schedule_text: string | null;
+      precautions: string | null;
       approved: number | null;
       verification_note: string | null;
     }
   >(
     db,
-    `SELECT e.id, e.source_file, e.source_page, e.title, e.text_layer, a.approved, a.verification_note
+    `SELECT e.id, e.source_file, e.source_page, e.title, e.kind, e.text_layer, e.used_for, e.symptoms, e.how_to_give, e.schedule_text, e.precautions, a.approved, a.verification_note
      FROM knowledge_entries e
      LEFT JOIN knowledge_approvals a ON a.entry_id = e.id AND a.farm_id = ?
-     ORDER BY e.source_file, e.source_page`,
+     ORDER BY FIELD(e.kind, 'disease', 'medicine', 'care'), e.source_file, e.source_page, e.title`,
     [farmId],
   );
   return rows.map((row) => ({
@@ -75,7 +87,13 @@ export async function listEntries(db: Db, farmId: string): Promise<KnowledgeEntr
     sourceFile: row.source_file,
     sourcePage: Number(row.source_page),
     title: row.title,
+    kind: row.kind,
     textLayer: row.text_layer,
+    usedFor: row.used_for ?? '',
+    symptoms: row.symptoms ?? '',
+    howToGive: row.how_to_give ?? '',
+    scheduleText: row.schedule_text ?? '',
+    precautions: row.precautions ?? '',
     mustVerify: true,
     verifyLabel: VERIFY_LABEL,
     approved: Number(row.approved) === 1,

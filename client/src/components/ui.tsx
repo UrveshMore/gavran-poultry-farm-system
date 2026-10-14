@@ -2,6 +2,7 @@ import { Slot } from '@radix-ui/react-slot';
 import { Label as RadixLabel } from '@radix-ui/react-label';
 import { cva, type VariantProps } from 'class-variance-authority';
 import { type ButtonHTMLAttributes, type ComponentProps, type InputHTMLAttributes, type ReactNode, type TextareaHTMLAttributes } from 'react';
+import { localToday } from '@/lib/today';
 import { cn } from '@/lib/utils';
 
 const buttonVariants = cva(
@@ -9,8 +10,8 @@ const buttonVariants = cva(
   {
     variants: {
       variant: {
-        default: 'bg-grove text-paper hover:bg-grove-2',
-        clay: 'bg-clay text-white hover:bg-clay-2',
+        default: 'bg-grove text-white hover:bg-grove-2',
+        clay: 'bg-clay text-ink hover:bg-clay-2',
         outline: 'border border-line bg-white text-ink hover:bg-paper-deep',
         ghost: 'text-ink hover:bg-paper-deep',
       },
@@ -29,14 +30,19 @@ export function Button({
   return <Comp className={cn(buttonVariants({ variant }), className)} {...props} />;
 }
 
-export function Input({ className, ...props }: InputHTMLAttributes<HTMLInputElement>) {
+export function Input({ className, type, max, min, allowFuture = false, ...props }: InputHTMLAttributes<HTMLInputElement> & { allowFuture?: boolean }) {
+  const dateMax = type === 'date' && max === undefined && !allowFuture ? localToday() : max;
+  const dateMin = type === 'date' && min === undefined ? '2000-01-01' : min;
   return (
     <input
+      type={type}
       className={cn(
         'min-h-11 w-full rounded-xl border border-line bg-white px-3 text-base text-ink outline-none focus-visible:border-grove focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-grove',
         className,
       )}
       {...props}
+      max={dateMax}
+      min={dateMin}
     />
   );
 }
@@ -106,8 +112,8 @@ export function Alert({ tone = 'danger', children }: { tone?: 'danger' | 'ok'; c
 export function Logo({ className }: { className?: string }) {
   return (
     <svg viewBox="0 0 64 64" className={cn('h-10 w-10', className)} aria-hidden="true">
-      <rect width="64" height="64" rx="14" fill="#1b4332" />
-      <circle cx="30" cy="36" r="14" fill="#f4efe4" />
+      <rect width="64" height="64" rx="14" fill="#2f6b3a" />
+      <circle cx="30" cy="36" r="14" fill="#f4e9c9" />
       <circle cx="35" cy="33" r="1.8" fill="#1b1914" />
       <path d="M42 35h10l-6 4z" fill="#c4522a" />
       <path d="M22 24c2-6 4-6 6 0 2-7 5-8 7 0" fill="none" stroke="#e0b15a" strokeWidth="3" strokeLinecap="round" />

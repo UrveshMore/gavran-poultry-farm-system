@@ -21,7 +21,7 @@ export async function createHatch(actor: Actor, access: FarmAccess, sittingId: s
   const farm = await findFarmById(pool, access.farmId, false);
   if (!farm) throw new AppError(404, 'NOT_FOUND', 'Not found.');
   if (input.hatchedOn > todayInTimeZone(farm.timezone)) {
-    throw new AppError(422, 'VALIDATION_ERROR', 'That date is in the future.', { fields: { hatchedOn: 'too_big' } });
+    throw new AppError(422, 'VALIDATION_ERROR', 'That date is in the future.', { fields: { hatchedOn: 'future_date' } });
   }
   const path = requestPath(idempotency.path);
   try {

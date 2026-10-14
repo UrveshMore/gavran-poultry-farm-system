@@ -262,7 +262,13 @@ export type KnowledgeEntry = {
   sourceFile: string;
   sourcePage: number;
   title: string;
+  kind: 'disease' | 'medicine' | 'care';
   textLayer: string;
+  usedFor: string;
+  symptoms: string;
+  howToGive: string;
+  scheduleText: string;
+  precautions: string;
   mustVerify: true;
   verifyLabel: string;
   approved: boolean;
@@ -297,6 +303,16 @@ export type BiosecurityStep = {
   approved: boolean;
   mustVerify: boolean;
 };
+
+export type YardNote = {
+  id: string;
+  notedOn: string;
+  kind: 'note' | 'let_out' | 'shut_in';
+  notedTime: string | null;
+  body: string;
+};
+
+export type YardPage = { notes: YardNote[]; today: string };
 
 export type LossIncident = {
   id: string;

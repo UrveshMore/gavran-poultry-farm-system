@@ -58,11 +58,11 @@ export function LoginPage() {
           <p className="mt-1 text-ink-soft">{t('auth.signInBody')}</p>
         </div>
         <form className="grid gap-3" onSubmit={form.handleSubmit((values) => mutation.mutate(values))} noValidate>
-          <Field id="email" label={t('auth.email')} error={message(t, form.formState.errors.email?.message)}>
-            <Input id="email" type="email" autoComplete="username" aria-invalid={Boolean(form.formState.errors.email)} {...form.register('email')} />
+          <Field id="email" label={t('auth.email')} error={message(t, form.formState.errors.email?.message)} hint={t('fieldHint.email')}>
+            <Input id="email" type="email" autoComplete="username" aria-invalid={Boolean(form.formState.errors.email)} {...form.register('email')}  placeholder={t('fieldPh.email')}/>
           </Field>
-          <Field id="password" label={t('auth.password')} error={message(t, form.formState.errors.password?.message)}>
-            <Input id="password" type="password" autoComplete="current-password" aria-invalid={Boolean(form.formState.errors.password)} {...form.register('password')} />
+          <Field id="password" label={t('auth.password')} error={message(t, form.formState.errors.password?.message)} hint={t('fieldHint.password')}>
+            <Input id="password" type="password" autoComplete="current-password" aria-invalid={Boolean(form.formState.errors.password)} {...form.register('password')}  placeholder={t('fieldPh.password')}/>
           </Field>
           {mutation.isError ? <Alert>{describe(mutation.error, t)}</Alert> : null}
           <Button type="submit" disabled={mutation.isPending}>
@@ -107,14 +107,14 @@ export function RegisterPage() {
           <p className="mt-1 text-ink-soft">{t('auth.registerBody')}</p>
         </div>
         <form className="grid gap-3" onSubmit={form.handleSubmit((values) => mutation.mutate(values))} noValidate>
-          <Field id="displayName" label={t('auth.displayName')} error={message(t, form.formState.errors.displayName?.message)}>
-            <Input id="displayName" autoComplete="name" {...form.register('displayName')} />
+          <Field id="displayName" label={t('auth.displayName')} error={message(t, form.formState.errors.displayName?.message)} hint={t('fieldHint.displayName')}>
+            <Input id="displayName" autoComplete="name" {...form.register('displayName')}  placeholder={t('fieldPh.displayName')}/>
           </Field>
-          <Field id="email" label={t('auth.email')} error={message(t, form.formState.errors.email?.message)}>
-            <Input id="email" type="email" autoComplete="username" {...form.register('email')} />
+          <Field id="email" label={t('auth.email')} error={message(t, form.formState.errors.email?.message)} hint={t('fieldHint.email')}>
+            <Input id="email" type="email" autoComplete="username" {...form.register('email')}  placeholder={t('fieldPh.email')}/>
           </Field>
           <Field id="password" label={t('auth.password')} hint={t('auth.passwordHint')} error={message(t, form.formState.errors.password?.message)}>
-            <Input id="password" type="password" autoComplete="new-password" {...form.register('password')} />
+            <Input id="password" type="password" autoComplete="new-password" {...form.register('password')}  placeholder={t('fieldPh.password')}/>
           </Field>
           {mutation.isError ? <Alert>{describe(mutation.error, t)}</Alert> : null}
           <Button type="submit" disabled={mutation.isPending}>
@@ -157,11 +157,11 @@ export function AccountPage() {
       <Card className="grid gap-3">
         <h2 className="font-display text-2xl">{t('auth.changePassword')}</h2>
         <form className="grid gap-3" onSubmit={form.handleSubmit((values) => mutation.mutate(values))} noValidate>
-          <Field id="currentPassword" label={t('auth.currentPassword')} error={message(t, form.formState.errors.currentPassword?.message)}>
-            <Input id="currentPassword" type="password" autoComplete="current-password" {...form.register('currentPassword')} />
+          <Field id="currentPassword" label={t('auth.currentPassword')} error={message(t, form.formState.errors.currentPassword?.message)} hint={t('fieldHint.currentPassword')}>
+            <Input id="currentPassword" type="password" autoComplete="current-password" {...form.register('currentPassword')}  placeholder={t('fieldPh.currentPassword')}/>
           </Field>
           <Field id="newPassword" label={t('auth.newPassword')} hint={t('auth.passwordHint')} error={message(t, form.formState.errors.newPassword?.message)}>
-            <Input id="newPassword" type="password" autoComplete="new-password" {...form.register('newPassword')} />
+            <Input id="newPassword" type="password" autoComplete="new-password" {...form.register('newPassword')}  placeholder={t('fieldPh.newPassword')}/>
           </Field>
           {mutation.isError ? <Alert>{describe(mutation.error, t)}</Alert> : null}
           {done ? <Alert tone="ok">{t('auth.passwordChanged')}</Alert> : null}

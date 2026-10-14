@@ -6,9 +6,11 @@ import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { Link, useParams } from 'react-router-dom';
 import { z } from 'zod';
+import { ScreenTour } from '@/components/Tour';
 import { Alert, Button, Card, Field, Input, TextArea } from '@/components/ui';
 import { ApiError, api, errorKey } from '@/lib/api';
 import type { Batch, BatchMovement, BirdType, FarmSummary, RangeArea, SexCount, Shed } from '@/lib/types';
+import { localToday } from '@/lib/today';
 
 function text(t: (key: string, options?: { defaultValue?: string }) => string, code?: string) {
   if (!code) return undefined;
@@ -51,11 +53,12 @@ export function BatchesPage() {
     <div className="grid gap-4">
       <div className="flex items-start justify-between gap-3">
         <div>
-          <h1 className="font-display text-3xl font-semibold">{t('batches.title')}</h1>
-          <p className="mt-1 text-ink-soft">{t('batches.body')}</p>
+          <h1 data-tour="screen-title" className="font-display text-3xl font-semibold">{t('batches.title')}</h1>
+          <p data-tour="screen-body" className="mt-1 text-ink-soft">{t('batches.body')}</p>
+          <ScreenTour screen="batches" />
         </div>
         {canCreate ? (
-          <Button type="button" variant="outline" onClick={() => setOpen((value) => !value)}>
+          <Button data-tour="screen-action" type="button" variant="outline" onClick={() => setOpen((value) => !value)}>
             {open ? t('batches.hideForm') : t('batches.add')}
           </Button>
         ) : null}
@@ -116,10 +119,10 @@ function BirdTypeForm({ farmId, onDone }: { farmId: string; onDone: () => void }
     <Card>
       <form className="grid gap-3" onSubmit={form.handleSubmit((values) => mutation.mutate(values))} noValidate>
         <Field id="bird-type" label={t('batches.birdType')} hint={t('batches.birdTypeHint')} error={text(t, form.formState.errors.name?.message)}>
-          <Input id="bird-type" {...form.register('name')} />
+          <Input id="bird-type" {...form.register('name')}  placeholder={t('fieldPh.bird-type')}/>
         </Field>
         <Field id="bird-strain" label={`${t('batches.strain')} (${t('common.optional')})`} hint={t('batches.strainHint')}>
-          <Input id="bird-strain" {...form.register('strainNote')} />
+          <Input id="bird-strain" {...form.register('strainNote')}  placeholder={t('fieldPh.bird-strain')}/>
         </Field>
         {mutation.isError ? <Alert>{explain(mutation.error, t)}</Alert> : null}
         <Button type="submit" variant="outline" disabled={mutation.isPending}>
@@ -142,7 +145,7 @@ function BatchForm({
   onDone: () => void;
 }) {
   const { t } = useTranslation();
-  const today = new Date().toISOString().slice(0, 10);
+  const today = localToday();
   const form = useForm<z.infer<typeof batchInputSchema>>({
     resolver: zodResolver(batchInputSchema),
     defaultValues: {
@@ -161,13 +164,14 @@ function BatchForm({
     onError: (error) => applyFields(error, (name, err) => form.setError(name as 'code', err)),
   });
   const errors = form.formState.errors;
+  const openedOn = form.watch('openedOn');
   return (
     <Card>
       <form className="grid gap-3" onSubmit={form.handleSubmit((values) => mutation.mutate(values))} noValidate>
-        <Field id="batch-code" label={t('batches.code')} error={text(t, errors.code?.message)}>
-          <Input id="batch-code" {...form.register('code')} />
+        <Field id="batch-code" label={t('batches.code')} error={text(t, errors.code?.message)} hint={t('fieldHint.batch-code')}>
+          <Input id="batch-code" {...form.register('code')}  placeholder={t('fieldPh.batch-code')}/>
         </Field>
-        <Field id="batch-type" label={t('batches.birdType')} error={text(t, errors.birdTypeId?.message)}>
+        <Field id="batch-type" label={t('batches.birdType')} error={text(t, errors.birdTypeId?.message)} hint={t('fieldHint.batch-type')}>
           <select id="batch-type" className={selectClass} {...form.register('birdTypeId')}>
             {types.map((type) => (
               <option key={type.id} value={type.id}>
@@ -176,7 +180,7 @@ function BatchForm({
             ))}
           </select>
         </Field>
-        <Field id="batch-shed" label={t('batches.shed')} error={text(t, errors.shedId?.message)}>
+        <Field id="batch-shed" label={t('batches.shed')} error={text(t, errors.shedId?.message)} hint={t('fieldHint.batch-shed')}>
           <select id="batch-shed" className={selectClass} {...form.register('shedId')}>
             {sheds.map((shed) => (
               <option key={shed.id} value={shed.id}>
@@ -185,17 +189,17 @@ function BatchForm({
             ))}
           </select>
         </Field>
-        <Field id="batch-count" label={t('batches.count')} hint={t('sheds.capacityBirds')} error={text(t, errors.birdCount?.message)}>
-          <Input id="batch-count" type="number" min={1} {...form.register('birdCount', { valueAsNumber: true })} />
+        <Field id="batch-count" label={t('batches.count')} hint={t('batches.countHint')} error={text(t, errors.birdCount?.message)}>
+          <Input id="batch-count" type="number" min={1} placeholder={t('batches.countPlaceholder')} {...form.register('birdCount', { valueAsNumber: true })} />
         </Field>
-        <Field id="batch-opened" label={t('batches.openedOn')} error={text(t, errors.openedOn?.message)}>
+        <Field id="batch-opened" label={t('batches.openedOn')} hint={t('batches.openedHint')} error={text(t, errors.openedOn?.message)}>
           <Input id="batch-opened" type="date" {...form.register('openedOn')} />
         </Field>
-        <Field id="batch-hatch" label={`${t('batches.hatchDate')} (${t('common.optional')})`} error={text(t, errors.hatchDate?.message)}>
-          <Input id="batch-hatch" type="date" {...form.register('hatchDate')} />
+        <Field id="batch-hatch" label={`${t('batches.hatchDate')} (${t('common.optional')})`} hint={t('batches.hatchHint')} error={text(t, errors.hatchDate?.message)}>
+          <Input id="batch-hatch" type="date" max={openedOn || undefined} {...form.register('hatchDate')} />
         </Field>
-        <Field id="batch-source" label={`${t('batches.source')} (${t('common.optional')})`} error={text(t, errors.sourceNote?.message)}>
-          <TextArea id="batch-source" {...form.register('sourceNote')} />
+        <Field id="batch-source" label={`${t('batches.source')} (${t('common.optional')})`} error={text(t, errors.sourceNote?.message)} hint={t('fieldHint.batch-source')}>
+          <TextArea id="batch-source" {...form.register('sourceNote')}  placeholder={t('fieldPh.batch-source')}/>
         </Field>
         {types.length === 0 ? <Alert>{t('batches.needType')}</Alert> : null}
         {mutation.isError ? <Alert>{explain(mutation.error, t)}</Alert> : null}
@@ -312,7 +316,7 @@ export function BatchDetailPage() {
 
 function MovementForm({ farmId, batchId, sheds, areas, onDone }: { farmId: string; batchId: string; sheds: Shed[]; areas: RangeArea[]; onDone: () => void }) {
   const { t } = useTranslation();
-  const today = new Date().toISOString().slice(0, 10);
+  const today = localToday();
   const form = useForm<z.infer<typeof movementInputSchema>>({
     resolver: zodResolver(movementInputSchema),
     defaultValues: {
@@ -351,7 +355,7 @@ function MovementForm({ farmId, batchId, sheds, areas, onDone }: { farmId: strin
     <Card>
       <form className="grid gap-3" onSubmit={form.handleSubmit((values) => mutation.mutate(values))} noValidate>
         <h2 className="font-display text-2xl">{t('batches.record')}</h2>
-        <Field id="move-type" label={t('batches.movementType')} error={text(t, errors.movementType?.message)}>
+        <Field id="move-type" label={t('batches.movementType')} error={text(t, errors.movementType?.message)} hint={t('fieldHint.move-type')}>
           <select id="move-type" className={selectClass} {...form.register('movementType')}>
             {MOVEMENT_TYPES.map((type) => (
               <option key={type} value={type}>
@@ -367,7 +371,7 @@ function MovementForm({ farmId, batchId, sheds, areas, onDone }: { farmId: strin
           </label>
         ) : null}
         {showFromShed ? (
-          <Field id="move-from" label={t('batches.fromShed')} error={text(t, errors.fromShedId?.message)}>
+          <Field id="move-from" label={t('batches.fromShed')} error={text(t, errors.fromShedId?.message)} hint={t('fieldHint.move-from')}>
             <select id="move-from" className={selectClass} {...form.register('fromShedId')}>
               {sheds.map((shed) => (
                 <option key={shed.id} value={shed.id}>{shed.code}</option>
@@ -376,7 +380,7 @@ function MovementForm({ farmId, batchId, sheds, areas, onDone }: { farmId: strin
           </Field>
         ) : null}
         {kind === 'from_range' || (exit && fromRange) ? (
-          <Field id="move-from-range" label={t('batches.fromRange')} error={text(t, errors.fromRangeAreaId?.message)}>
+          <Field id="move-from-range" label={t('batches.fromRange')} error={text(t, errors.fromRangeAreaId?.message)} hint={t('fieldHint.move-from-range')}>
             <select id="move-from-range" className={selectClass} {...form.register('fromRangeAreaId')}>
               <option value="">{t('batches.chooseRange')}</option>
               {areas.map((area) => (
@@ -386,7 +390,7 @@ function MovementForm({ farmId, batchId, sheds, areas, onDone }: { farmId: strin
           </Field>
         ) : null}
         {showToShed ? (
-          <Field id="move-to" label={t('batches.toShed')} error={text(t, errors.toShedId?.message)}>
+          <Field id="move-to" label={t('batches.toShed')} error={text(t, errors.toShedId?.message)} hint={t('fieldHint.move-to')}>
             <select id="move-to" className={selectClass} {...form.register('toShedId')}>
               {sheds.map((shed) => (
                 <option key={shed.id} value={shed.id}>{shed.code}</option>
@@ -395,7 +399,7 @@ function MovementForm({ farmId, batchId, sheds, areas, onDone }: { farmId: strin
           </Field>
         ) : null}
         {kind === 'to_range' ? (
-          <Field id="move-to-range" label={t('batches.toRange')} error={text(t, errors.toRangeAreaId?.message)}>
+          <Field id="move-to-range" label={t('batches.toRange')} error={text(t, errors.toRangeAreaId?.message)} hint={t('fieldHint.move-to-range')}>
             <select id="move-to-range" className={selectClass} {...form.register('toRangeAreaId')}>
               <option value="">{t('batches.chooseRange')}</option>
               {areas.map((area) => (
@@ -404,14 +408,14 @@ function MovementForm({ farmId, batchId, sheds, areas, onDone }: { farmId: strin
             </select>
           </Field>
         ) : null}
-        <Field id="move-count" label={t('batches.count')} error={text(t, errors.birdCount?.message)}>
-          <Input id="move-count" type="number" min={1} {...form.register('birdCount', { valueAsNumber: true })} />
+        <Field id="move-count" label={t('batches.count')} error={text(t, errors.birdCount?.message)} hint={t('fieldHint.move-count')}>
+          <Input id="move-count" type="number" min={1} {...form.register('birdCount', { valueAsNumber: true })}  placeholder={t('fieldPh.move-count')}/>
         </Field>
-        <Field id="move-date" label={t('batches.date')} error={text(t, errors.occurredOn?.message)}>
+        <Field id="move-date" label={t('batches.date')} error={text(t, errors.occurredOn?.message)} hint={t('fieldHint.move-date')}>
           <Input id="move-date" type="date" {...form.register('occurredOn')} />
         </Field>
-        <Field id="move-reason" label={`${t('batches.reason')} (${t('common.optional')})`} error={text(t, errors.reason?.message)}>
-          <Input id="move-reason" {...form.register('reason')} />
+        <Field id="move-reason" label={`${t('batches.reason')} (${t('common.optional')})`} error={text(t, errors.reason?.message)} hint={t('fieldHint.move-reason')}>
+          <Input id="move-reason" {...form.register('reason')}  placeholder={t('fieldPh.move-reason')}/>
         </Field>
         <p className="text-sm text-ink-soft">{t('batches.noPrice')}</p>
         {mutation.isError ? <Alert>{explain(mutation.error, t)}</Alert> : null}
@@ -441,8 +445,8 @@ function RangeAreaForm({ farmId, onDone }: { farmId: string; onDone: () => void 
       <form className="grid gap-3" onSubmit={form.handleSubmit((values) => mutation.mutate(values))}>
         <h2 className="font-display text-2xl">{t('batches.rangeTitle')}</h2>
         <p className="text-sm text-ink-soft">{t('batches.rangeBody')}</p>
-        <Field id="range-name" label={t('batches.rangeName')} error={text(t, form.formState.errors.name?.message)}>
-          <Input id="range-name" {...form.register('name')} />
+        <Field id="range-name" label={t('batches.rangeName')} error={text(t, form.formState.errors.name?.message)} hint={t('fieldHint.range-name')}>
+          <Input id="range-name" {...form.register('name')}  placeholder={t('fieldPh.range-name')}/>
         </Field>
         {mutation.isError ? <Alert>{explain(mutation.error, t)}</Alert> : null}
         <Button type="submit" variant="outline">{mutation.isPending ? t('batches.saving') : t('batches.saveRange')}</Button>
@@ -469,7 +473,7 @@ function SexCounts({
   const { t } = useTranslation();
   const form = useForm<z.infer<typeof sexCountInputSchema>>({
     resolver: zodResolver(sexCountInputSchema),
-    defaultValues: { countedOn: '', batchId, roosterCount: '' as unknown as number, henCount: '' as unknown as number },
+    defaultValues: { countedOn: localToday(), batchId, roosterCount: '' as unknown as number, henCount: '' as unknown as number },
   });
   const mutation = useMutation({
     mutationFn: (values: z.infer<typeof sexCountInputSchema>) => api(`/api/v1/farms/${farmId}/sex-counts`, {
@@ -477,7 +481,7 @@ function SexCounts({
       json: { ...values, batchId, roosterCount: Number(values.roosterCount), henCount: Number(values.henCount) },
     }),
     onSuccess: () => {
-      form.reset({ countedOn: '', batchId, roosterCount: '' as unknown as number, henCount: '' as unknown as number });
+      form.reset({ countedOn: localToday(), batchId, roosterCount: '' as unknown as number, henCount: '' as unknown as number });
       onDone();
     },
   });
@@ -494,14 +498,14 @@ function SexCounts({
       )}
       {canRecord ? (
         <form className="mt-3 grid gap-3" onSubmit={form.handleSubmit((values) => mutation.mutate(values))}>
-          <Field id="sex-date" label={t('batches.date')}>
+          <Field id="sex-date" label={t('batches.date')} hint={t('fieldHint.sex-date')}>
             <Input id="sex-date" type="date" {...form.register('countedOn')} />
           </Field>
-          <Field id="sex-roosters" label={t('batches.roosters')}>
-            <Input id="sex-roosters" type="number" min={0} {...form.register('roosterCount', { valueAsNumber: true })} />
+          <Field id="sex-roosters" label={t('batches.roosters')} hint={t('fieldHint.sex-roosters')}>
+            <Input id="sex-roosters" type="number" min={0} {...form.register('roosterCount', { valueAsNumber: true })}  placeholder={t('fieldPh.sex-roosters')}/>
           </Field>
-          <Field id="sex-hens" label={t('batches.hens')}>
-            <Input id="sex-hens" type="number" min={0} {...form.register('henCount', { valueAsNumber: true })} />
+          <Field id="sex-hens" label={t('batches.hens')} hint={t('fieldHint.sex-hens')}>
+            <Input id="sex-hens" type="number" min={0} {...form.register('henCount', { valueAsNumber: true })}  placeholder={t('fieldPh.sex-hens')}/>
           </Field>
           {mutation.isError ? <Alert>{explain(mutation.error, t)}</Alert> : null}
           <Button type="submit" variant="outline">{mutation.isPending ? t('batches.saving') : t('batches.saveSex')}</Button>

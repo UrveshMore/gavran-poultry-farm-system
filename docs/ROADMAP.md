@@ -54,7 +54,7 @@ Done in this repository. WF-10, WF-11, WF-12. Quantities and user-entered item n
 
 ## Phase 9 — Health observations and the disease knowledge base
 
-Done in this repository. WF-09, plus a Disease & Treatment Knowledge Base. The base is one row per page of the three Patil PDFs in `docs/sources/`. Each row stores the file, the page, and that page's text layer. Those files do not keep Marathi vowel signs in the text layer, so the app does not reconstruct a dose from it. Every row says “owner/vet must verify before use” and starts unapproved. Medicine records and vaccine tasks stay blocked until the owner writes a verification note and approves that page. The medicine record stores what the person typed, not a dose or a withdrawal date. Biosecurity steps are typed by the owner, or copied from `patil-poultry-step-by-step-process.pdf` with the page number and the unapproved flag. A copied step uses the text layer, not text the browser sends.
+Done in this repository. WF-09, plus a Disease & Treatment Knowledge Base. Migration 024 replaced the broken one-row-per-page text layer with one note per disease, medicine, or care step. Amounts are copied only where a page stated them. OCR (Tesseract, Marathi, Hindi, and English) was checked against the text layer. The app still does not invent a dose. Every row says “owner/vet must verify before use” and starts unapproved. Medicine records and vaccine tasks stay blocked until the owner writes a verification note and approves that page. The medicine record stores what the person typed, not a dose or a withdrawal date. Biosecurity steps are typed by the owner, or copied from `patil-poultry-step-by-step-process.pdf` with the page number and the unapproved flag. A copied step uses the text layer, not text the browser sends.
 
 ## Phase 10 — Mortality and predator losses
 
@@ -131,6 +131,10 @@ Done in this repository. A search needs at least two characters. `%` and `_` are
 ## Phase 26 — Scheduled reports
 
 Done in this repository. A named report stores a name, a note, and a date the farm types. Running it uses the existing report for a date range typed at that moment. Nothing is sent out. No clock is stored.
+
+## After phase 26 — farmer pass
+
+Done in this repository. Home is large tiles. A first visit starts a short tour, and Help replays it. The yard book records let-out, shut-in, and a free note, with no suggested clock time. The user guide covers every screen.
 
 ## Explicitly later
 

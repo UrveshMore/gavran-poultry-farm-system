@@ -86,11 +86,11 @@ export function DocumentsPage() {
           }}
         >
           <h2 className="font-display text-2xl">{t('documents.add')}</h2>
-          <Field id="doc-file" label={t('documents.choose')}>
+          <Field id="doc-file" label={t('documents.choose')} hint={t('fieldHint.doc-file')}>
             <input id="doc-file" ref={fileRef} className={fileClass} type="file" accept="image/jpeg,image/png,image/webp,application/pdf" />
           </Field>
-          <Field id="doc-note" label={t('documents.note')}>
-            <Input id="doc-note" value={note} onChange={(event) => setNote(event.target.value)} />
+          <Field id="doc-note" label={t('documents.note')} hint={t('fieldHint.doc-note')}>
+            <Input id="doc-note" value={note} placeholder={t('fieldPh.doc-note')} onChange={(event) => setNote(event.target.value)} />
           </Field>
           {save.isError ? <Alert>{explain(save.error, t)}</Alert> : null}
           <Button type="submit">{save.isPending ? t('documents.saving') : t('documents.save')}</Button>

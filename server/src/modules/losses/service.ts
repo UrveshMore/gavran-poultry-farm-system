@@ -29,7 +29,7 @@ export async function createLoss(actor: Actor, access: FarmAccess, body: unknown
   const farm = await findFarmById(pool, access.farmId, false);
   if (!farm) throw new AppError(404, 'NOT_FOUND', 'Not found.');
   if (input.occurredOn > todayInTimeZone(farm.timezone)) {
-    throw new AppError(422, 'VALIDATION_ERROR', 'That date is in the future.', { fields: { occurredOn: 'too_big' } });
+    throw new AppError(422, 'VALIDATION_ERROR', 'That date is in the future.', { fields: { occurredOn: 'future_date' } });
   }
   const path = requestPath(idempotency.path);
   return withTransaction(async (conn) => {

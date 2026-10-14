@@ -82,7 +82,7 @@ export async function createObservation(actor: Actor, access: FarmAccess, body: 
   const input = healthObservationSchema.parse(body);
   const today = await farmToday(access.farmId);
   if (input.observedOn > today) {
-    throw new AppError(422, 'VALIDATION_ERROR', 'That date is in the future.', { fields: { observedOn: 'too_big' } });
+    throw new AppError(422, 'VALIDATION_ERROR', 'That date is in the future.', { fields: { observedOn: 'future_date' } });
   }
   const path = requestPath(idempotency.path);
   return withTransaction(async (conn) => {
@@ -137,7 +137,7 @@ export async function createMedicine(actor: Actor, access: FarmAccess, body: unk
   const input = medicineRecordSchema.parse(body);
   const today = await farmToday(access.farmId);
   if (input.givenOn > today) {
-    throw new AppError(422, 'VALIDATION_ERROR', 'That date is in the future.', { fields: { givenOn: 'too_big' } });
+    throw new AppError(422, 'VALIDATION_ERROR', 'That date is in the future.', { fields: { givenOn: 'future_date' } });
   }
   const path = requestPath(idempotency.path);
   return withTransaction(async (conn) => {

@@ -44,7 +44,7 @@ async function truncate(): Promise<void> {
   try {
     await conn.query('SET FOREIGN_KEY_CHECKS = 0');
     for (const table of [
-      'report_schedules', 'farm_files', 'notifications', 'sale_returns', 'invoice_lines', 'invoice_documents', 'supplier_payments', 'supplier_bills', 'goods_receipts', 'purchase_order_lines', 'purchase_orders', 'suppliers', 'parentage_records', 'task_training_requirements', 'training_completions', 'training_assignments', 'training_items', 'attendance_records', 'idempotency_keys',
+      'yard_notes', 'report_schedules', 'farm_files', 'notifications', 'sale_returns', 'invoice_lines', 'invoice_documents', 'supplier_payments', 'supplier_bills', 'goods_receipts', 'purchase_order_lines', 'purchase_orders', 'suppliers', 'parentage_records', 'task_training_requirements', 'training_completions', 'training_assignments', 'training_items', 'attendance_records', 'idempotency_keys',
       'audit_logs',
       'expense_entries',
       'expense_categories',
@@ -114,12 +114,18 @@ describe('health knowledge base', () => {
 
     const listed = await http.get(`/api/v1/farms/${farmId}/knowledge`);
     expect(listed.status).toBe(200);
-    expect(listed.body.data).toHaveLength(63);
-    expect(listed.body.data.every((item: { approved: boolean; mustVerify: boolean; verifyLabel: string }) => !item.approved && item.mustVerify && item.verifyLabel === 'owner/vet must verify before use')).toBe(true);
-    const marek = listed.body.data.find((item: { title: string }) => item.title.includes('Mareks Disease'));
+    expect(listed.body.data.length).toBeGreaterThan(40);
+    expect(listed.body.data.every((item: { approved: boolean; mustVerify: boolean; verifyLabel: string; title: string }) => !item.approved && item.mustVerify && item.verifyLabel === 'owner/vet must verify before use' && !item.title.startsWith('•'))).toBe(true);
+    const marek = listed.body.data.find((item: { title: string }) => item.title.includes('Marek'));
     expect(marek).toBeTruthy();
     expect(marek.sourceFile).toBe('patil-poultry-diseases-symptoms-medicines.pdf');
     expect(marek.sourcePage).toBe(2);
+    expect(marek.kind).toBe('disease');
+    expect(String(marek.symptoms)).toContain('पंख');
+    const lixen = listed.body.data.find((item: { title: string }) => item.title === 'Lixen powder');
+    expect(lixen.kind).toBe('medicine');
+    expect(String(lixen.howToGive)).toContain('१ ग्रॅम');
+    expect(String(lixen.title)).not.toContain('किासाठी');
 
     const blocked = await send(http, 'post', `/api/v1/farms/${farmId}/medicine-records`, {
       entryId: marek.id,
@@ -176,6 +182,7 @@ describe('health knowledge base', () => {
     expect(copied.body.data.origin).toBe('pdf');
     expect(copied.body.data.sourcePage).toBe(3);
     expect(copied.body.data.body).not.toContain('this client text');
+    expect(copied.body.data.body).toContain('स्वच्छ');
     expect(copied.body.data.mustVerify).toBe(true);
 
     const wrongFile = await send(http, 'post', `/api/v1/farms/${farmId}/biosecurity-steps`, {

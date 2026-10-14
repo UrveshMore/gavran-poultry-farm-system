@@ -27,6 +27,8 @@ import { DocumentsPage } from '@/pages/DocumentPages';
 import { OfflinePage } from '@/pages/OfflinePages';
 import { SearchPageView } from '@/pages/SearchPages';
 import { SchedulesPage } from '@/pages/SchedulePages';
+import { FarmHomePage, GroupPage, HelpPage, TodayPage } from '@/pages/GuidePages';
+import { YardPageView } from '@/pages/YardPages';
 
 function RequireAuth() {
   const { t } = useTranslation();
@@ -55,7 +57,12 @@ export function App() {
         <Route index element={<FarmsPage />} />
         <Route path="account" element={<AccountPage />} />
         <Route path="farms/new" element={<FarmCreatePage />} />
-        <Route path="farms/:farmId" element={<FarmProfilePage />} />
+        <Route path="farms/:farmId" element={<FarmHomePage />} />
+        <Route path="farms/:farmId/go/:groupId" element={<GroupPage />} />
+        <Route path="farms/:farmId/help" element={<HelpPage />} />
+        <Route path="farms/:farmId/today" element={<TodayPage />} />
+        <Route path="farms/:farmId/yard" element={<YardPageView />} />
+        <Route path="farms/:farmId/profile" element={<FarmProfilePage />} />
         <Route path="farms/:farmId/sheds" element={<ShedsPage />} />
         <Route path="farms/:farmId/batches" element={<BatchesPage />} />
         <Route path="farms/:farmId/eggs" element={<EggsPage />} />

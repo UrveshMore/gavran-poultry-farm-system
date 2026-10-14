@@ -73,7 +73,7 @@ export async function createOrder(actor: Actor, access: FarmAccess, body: unknow
 export async function createReceipt(actor: Actor, access: FarmAccess, body: unknown, idempotency: IdempotencyInput) {
   const input = goodsReceiptInputSchema.parse(body);
   const today = await farmDay(access.farmId);
-  if (input.receivedOn > today) throw new AppError(422, 'VALIDATION_ERROR', 'That date is in the future.', { fields: { receivedOn: 'too_big' } });
+  if (input.receivedOn > today) throw new AppError(422, 'VALIDATION_ERROR', 'That date is in the future.', { fields: { receivedOn: 'future_date' } });
   if (!(await supplierOnFarm(pool, access.farmId, input.supplierId))) {
     throw new AppError(422, 'VALIDATION_ERROR', 'Choose a supplier on this farm.', { fields: { supplierId: 'invalid_format' } });
   }
@@ -100,7 +100,7 @@ export async function createReceipt(actor: Actor, access: FarmAccess, body: unkn
 export async function createBill(actor: Actor, access: FarmAccess, body: unknown, idempotency: IdempotencyInput) {
   const input = supplierBillInputSchema.parse(body);
   const today = await farmDay(access.farmId);
-  if (input.billedOn > today) throw new AppError(422, 'VALIDATION_ERROR', 'That date is in the future.', { fields: { billedOn: 'too_big' } });
+  if (input.billedOn > today) throw new AppError(422, 'VALIDATION_ERROR', 'That date is in the future.', { fields: { billedOn: 'future_date' } });
   if (!(await supplierOnFarm(pool, access.farmId, input.supplierId))) {
     throw new AppError(422, 'VALIDATION_ERROR', 'Choose a supplier on this farm.', { fields: { supplierId: 'invalid_format' } });
   }
@@ -120,7 +120,7 @@ export async function createBill(actor: Actor, access: FarmAccess, body: unknown
 export async function createPayment(actor: Actor, access: FarmAccess, body: unknown, idempotency: IdempotencyInput) {
   const input = supplierPaymentInputSchema.parse(body);
   const today = await farmDay(access.farmId);
-  if (input.paidOn > today) throw new AppError(422, 'VALIDATION_ERROR', 'That date is in the future.', { fields: { paidOn: 'too_big' } });
+  if (input.paidOn > today) throw new AppError(422, 'VALIDATION_ERROR', 'That date is in the future.', { fields: { paidOn: 'future_date' } });
   if (!(await supplierOnFarm(pool, access.farmId, input.supplierId))) {
     throw new AppError(422, 'VALIDATION_ERROR', 'Choose a supplier on this farm.', { fields: { supplierId: 'invalid_format' } });
   }

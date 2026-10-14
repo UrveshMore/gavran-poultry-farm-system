@@ -38,7 +38,7 @@ async function truncate(): Promise<void> {
   try {
     await conn.query('SET FOREIGN_KEY_CHECKS = 0');
     for (const table of [
-      'report_schedules', 'farm_files', 'notifications', 'sale_returns', 'invoice_lines', 'invoice_documents', 'supplier_payments', 'supplier_bills', 'goods_receipts', 'purchase_order_lines', 'purchase_orders', 'suppliers', 'parentage_records', 'task_training_requirements', 'training_completions', 'training_assignments', 'training_items', 'attendance_records', 'idempotency_keys',
+      'yard_notes', 'report_schedules', 'farm_files', 'notifications', 'sale_returns', 'invoice_lines', 'invoice_documents', 'supplier_payments', 'supplier_bills', 'goods_receipts', 'purchase_order_lines', 'purchase_orders', 'suppliers', 'parentage_records', 'task_training_requirements', 'training_completions', 'training_assignments', 'training_items', 'attendance_records', 'idempotency_keys',
       'audit_logs',
       'expense_entries',
       'expense_categories',
@@ -276,5 +276,35 @@ describe('batch ledger', () => {
     expect((await worker.get(`/api/v1/farms/${farmId}/batches`)).status).toBe(200);
     expect((await worker.post(`/api/v1/farms/${farmId}/bird-types`).set('X-CSRF-Token', await csrf(worker)).send({ name: 'Other' })).status).toBe(403);
     expect((await worker.get('/api/v1/farms/00000000-0000-4000-8000-000000009999/batches')).status).toBe(404);
+  });
+
+  it('says when the hatch date is after the day the flock was opened', async () => {
+    const { http, farmId, shedId } = await registerAndFarm();
+    const type = await http.post(`/api/v1/farms/${farmId}/bird-types`).set('X-CSRF-Token', await csrf(http)).send({ name: 'Gavran' });
+    const opened = '2020-09-06';
+    const hatched = '2020-09-27';
+    const rejected = await http.post(`/api/v1/farms/${farmId}/batches`).set('X-CSRF-Token', await csrf(http)).send({
+      code: 'H1',
+      birdTypeId: type.body.data.id,
+      sourceNote: '',
+      hatchDate: hatched,
+      openedOn: opened,
+      shedId,
+      birdCount: 12,
+    });
+    expect(rejected.status).toBe(422);
+    expect(rejected.body.error.details.fields.hatchDate).toBe('hatch_after_opened');
+
+    const sameDay = await http.post(`/api/v1/farms/${farmId}/batches`).set('X-CSRF-Token', await csrf(http)).send({
+      code: 'H2',
+      birdTypeId: type.body.data.id,
+      sourceNote: '',
+      hatchDate: opened,
+      openedOn: opened,
+      shedId,
+      birdCount: 12,
+    });
+    expect(sameDay.status).toBe(201);
+    expect(sameDay.body.data.hatchDate).toBe(opened);
   });
 });

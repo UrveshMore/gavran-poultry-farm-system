@@ -3,30 +3,33 @@
 @theme {
   --font-sans: "Source Sans 3", "Noto Sans Devanagari", ui-sans-serif, sans-serif;
   --font-display: Fraunces, Georgia, serif;
-  --color-paper: #f4efe4;
-  --color-paper-deep: #e6decc;
-  --color-ink: #1b1914;
-  --color-ink-soft: #5e564c;
-  --color-grove: #1b4332;
-  --color-grove-2: #2d6a4f;
-  --color-clay: #c4522a;
-  --color-clay-2: #9a3f1f;
-  --color-gold: #e0b15a;
-  --color-line: #d5cdb8;
+  --color-paper: #f4e9c9;
+  --color-paper-deep: #ead9a8;
+  --color-ink: #1a2e1c;
+  --color-ink-soft: #3d5340;
+  --color-grove: #2f6b3a;
+  --color-grove-2: #245430;
+  --color-leaf: #7fb069;
+  --color-clay: #e07a2f;
+  --color-clay-2: #c4681f;
+  --color-gold: #f6e7b2;
+  --color-line: #e4d3a4;
+  --color-nav: #1e3d24;
+  --color-nav-text: #f4e9c9;
   --color-danger: #8d2c2c;
   --color-danger-bg: #f8e6e1;
   --color-ok-bg: #e4f0e8;
 }
 
 html {
-  background: #f4efe4;
+  background: #f4e9c9;
 }
 
 body {
   margin: 0;
   min-height: 100dvh;
-  color: #1b1914;
-  background-color: #f4efe4;
+  color: #1a2e1c;
+  background-color: #f4e9c9;
   background-image: radial-gradient(rgba(27, 25, 20, 0.045) 0.7px, transparent 0.7px);
   background-size: 8px 8px;
   font-family: var(--font-sans);
@@ -39,6 +42,11 @@ body {
     animation: none !important;
     transition: none !important;
   }
+}
+
+.gavran-tour {
+  font-family: var(--font-sans);
+  color: #1a2e1c;
 }
 
 .sr-only {

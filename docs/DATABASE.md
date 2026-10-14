@@ -73,7 +73,7 @@ MySQL 8.4, `utf8mb4` / `utf8mb4_0900_ai_ci`, session time zone `+00:00`. Migrati
 
 ## 011 health
 
-- `knowledge_entries` — one row per page of the three Patil PDFs. `text_layer` is the PDF text layer, not a reconstructed dose. 63 rows.
+- `knowledge_entries` — one row per disease, medicine, or care note from the three Patil PDFs (migration 024). `kind` is `disease`, `medicine`, or `care`. `used_for`, `symptoms`, `how_to_give`, `schedule_text`, and `precautions` are copied text. A page that is only a pack photo does not gain an amount. Brooding temperatures that did not copy are not stored. Junk page-fragment titles were deleted, and approvals or medicine rows that pointed at them were cleared.
 - `knowledge_approvals` — per farm. Starts absent, which the API reports as unapproved. A note is required to approve.
 - `health_observations` — a date, notes, optional batch, optional bird count, optional page link.
 - `medicine_records` — the approved page and notes the person typed. No dose column and no withdrawal column.
@@ -153,6 +153,7 @@ There is no backup table. `npm run restore-drill -w @gavran/server` creates `gav
 
 - Permissions `000000000148` and `000000000149`: `document.read`, `document.record`. Owner and manager only.
 - `farm_files` — original name, stored name, media type, byte size, and a note. Bytes live under `uploads/` and are not removed by a schedule. No scan-result column.
+- `yard_notes` — a let-out, a shut-in, or a free note. The clock time is null when the farm leaves it blank. No suggested time and no predator list.
 
 ## 023 named reports
 

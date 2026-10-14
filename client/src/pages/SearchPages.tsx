@@ -51,8 +51,8 @@ export function SearchPageView() {
       </div>
       <Card>
         <form className="grid gap-3" onSubmit={(event) => void onSubmit(event)}>
-          <Field id="search-q" label={t('search.label')}>
-            <Input id="search-q" value={text} onChange={(event) => setText(event.target.value)} />
+          <Field id="search-q" label={t('search.label')} hint={t('fieldHint.search-q')}>
+            <Input id="search-q" value={text} placeholder={t('fieldPh.search-q')} onChange={(event) => setText(event.target.value)} />
           </Field>
           {error ? <Alert>{error}</Alert> : null}
           <Button type="submit">{pending ? t('search.working') : t('search.action')}</Button>

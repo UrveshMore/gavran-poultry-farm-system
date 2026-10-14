@@ -15,6 +15,7 @@ import { z } from 'zod';
 import { Alert, Button, Card, Field, Input, TextArea } from '@/components/ui';
 import { ApiError, api, errorKey } from '@/lib/api';
 import type { Batch, BirdType, FarmSummary, GrowthTarget, Shed, StockItem, StockMovement, WaterRecord, Weighing } from '@/lib/types';
+import { localToday } from '@/lib/today';
 
 const selectClass = 'min-h-11 w-full rounded-xl border border-line bg-white px-3';
 
@@ -173,17 +174,17 @@ function ItemForm({ farmId }: { farmId: string }) {
         onSubmit={form.handleSubmit((values) => mutation.mutate({ ...values, reorderLevel: numberOrNull(form.getValues('reorderLevel')) }))}
       >
         <h3 className="font-display text-xl">{t('stock.addItem')}</h3>
-        <Field id="item-name" label={t('stock.itemName')} error={text(t, form.formState.errors.name?.message)}>
-          <Input id="item-name" {...form.register('name')} />
+        <Field id="item-name" label={t('stock.itemName')} error={text(t, form.formState.errors.name?.message)} hint={t('fieldHint.item-name')}>
+          <Input id="item-name" {...form.register('name')}  placeholder={t('fieldPh.item-name')}/>
         </Field>
         <Field id="item-unit" label={t('stock.unit')} hint={t('stock.unitHint')} error={text(t, form.formState.errors.unitLabel?.message)}>
-          <Input id="item-unit" {...form.register('unitLabel')} />
+          <Input id="item-unit" {...form.register('unitLabel')}  placeholder={t('fieldPh.item-unit')}/>
         </Field>
-        <Field id="item-reorder" label={`${t('stock.reorder')} (${t('common.optional')})`} error={text(t, form.formState.errors.reorderLevel?.message)}>
-          <Input id="item-reorder" type="number" min={0} step="0.001" {...form.register('reorderLevel', { setValueAs: numberOrNull })} />
+        <Field id="item-reorder" label={`${t('stock.reorder')} (${t('common.optional')})`} error={text(t, form.formState.errors.reorderLevel?.message)} hint={t('fieldHint.item-reorder')}>
+          <Input id="item-reorder" type="number" min={0} step="0.001" {...form.register('reorderLevel', { setValueAs: numberOrNull })}  placeholder={t('fieldPh.item-reorder')}/>
         </Field>
-        <Field id="item-notes" label={`${t('stock.notes')} (${t('common.optional')})`}>
-          <TextArea id="item-notes" {...form.register('notes')} />
+        <Field id="item-notes" label={`${t('stock.notes')} (${t('common.optional')})`} hint={t('fieldHint.item-notes')}>
+          <TextArea id="item-notes" {...form.register('notes')}  placeholder={t('fieldPh.item-notes')}/>
         </Field>
         {mutation.isError ? <Alert>{explain(mutation.error, t)}</Alert> : null}
         <Button type="submit">{mutation.isPending ? t('stock.saving') : t('stock.saveItem')}</Button>
@@ -204,7 +205,7 @@ function MovementForm({ farmId, items }: { farmId: string; items: StockItem[] })
       movementType: 'receipt',
       direction: 'in',
       quantity: 0,
-      occurredOn: '',
+      occurredOn: localToday(),
       batchId: '',
       shedId: '',
       lotCode: '',
@@ -239,7 +240,7 @@ function MovementForm({ farmId, items }: { farmId: string; items: StockItem[] })
         })}
       >
         <h3 className="font-display text-xl">{t('stock.addMovement')}</h3>
-        <Field id="move-item" label={t('stock.itemName')} error={text(t, form.formState.errors.itemId?.message)}>
+        <Field id="move-item" label={t('stock.itemName')} error={text(t, form.formState.errors.itemId?.message)} hint={t('fieldHint.move-item')}>
           <select id="move-item" className={selectClass} {...form.register('itemId')}>
             <option value="">{t('stock.choose')}</option>
             {items.map((item) => (
@@ -249,8 +250,8 @@ function MovementForm({ farmId, items }: { farmId: string; items: StockItem[] })
             ))}
           </select>
         </Field>
-        <Field id="move-type" label={t('stock.movementType')}>
-          <select id="move-type" className={selectClass} {...form.register('movementType')}>
+        <Field id="stock-move-type" label={t('stock.movementType')} hint={t('fieldHint.stock-move-type')}>
+          <select id="stock-move-type" className={selectClass} {...form.register('movementType')}>
             {(['receipt', 'use', 'wastage', 'reversal'] as const).map((type) => (
               <option key={type} value={type}>
                 {t(`stock.type.${type}`)}
@@ -259,20 +260,20 @@ function MovementForm({ farmId, items }: { farmId: string; items: StockItem[] })
           </select>
         </Field>
         {movementType === 'reversal' ? (
-          <Field id="move-direction" label={t('stock.directionLabel')}>
+          <Field id="move-direction" label={t('stock.directionLabel')} hint={t('fieldHint.move-direction')}>
             <select id="move-direction" className={selectClass} {...form.register('direction')}>
               <option value="in">{t('stock.direction.in')}</option>
               <option value="out">{t('stock.direction.out')}</option>
             </select>
           </Field>
         ) : null}
-        <Field id="move-qty" label={t('stock.quantity')} error={text(t, form.formState.errors.quantity?.message)}>
-          <Input id="move-qty" type="number" min={0} step="0.001" {...form.register('quantity', { valueAsNumber: true })} />
+        <Field id="move-qty" label={t('stock.quantity')} error={text(t, form.formState.errors.quantity?.message)} hint={t('fieldHint.move-qty')}>
+          <Input id="move-qty" type="number" min={0} step="0.001" {...form.register('quantity', { valueAsNumber: true })}  placeholder={t('fieldPh.move-qty')}/>
         </Field>
-        <Field id="move-date" label={t('stock.date')} error={text(t, form.formState.errors.occurredOn?.message)}>
-          <Input id="move-date" type="date" {...form.register('occurredOn')} />
+        <Field id="stock-move-date" label={t('stock.date')} error={text(t, form.formState.errors.occurredOn?.message)} hint={t('fieldHint.stock-move-date')}>
+          <Input id="stock-move-date" type="date" {...form.register('occurredOn')} />
         </Field>
-        <Field id="move-batch" label={`${t('stock.batch')} (${t('common.optional')})`}>
+        <Field id="move-batch" label={`${t('stock.batch')} (${t('common.optional')})`} hint={t('fieldHint.move-batch')}>
           <select id="move-batch" className={selectClass} {...form.register('batchId')}>
             <option value="">{t('stock.none')}</option>
             {(batches.data ?? []).map((batch) => (
@@ -282,7 +283,7 @@ function MovementForm({ farmId, items }: { farmId: string; items: StockItem[] })
             ))}
           </select>
         </Field>
-        <Field id="move-shed" label={`${t('stock.shed')} (${t('common.optional')})`}>
+        <Field id="move-shed" label={`${t('stock.shed')} (${t('common.optional')})`} hint={t('fieldHint.move-shed')}>
           <select id="move-shed" className={selectClass} {...form.register('shedId')}>
             <option value="">{t('stock.none')}</option>
             {(sheds.data ?? []).map((shed) => (
@@ -297,8 +298,8 @@ function MovementForm({ farmId, items }: { farmId: string; items: StockItem[] })
             <Input id="move-cost" type="number" min={0} step="0.01" {...form.register('unitCost', { setValueAs: numberOrNull })} />
           </Field>
         ) : null}
-        <Field id="move-reason" label={movementType === 'reversal' ? t('stock.reason') : `${t('stock.reason')} (${t('common.optional')})`} error={text(t, form.formState.errors.reason?.message)}>
-          <Input id="move-reason" {...form.register('reason')} />
+        <Field id="stock-move-reason" label={movementType === 'reversal' ? t('stock.reason') : `${t('stock.reason')} (${t('common.optional')})`} error={text(t, form.formState.errors.reason?.message)} hint={t('fieldHint.stock-move-reason')}>
+          <Input id="stock-move-reason" {...form.register('reason')}  placeholder={t('fieldPh.stock-move-reason')}/>
         </Field>
         {mutation.isError ? <Alert>{explain(mutation.error, t)}</Alert> : null}
         <Button type="submit">{mutation.isPending ? t('stock.saving') : t('stock.saveMovement')}</Button>
@@ -312,7 +313,7 @@ function WaterForm({ farmId }: { farmId: string }) {
   const queryClient = useQueryClient();
   const form = useForm<z.infer<typeof waterInputSchema>>({
     resolver: zodResolver(waterInputSchema),
-    defaultValues: { recordedOn: '', batchId: '', shedId: '', quantity: null, unitLabel: '', sourceNote: '', testNote: '', notes: '' },
+    defaultValues: { recordedOn: localToday(), batchId: '', shedId: '', quantity: null, unitLabel: '', sourceNote: '', testNote: '', notes: '' },
   });
   const mutation = useMutation({
     mutationFn: (values: z.infer<typeof waterInputSchema>) => api(`/api/v1/farms/${farmId}/water`, { method: 'POST', json: values }),
@@ -328,23 +329,23 @@ function WaterForm({ farmId }: { farmId: string }) {
         onSubmit={form.handleSubmit((values) => mutation.mutate({ ...values, quantity: numberOrNull(values.quantity) }))}
       >
         <h3 className="font-display text-xl">{t('stock.addWater')}</h3>
-        <Field id="water-date" label={t('stock.date')} error={text(t, form.formState.errors.recordedOn?.message)}>
+        <Field id="water-date" label={t('stock.date')} error={text(t, form.formState.errors.recordedOn?.message)} hint={t('fieldHint.water-date')}>
           <Input id="water-date" type="date" {...form.register('recordedOn')} />
         </Field>
-        <Field id="water-qty" label={`${t('stock.quantity')} (${t('common.optional')})`} error={text(t, form.formState.errors.quantity?.message)}>
-          <Input id="water-qty" type="number" min={0} step="0.001" {...form.register('quantity', { setValueAs: numberOrNull })} />
+        <Field id="water-qty" label={`${t('stock.quantity')} (${t('common.optional')})`} error={text(t, form.formState.errors.quantity?.message)} hint={t('fieldHint.water-qty')}>
+          <Input id="water-qty" type="number" min={0} step="0.001" {...form.register('quantity', { setValueAs: numberOrNull })}  placeholder={t('fieldPh.water-qty')}/>
         </Field>
-        <Field id="water-unit" label={t('stock.unit')} error={text(t, form.formState.errors.unitLabel?.message)}>
-          <Input id="water-unit" {...form.register('unitLabel')} />
+        <Field id="water-unit" label={t('stock.unit')} error={text(t, form.formState.errors.unitLabel?.message)} hint={t('fieldHint.water-unit')}>
+          <Input id="water-unit" {...form.register('unitLabel')}  placeholder={t('fieldPh.water-unit')}/>
         </Field>
-        <Field id="water-source" label={`${t('stock.source')} (${t('common.optional')})`}>
-          <Input id="water-source" {...form.register('sourceNote')} />
+        <Field id="water-source" label={`${t('stock.source')} (${t('common.optional')})`} hint={t('fieldHint.water-source')}>
+          <Input id="water-source" {...form.register('sourceNote')}  placeholder={t('fieldPh.water-source')}/>
         </Field>
         <Field id="water-test" label={`${t('stock.testNote')} (${t('common.optional')})`} hint={t('stock.testHint')}>
-          <TextArea id="water-test" {...form.register('testNote')} />
+          <TextArea id="water-test" {...form.register('testNote')}  placeholder={t('fieldPh.water-test')}/>
         </Field>
-        <Field id="water-notes" label={`${t('stock.notes')} (${t('common.optional')})`}>
-          <TextArea id="water-notes" {...form.register('notes')} />
+        <Field id="water-notes" label={`${t('stock.notes')} (${t('common.optional')})`} hint={t('fieldHint.water-notes')}>
+          <TextArea id="water-notes" {...form.register('notes')}  placeholder={t('fieldPh.water-notes')}/>
         </Field>
         {mutation.isError ? <Alert>{explain(mutation.error, t)}</Alert> : null}
         <Button type="submit">{mutation.isPending ? t('stock.saving') : t('stock.saveWater')}</Button>
@@ -373,7 +374,7 @@ function TargetForm({ farmId }: { farmId: string }) {
     <Card>
       <form className="grid gap-3" onSubmit={form.handleSubmit((values) => mutation.mutate(values))}>
         <h3 className="font-display text-xl">{t('stock.addTarget')}</h3>
-        <Field id="target-type" label={t('stock.birdType')} error={text(t, form.formState.errors.birdTypeId?.message)}>
+        <Field id="target-type" label={t('stock.birdType')} error={text(t, form.formState.errors.birdTypeId?.message)} hint={t('fieldHint.target-type')}>
           <select id="target-type" className={selectClass} {...form.register('birdTypeId')}>
             <option value="">{t('stock.choose')}</option>
             {(types.data ?? []).filter((item) => item.status === 'active').map((item) => (
@@ -386,10 +387,10 @@ function TargetForm({ farmId }: { farmId: string }) {
         <Field id="target-age" label={t('stock.ageYouType')} hint={t('stock.ageHint')} error={text(t, form.formState.errors.ageDays?.message)}>
           <Input id="target-age" type="number" min={1} {...form.register('ageDays', { valueAsNumber: true })} />
         </Field>
-        <Field id="target-weight" label={t('stock.targetWeight')} error={text(t, form.formState.errors.targetWeight?.message)}>
-          <Input id="target-weight" type="number" min={0} step="0.001" {...form.register('targetWeight', { valueAsNumber: true })} />
+        <Field id="target-weight" label={t('stock.targetWeight')} error={text(t, form.formState.errors.targetWeight?.message)} hint={t('fieldHint.target-weight')}>
+          <Input id="target-weight" type="number" min={0} step="0.001" {...form.register('targetWeight', { valueAsNumber: true })}  placeholder={t('fieldPh.target-weight')}/>
         </Field>
-        <Field id="target-unit" label={t('stock.weightUnit')}>
+        <Field id="target-unit" label={t('stock.weightUnit')} hint={t('fieldHint.target-unit')}>
           <select id="target-unit" className={selectClass} {...form.register('weightUnit')}>
             <option value="g">g</option>
             <option value="kg">kg</option>
@@ -409,7 +410,7 @@ function WeighingForm({ farmId }: { farmId: string }) {
   const [open, setOpen] = useState(false);
   const form = useForm<z.infer<typeof weighingInputSchema>>({
     resolver: zodResolver(weighingInputSchema),
-    defaultValues: { batchId: '', weighedOn: '', ageDays: null, weightValue: 0, weightUnit: 'g', birdCount: null, notes: '' },
+    defaultValues: { batchId: '', weighedOn: localToday(), ageDays: null, weightValue: 0, weightUnit: 'g', birdCount: null, notes: '' },
   });
   const mutation = useMutation({
     mutationFn: (values: z.infer<typeof weighingInputSchema>) => api(`/api/v1/farms/${farmId}/weighings`, { method: 'POST', json: values }),
@@ -435,7 +436,7 @@ function WeighingForm({ farmId }: { farmId: string }) {
         )}
       >
         <h3 className="font-display text-xl">{t('stock.addWeighing')}</h3>
-        <Field id="weigh-batch" label={t('stock.batch')} error={text(t, form.formState.errors.batchId?.message)}>
+        <Field id="weigh-batch" label={t('stock.batch')} error={text(t, form.formState.errors.batchId?.message)} hint={t('fieldHint.weigh-batch')}>
           <select id="weigh-batch" className={selectClass} {...form.register('batchId')}>
             <option value="">{t('stock.choose')}</option>
             {(batches.data ?? []).map((batch) => (
@@ -445,16 +446,16 @@ function WeighingForm({ farmId }: { farmId: string }) {
             ))}
           </select>
         </Field>
-        <Field id="weigh-date" label={t('stock.date')} error={text(t, form.formState.errors.weighedOn?.message)}>
+        <Field id="weigh-date" label={t('stock.date')} error={text(t, form.formState.errors.weighedOn?.message)} hint={t('fieldHint.weigh-date')}>
           <Input id="weigh-date" type="date" {...form.register('weighedOn')} />
         </Field>
         <Field id="weigh-age" label={`${t('stock.ageYouType')} (${t('common.optional')})`} hint={t('stock.ageHint')} error={text(t, form.formState.errors.ageDays?.message)}>
           <Input id="weigh-age" type="number" min={1} {...form.register('ageDays', { setValueAs: numberOrNull })} />
         </Field>
-        <Field id="weigh-value" label={t('stock.weight')} error={text(t, form.formState.errors.weightValue?.message)}>
-          <Input id="weigh-value" type="number" min={0} step="0.001" {...form.register('weightValue', { valueAsNumber: true })} />
+        <Field id="weigh-value" label={t('stock.weight')} error={text(t, form.formState.errors.weightValue?.message)} hint={t('fieldHint.weigh-value')}>
+          <Input id="weigh-value" type="number" min={0} step="0.001" {...form.register('weightValue', { valueAsNumber: true })}  placeholder={t('fieldPh.weigh-value')}/>
         </Field>
-        <Field id="weigh-unit" label={t('stock.weightUnit')}>
+        <Field id="weigh-unit" label={t('stock.weightUnit')} hint={t('fieldHint.weigh-unit')}>
           <select id="weigh-unit" className={selectClass} {...form.register('weightUnit')}>
             <option value="g">g</option>
             <option value="kg">kg</option>

@@ -35,7 +35,7 @@ export async function createSitting(actor: Actor, access: FarmAccess, body: unkn
   const input = incubationInputSchema.parse(body);
   const today = await farmToday(access.farmId);
   if (input.startedOn > today) {
-    throw new AppError(422, 'VALIDATION_ERROR', 'That date is in the future.', { fields: { startedOn: 'too_big' } });
+    throw new AppError(422, 'VALIDATION_ERROR', 'That date is in the future.', { fields: { startedOn: 'future_date' } });
   }
   const path = requestPath(idempotency.path);
   try {
@@ -91,7 +91,7 @@ export async function createCandling(actor: Actor, access: FarmAccess, sittingId
   const input = candlingInputSchema.parse(body);
   const today = await farmToday(access.farmId);
   if (input.observedOn > today) {
-    throw new AppError(422, 'VALIDATION_ERROR', 'That date is in the future.', { fields: { observedOn: 'too_big' } });
+    throw new AppError(422, 'VALIDATION_ERROR', 'That date is in the future.', { fields: { observedOn: 'future_date' } });
   }
   const path = requestPath(idempotency.path);
   return withTransaction(async (conn) => {

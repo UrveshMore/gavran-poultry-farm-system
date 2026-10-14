@@ -54,7 +54,7 @@ export function todayInTimeZone(timeZone: string, now = new Date()): string {
 
 function assertNotFuture(date: string, today: string, field: string) {
   if (date > today) {
-    throw new AppError(422, 'VALIDATION_ERROR', 'That date is in the future.', { fields: { [field]: 'too_big' } });
+    throw new AppError(422, 'VALIDATION_ERROR', 'That date is in the future.', { fields: { [field]: 'future_date' } });
   }
 }
 
@@ -294,7 +294,7 @@ export async function getSexCounts(farmId: string) {
 export async function createSexCount(actor: Actor, access: FarmAccess, body: unknown, idempotency: IdempotencyInput) {
   const input = sexCountInputSchema.parse(body);
   if (input.countedOn > (await farmToday(access.farmId))) {
-    throw new AppError(422, 'VALIDATION_ERROR', 'That date is in the future.', { fields: { countedOn: 'too_big' } });
+    throw new AppError(422, 'VALIDATION_ERROR', 'That date is in the future.', { fields: { countedOn: 'future_date' } });
   }
   const path = requestPath(idempotency.path);
   return withTransaction(async (conn) => {

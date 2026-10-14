@@ -51,7 +51,7 @@ export async function getPrices(farmId: string) {
 export async function createPrice(actor: Actor, access: FarmAccess, body: unknown, idempotency: IdempotencyInput) {
   const input = marketPriceInputSchema.parse(body);
   if (input.effectiveOn > (await today(access.farmId))) {
-    throw new AppError(422, 'VALIDATION_ERROR', 'That date is in the future.', { fields: { effectiveOn: 'too_big' } });
+    throw new AppError(422, 'VALIDATION_ERROR', 'That date is in the future.', { fields: { effectiveOn: 'future_date' } });
   }
   const path = requestPath(idempotency.path);
   return withTransaction(async (conn) => {
@@ -73,7 +73,7 @@ export async function getOrders(farmId: string) {
 export async function createOrder(actor: Actor, access: FarmAccess, body: unknown, idempotency: IdempotencyInput) {
   const input = orderInputSchema.parse(body);
   if (input.orderedOn > (await today(access.farmId))) {
-    throw new AppError(422, 'VALIDATION_ERROR', 'That date is in the future.', { fields: { orderedOn: 'too_big' } });
+    throw new AppError(422, 'VALIDATION_ERROR', 'That date is in the future.', { fields: { orderedOn: 'future_date' } });
   }
   const path = requestPath(idempotency.path);
   return withTransaction(async (conn) => {

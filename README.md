@@ -23,6 +23,8 @@ npm run dev
 - API: http://127.0.0.1:4318
 - MySQL on the host: port 3307
 
+The farmer guide is `docs/USER_GUIDE.md` and `docs/USER_GUIDE.pdf`. The same words, with a picture of each screen, are on Help inside the program. The first visit starts a short tour. Help can play it again.
+
 The first visit can create the owner account. After that, people join by invitation from the farm's People screen. Nothing is emailed. Share the temporary password yourself.
 
 `npm run db:seed` creates a local owner only when `SEED_DEV=true` (the script sets that). Default seed email is `owner@gavran.local` and the password is `change-me-local-only`. The command does not print the password and does not create a farm. Do not enable seeding in production.
