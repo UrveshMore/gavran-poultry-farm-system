@@ -172,7 +172,7 @@ export function Label({ className, ...props }: ComponentProps<typeof RadixLabel>
 }
 
 export function Card({ className, children }: { className?: string; children: ReactNode }) {
-  return <section className={cn('rounded-2xl border border-line bg-white/90 p-4 shadow-sm', className)}>{children}</section>;
+  return <section className={cn('rounded-3xl bg-white p-4 shadow-[0_8px_28px_rgba(31,77,43,0.06)]', className)}>{children}</section>;
 }
 
 export function Field({
@@ -220,7 +220,7 @@ export function Alert({ tone = 'danger', children }: { tone?: 'danger' | 'ok'; c
 export function Logo({ className }: { className?: string }) {
   return (
     <svg viewBox="0 0 64 64" className={cn('h-10 w-10', className)} aria-hidden="true">
-      <rect width="64" height="64" rx="14" fill="#2f6b3a" />
+      <rect width="64" height="64" rx="14" fill="#1f4d2b" />
       <circle cx="30" cy="36" r="14" fill="#f4e9c9" />
       <circle cx="35" cy="33" r="1.8" fill="#1b1914" />
       <path d="M42 35h10l-6 4z" fill="#c4522a" />

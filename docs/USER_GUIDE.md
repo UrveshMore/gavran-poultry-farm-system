@@ -2,7 +2,7 @@
 
 ## Eight tabs (flow-3)
 
-Open the farm. The bar has Home, Incubator, Batch, Medicine, Feed, Eggs, Birds, and Hisaab.
+Open the farm. The bar has Home, Incubator, Batch, and Eggs. More holds Medicine, Feed, Birds, Hisaab, and Account.
 
 Home shows brooding birds, birds in sheds, today's medicine, today's feed, today's eggs, and this month's typed sales minus typed expenses. That last number is not an official profit.
 

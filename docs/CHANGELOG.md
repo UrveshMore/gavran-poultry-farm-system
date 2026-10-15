@@ -14,6 +14,7 @@ The eight-tab farm book, on the flow-3 branch.
 - Taking birds away asks for the shed and Died, Sold, or Other. Sold writes a hisaab sale.
 - Hisaab stores expenses and sales. This month shows typed sales minus typed expenses. That is not an official profit.
 - Every new line can be edited or deleted. Account can change the server address stored on the device.
+- The screens use the cream page, dark green buttons, white cards, the Gavran wordmark, and pictures of the barn, hens, chicks, eggs, and medicine bottles. Home, Incubator, Batch, and Eggs sit on the bottom bar. Medicine, Feed, Birds, Hisaab, and Account sit under More.
 
 ## 0.36.0 — 2026-10-14
 
