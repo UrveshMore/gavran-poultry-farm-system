@@ -10,6 +10,7 @@ import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import { PinPad } from '@/components/PinPad';
 import { Alert, Button, Card, Field, Input, Logo } from '@/components/ui';
 import { ApiError, api, errorKey, fetchMe } from '@/lib/api';
+import { saveServer } from '@/lib/serverAddress';
 import type { PublicUser } from '@/lib/types';
 
 function message(t: (key: string, options?: { defaultValue?: string }) => string, code?: string) {
@@ -210,6 +211,8 @@ export function AccountPage() {
   const { t } = useTranslation();
   const me = useQuery({ queryKey: ['me'], queryFn: fetchMe, retry: false });
   const [done, setDone] = useState(false);
+  const [server, setServer] = useState(() => localStorage.getItem('gavran.server') ?? '');
+  const [serverSaved, setServerSaved] = useState(false);
   const form = useForm<z.infer<typeof changePasswordSchema>>({
     resolver: zodResolver(changePasswordSchema),
     defaultValues: { currentPassword: '', newPassword: '' },
@@ -243,6 +246,24 @@ export function AccountPage() {
           <Button type="submit" disabled={mutation.isPending}>
             {t('auth.changePassword')}
           </Button>
+        </form>
+      </Card>
+      <Card className="grid gap-3">
+        <h2 className="font-display text-2xl">{t('auth.serverTitle')}</h2>
+        <p className="text-ink-soft">{t('auth.serverBody')}</p>
+        <form
+          className="grid gap-3"
+          onSubmit={(event) => {
+            event.preventDefault();
+            saveServer(server);
+            setServerSaved(true);
+          }}
+        >
+          <Field id="server-address" label={t('auth.serverLabel')} hint={t('auth.serverHint')}>
+            <Input id="server-address" value={server} placeholder={t('auth.serverPh')} autoComplete="off" onChange={(event) => setServer(event.target.value)} />
+          </Field>
+          {serverSaved ? <Alert tone="ok">{t('auth.serverSaved')}</Alert> : null}
+          <Button type="submit">{t('flow.action.save')}</Button>
         </form>
       </Card>
       <p className="text-sm text-ink-soft">{t('lang.reviewNote')}</p>

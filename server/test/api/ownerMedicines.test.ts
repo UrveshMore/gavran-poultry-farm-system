@@ -49,6 +49,17 @@ async function truncate(): Promise<void> {
   try {
     await conn.query('SET FOREIGN_KEY_CHECKS = 0');
     for (const table of [
+      'flow_sales',
+      'flow_expenses',
+      'flow_egg_entries',
+      'flow_feed_entries',
+      'flow_dose_marks',
+      'flow_moves',
+      'flow_hatch_days',
+      'flow_batches',
+      'flow_sheds',
+      'flow_incubators',
+      'flow_setup',
       'owner_dose_marks',
       'owner_batch_plans',
       'owner_medicine_links',

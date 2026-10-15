@@ -1,0 +1,11 @@
+DROP TABLE IF EXISTS flow_sales;
+DROP TABLE IF EXISTS flow_expenses;
+DROP TABLE IF EXISTS flow_egg_entries;
+DROP TABLE IF EXISTS flow_feed_entries;
+DROP TABLE IF EXISTS flow_dose_marks;
+DROP TABLE IF EXISTS flow_moves;
+DROP TABLE IF EXISTS flow_hatch_days;
+DROP TABLE IF EXISTS flow_batches;
+DROP TABLE IF EXISTS flow_sheds;
+DROP TABLE IF EXISTS flow_incubators;
+DROP TABLE IF EXISTS flow_setup;

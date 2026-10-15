@@ -27,7 +27,7 @@ Those sample ports are in `.env.example`. They are not 4317, 4318, or 3307, beca
 
 `npm run laptop` builds once and serves the screens from the API port. On a small Windows laptop, use MySQL installed on the PC and skip Docker. Phone install and Tailscale are in `docs/WINDOWS_SETUP.md`.
 
-The farmer guide is `docs/USER_GUIDE.md` and `docs/USER_GUIDE.pdf`. The same words, with a picture of each screen, are on Help inside the program. The first visit starts a short tour. Help can play it again.
+On the flow-3 branch the farm menu is Home, Incubator, Batch, Medicine, Feed, Eggs, Birds, and Hisaab. Older screens, including Gavran Saathi, stay in the program and are not on that menu. The farmer guide is `docs/USER_GUIDE.md`. Account can store a server address on the device.
 
 Gavran Saathi is under Daily work. Speak or type in English, Hindi, or Marathi. A card shows the flock, the number, and the day. Nothing is written until Save. The Gemini key is typed in farm details and stored on the computer. A sick-bird photo is matched to the farm papers and to medicines the owner typed, and labelled possible - confirm with vet. An owner medicine is labelled Added by owner. The amount is only what the owner typed.
 

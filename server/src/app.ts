@@ -17,6 +17,7 @@ import { requestContext, requestLogger } from './middleware/context.js';
 import { authRoutes } from './modules/auth/routes.js';
 import { batchRoutes } from './modules/batches/routes.js';
 import { desiRoutes } from './modules/desi/routes.js';
+import { flowRoutes } from './modules/flow3/routes.js';
 import { eggRoutes } from './modules/eggs/routes.js';
 import { hatchRoutes } from './modules/hatch/routes.js';
 import { incubationRoutes } from './modules/incubation/routes.js';
@@ -86,6 +87,7 @@ export function createApp() {
   app.use('/api/v1/farms', batchRoutes);
   app.use('/api/v1/farms', eggRoutes);
   app.use('/api/v1/farms', desiRoutes);
+  app.use('/api/v1/farms', flowRoutes);
   app.use('/api/v1/farms', incubatorRoutes);
   app.use('/api/v1/farms', incubationRoutes);
   app.use('/api/v1/farms', hatchRoutes);

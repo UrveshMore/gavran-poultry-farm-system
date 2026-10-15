@@ -1,48 +1,19 @@
-import {
-  Bell,
-  Bird,
-  CircleHelp,
-  ClipboardList,
-  Home,
-  LogOut,
-  ShoppingBasket,
-  Stethoscope,
-  Sun,
-  Thermometer,
-  Users,
-  Warehouse,
-  Wheat,
-  type LucideIcon,
-} from 'lucide-react';
+import { LogOut } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom';
-import { SaathiDock } from '@/components/SaathiDock';
-import { alertCount, type DashboardData } from '@/components/DashboardCards';
-import { PageExplain } from '@/components/Tour';
+// flow-3: Gavran Saathi, the old group menu, the bell, and the page tour stay in the repo and are not shown.
+// import { SaathiDock } from '@/components/SaathiDock';
+// import { PageExplain } from '@/components/Tour';
+// import { schedulePhoneAlerts } from '@/lib/phoneAlerts';
 import { api } from '@/lib/api';
 import { flushQueue, subscribeQueue, waitingCount } from '@/lib/offlineQueue';
-import { schedulePhoneAlerts } from '@/lib/phoneAlerts';
 import { isNativeApp } from '@/lib/serverAddress';
-import { useQuery } from '@tanstack/react-query';
 import { useQueryClient } from '@tanstack/react-query';
 import { InstallPrompt } from './InstallPrompt';
 import { LanguageSwitcher } from './LanguageSwitcher';
 import { Logo } from './ui';
-import { visibleGroups, type GroupId } from '@/lib/nav';
-import type { FarmSummary } from '@/lib/types';
-
-const groupIcons: Record<GroupId, LucideIcon> = {
-  daily: Sun,
-  birds: Bird,
-  incubator: Thermometer,
-  health: Stethoscope,
-  feed: Wheat,
-  money: ShoppingBasket,
-  reports: ClipboardList,
-  people: Users,
-  settings: Warehouse,
-};
+import { flowNav } from '@/pages/FlowPages';
 
 const linkClass = ({ isActive }: { isActive: boolean }) =>
   `flex min-h-11 items-center gap-2 rounded-xl px-3 text-sm font-semibold ${isActive ? 'bg-paper text-ink' : 'text-nav-text hover:bg-white/10'}`;
@@ -56,15 +27,8 @@ export function AppShell() {
   const [waiting, setWaiting] = useState(0);
   const farmMatch = location.pathname.match(/^\/farms\/([^/]+)/);
   const farmId = farmMatch && farmMatch[1] !== 'new' ? farmMatch[1] : undefined;
-  const farms = useQuery({ queryKey: ['farms'], queryFn: () => api<FarmSummary[]>('/api/v1/farms'), enabled: Boolean(farmId) });
-  const farm = farms.data?.find((item) => item.id === farmId);
-  const board = useQuery({
-    queryKey: ['dashboard', farmId],
-    queryFn: () => api<DashboardData>(`/api/v1/farms/${farmId}/dashboard`),
-    enabled: Boolean(farmId && farm),
-  });
-  const alerts = alertCount(board.data?.alerts ?? []);
-  const groups = farm ? visibleGroups(farm.permissions) : [];
+  // flow-3: the old dashboard fetch and phone alarms stay commented so the eight tabs are the menu.
+  // const groups = farm ? visibleGroups(farm.permissions) : [];
 
   useEffect(() => {
     const refresh = () => {
@@ -86,11 +50,6 @@ export function AppShell() {
       window.removeEventListener('offline', off);
     };
   }, []);
-
-  useEffect(() => {
-    if (!board.data || !farmId) return;
-    void schedulePhoneAlerts(farmId, board.data);
-  }, [board.data, farmId]);
 
   useEffect(() => {
     if (!isNativeApp()) return;
@@ -118,27 +77,14 @@ export function AppShell() {
   }
 
   const items = farmId
-    ? [
-        { to: `/farms/${farmId}`, label: t('nav.home'), icon: Home, end: true },
-        ...groups.map((group) => ({
-          to: `/farms/${farmId}/go/${group}`,
-          label: t(`nav.group.${group}`),
-          icon: groupIcons[group],
-          end: false,
-        })),
-        { to: `/farms/${farmId}/help`, label: t('nav.group.help'), icon: CircleHelp, end: false },
-      ]
-    : [{ to: '/', label: t('nav.home'), icon: Home, end: true }];
-
-  const mobile = farmId
-    ? [
-        { to: `/farms/${farmId}`, label: t('nav.home'), icon: Home, end: true },
-        { to: `/farms/${farmId}/today`, label: t('nav.screen.today'), icon: Sun, end: false },
-        { to: `/farms/${farmId}/go/birds`, label: t('nav.group.birds'), icon: Bird, end: false },
-        { to: `/farms/${farmId}/health`, label: t('nav.group.health'), icon: Stethoscope, end: false },
-        { to: `/farms/${farmId}/help`, label: t('nav.group.help'), icon: CircleHelp, end: false },
-      ]
-    : [];
+    ? flowNav.map((item) => ({
+        to: item.path ? `/farms/${farmId}/${item.path}` : `/farms/${farmId}`,
+        label: t(`flow.nav.${item.id}`),
+        icon: item.icon,
+        end: Boolean(item.end),
+      }))
+    : [{ to: '/', label: t('flow.nav.home'), icon: flowNav[0]!.icon, end: true }];
+  const mobile = items;
 
   return (
     <div className="min-h-dvh md:grid md:grid-cols-[16rem_1fr]">
@@ -167,14 +113,13 @@ export function AppShell() {
             <Brand compact />
           </div>
           <div className="flex items-center gap-2">
+            {/* flow-3: the alert bell stays off the header.
             {farmId ? (
               <NavLink to={`/farms/${farmId}#alerts`} className="relative inline-flex min-h-11 min-w-11 items-center justify-center rounded-xl hover:bg-paper-deep" aria-label={t('alerts.bell')}>
                 <Bell aria-hidden="true" size={20} />
-                {alerts > 0 ? (
-                  <span className="absolute right-1 top-1 min-w-5 rounded-full bg-clay px-1 text-center text-xs font-semibold text-ink">{alerts}</span>
-                ) : null}
               </NavLink>
             ) : null}
+            */}
             <InstallPrompt />
             <LanguageSwitcher />
             <NavLink to="/account" className="min-h-11 rounded-xl px-3 py-2 text-sm font-semibold hover:bg-paper-deep">
@@ -192,15 +137,15 @@ export function AppShell() {
           </p>
         ) : null}
         <main id="content" className="mx-auto grid w-full max-w-3xl gap-4 px-4 pb-28 pt-5 md:max-w-5xl md:pb-10">
-          {farmId ? <PageExplain /> : null}
+          {/* flow-3: page tour button hidden. {farmId ? <PageExplain /> : null} */}
           <Outlet />
         </main>
       </div>
-      {farmId ? <SaathiDock farmId={farmId} /> : null}
+      {/* flow-3: voice and chat dock hidden. {farmId ? <SaathiDock farmId={farmId} /> : null} */}
       {farmId ? (
-        <nav className="fixed inset-x-0 bottom-0 z-20 grid grid-cols-5 border-t border-line bg-white pb-[env(safe-area-inset-bottom)] md:hidden">
+        <nav className="fixed inset-x-0 bottom-0 z-20 flex gap-1 overflow-x-auto border-t border-line bg-white px-1 pb-[env(safe-area-inset-bottom)] md:hidden">
           {mobile.map((item) => (
-            <NavLink key={item.to} to={item.to} end={item.end} className={({ isActive }) => `flex min-h-14 flex-col items-center justify-center gap-1 px-1 text-xs font-semibold ${isActive ? 'text-grove' : 'text-ink-soft'}`}>
+            <NavLink key={item.to} to={item.to} end={item.end} className={({ isActive }) => `flex min-h-14 min-w-16 flex-col items-center justify-center gap-1 px-2 text-xs font-semibold ${isActive ? 'text-grove' : 'text-ink-soft'}`}>
               <item.icon aria-hidden="true" size={18} />
               {item.label}
             </NavLink>

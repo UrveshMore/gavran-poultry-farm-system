@@ -37,6 +37,17 @@ beforeEach(async () => {
   try {
     await conn.query('SET FOREIGN_KEY_CHECKS = 0');
     for (const table of [
+      'flow_sales',
+      'flow_expenses',
+      'flow_egg_entries',
+      'flow_feed_entries',
+      'flow_dose_marks',
+      'flow_moves',
+      'flow_hatch_days',
+      'flow_batches',
+      'flow_sheds',
+      'flow_incubators',
+      'flow_setup',
       'batch_dose_marks', 'medicine_photos', 'farm_schedule_approvals', 'yard_notes', 'report_schedules', 'farm_files', 'notifications', 'sale_returns', 'invoice_lines', 'invoice_documents', 'supplier_payments', 'supplier_bills', 'goods_receipts', 'purchase_order_lines', 'purchase_orders', 'suppliers', 'parentage_records', 'task_training_requirements', 'training_completions', 'training_assignments', 'training_items', 'attendance_records', 'idempotency_keys', 'audit_logs', 'expense_entries', 'expense_categories', 'order_lines', 'orders', 'market_prices', 'customers',
       'loss_incidents', 'sex_counts', 'range_areas', 'batch_movements', 'batches', 'bird_types',
       'membership_permission_grants', 'sheds', 'farm_settings', 'farm_memberships', 'sessions', 'password_reset_tokens', 'farms', 'users',

@@ -5,34 +5,37 @@ import { AppShell } from '@/components/Shell';
 import { Button, Splash } from '@/components/ui';
 import { ApiError, fetchMe } from '@/lib/api';
 import { AccountPage, LoginPage, RegisterPage } from '@/pages/AuthPages';
-import { BatchDetailPage, BatchesPage } from '@/pages/BatchPages';
-import { EggsPage } from '@/pages/EggPages';
-import { IncubationDetailPage, IncubationPage } from '@/pages/IncubationPages';
-import { IncubatorDetailPage, IncubatorsPage } from '@/pages/IncubatorPages';
-import { ActivityPage, FarmCreatePage, FarmProfilePage, FarmsPage, PeoplePage, ShedsPage } from '@/pages/FarmPages';
-import { ExpensesPage } from '@/pages/ExpensePages';
-import { ReportsPage } from '@/pages/ReportPages';
-import { SafeguardsPage } from '@/pages/SafeguardPages';
-import { LossesPage } from '@/pages/LossPages';
-import { SalesPage } from '@/pages/SalesPages';
-import { HealthPage } from '@/pages/HealthPages';
-import { MedicinesPage } from '@/pages/MedicinesPage';
-import { StockPage } from '@/pages/StockPages';
-import { TaskDetailPage, TasksPage } from '@/pages/TaskPages';
-import { WorkforcePage } from '@/pages/WorkforcePages';
-import { ParentagePageView } from '@/pages/ParentagePages';
-import { SuppliersPage } from '@/pages/SupplierPages';
-import { InvoiceDocumentsPage } from '@/pages/InvoicePages';
-import { NoticesPage } from '@/pages/NoticePages';
-import { DocumentsPage } from '@/pages/DocumentPages';
-import { OfflinePage } from '@/pages/OfflinePages';
-import { SearchPageView } from '@/pages/SearchPages';
-import { SchedulesPage } from '@/pages/SchedulePages';
-import { FarmHomePage, GroupPage, HelpPage, TodayPage } from '@/pages/GuidePages';
-import { BirdsBookPage, EggLotsPage, IncomePage, TraysPage } from '@/pages/DesiPages';
-import { SaathiPage } from '@/pages/SaathiPage';
+// flow-3 keeps the old screens in the repo and off the menu.
+// import { BatchDetailPage, BatchesPage } from '@/pages/BatchPages';
+// import { EggsPage } from '@/pages/EggPages';
+// import { IncubationDetailPage, IncubationPage } from '@/pages/IncubationPages';
+// import { IncubatorDetailPage, IncubatorsPage } from '@/pages/IncubatorPages';
+import { FarmCreatePage, FarmsPage } from '@/pages/FarmPages';
+// import { ActivityPage, FarmProfilePage, PeoplePage, ShedsPage } from '@/pages/FarmPages';
+// import { ExpensesPage } from '@/pages/ExpensePages';
+// import { ReportsPage } from '@/pages/ReportPages';
+// import { SafeguardsPage } from '@/pages/SafeguardPages';
+// import { LossesPage } from '@/pages/LossPages';
+// import { SalesPage } from '@/pages/SalesPages';
+// import { HealthPage } from '@/pages/HealthPages';
+// import { MedicinesPage } from '@/pages/MedicinesPage';
+// import { StockPage } from '@/pages/StockPages';
+// import { TaskDetailPage, TasksPage } from '@/pages/TaskPages';
+// import { WorkforcePage } from '@/pages/WorkforcePages';
+// import { ParentagePageView } from '@/pages/ParentagePages';
+// import { SuppliersPage } from '@/pages/SupplierPages';
+// import { InvoiceDocumentsPage } from '@/pages/InvoicePages';
+// import { NoticesPage } from '@/pages/NoticePages';
+// import { DocumentsPage } from '@/pages/DocumentPages';
+// import { OfflinePage } from '@/pages/OfflinePages';
+// import { SearchPageView } from '@/pages/SearchPages';
+// import { SchedulesPage } from '@/pages/SchedulePages';
+// import { FarmHomePage, GroupPage, HelpPage, TodayPage } from '@/pages/GuidePages';
+// import { BirdsBookPage, EggLotsPage, IncomePage, TraysPage } from '@/pages/DesiPages';
+// import { SaathiPage } from '@/pages/SaathiPage';
 import { ServerAddressPage } from '@/pages/ServerAddressPage';
-import { YardPageView } from '@/pages/YardPages';
+// import { YardPageView } from '@/pages/YardPages';
+import { FlowBatchPage, FlowBirdsPage, FlowEggsPage, FlowFeedPage, FlowHisaabPage, FlowHomePage, FlowIncubatorPage, FlowMedicinePage } from '@/pages/FlowPages';
 import { isNativeApp, savedServer } from '@/lib/serverAddress';
 
 function RequireAuth() {
@@ -64,6 +67,15 @@ export function App() {
         <Route index element={<FarmsPage />} />
         <Route path="account" element={<AccountPage />} />
         <Route path="farms/new" element={<FarmCreatePage />} />
+        <Route path="farms/:farmId" element={<FlowHomePage />} />
+        <Route path="farms/:farmId/flow/incubator" element={<FlowIncubatorPage />} />
+        <Route path="farms/:farmId/flow/batch" element={<FlowBatchPage />} />
+        <Route path="farms/:farmId/flow/medicine" element={<FlowMedicinePage />} />
+        <Route path="farms/:farmId/flow/feed" element={<FlowFeedPage />} />
+        <Route path="farms/:farmId/flow/eggs" element={<FlowEggsPage />} />
+        <Route path="farms/:farmId/flow/birds" element={<FlowBirdsPage />} />
+        <Route path="farms/:farmId/flow/hisaab" element={<FlowHisaabPage />} />
+        {/* flow-3: old farm screens stay in the repo. Uncomment these routes to show them again.
         <Route path="farms/:farmId" element={<FarmHomePage />} />
         <Route path="farms/:farmId/go/:groupId" element={<GroupPage />} />
         <Route path="farms/:farmId/help" element={<HelpPage />} />
@@ -104,6 +116,7 @@ export function App() {
         <Route path="farms/:farmId/safeguards" element={<SafeguardsPage />} />
         <Route path="farms/:farmId/people" element={<PeoplePage />} />
         <Route path="farms/:farmId/activity" element={<ActivityPage />} />
+        */}
       </Route>
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>

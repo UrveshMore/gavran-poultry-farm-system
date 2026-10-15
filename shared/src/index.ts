@@ -75,6 +75,23 @@ export {
 export type { CoursePoint, DoseSlot, MedicineRoute, MedicineSource, OwnerMedicineInput } from './ownerMedicines.js';
 export { likePattern } from './search.js';
 export {
+  HATCH_LENGTH_DAYS,
+  MOVE_REMINDER_DAYS,
+  ageFromHatch,
+  flowBatchInputSchema,
+  flowDoseInputSchema,
+  flowEggInputSchema,
+  flowExpenseInputSchema,
+  flowFeedInputSchema,
+  flowHatchDayInputSchema,
+  flowIncubatorInputSchema,
+  flowMoveInputSchema,
+  flowSaleInputSchema,
+  flowShedInputSchema,
+  plusDays,
+  typedAmount,
+} from './flow3.js';
+export {
   batchInputSchema,
   rangeAreaInputSchema,
   sexCountInputSchema,

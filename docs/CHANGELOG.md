@@ -1,5 +1,20 @@
 # Changelog
 
+## 0.37.0 — 2026-10-15
+
+The eight-tab farm book, on the flow-3 branch.
+
+- The menu is Home, Incubator, Batch, Medicine, Feed, Eggs, Birds, and Hisaab. Older screens, including Gavran Saathi, stay in the program and are not on the menu.
+- Incubators start at 100 and 80 eggs when a farm has none. Sheds take a name and a capacity. Birds already on the farm are Batch 0.
+- A new batch picks an incubator, an egg count, and a set date. The hatch date stored is that date plus 21 days. A full incubator shows a warning and still saves.
+- Brooding keeps a day list, a running total, bad eggs as eggs set minus live chicks, and live chicks divided by eggs set. That ratio is not an official hatch percent. About 30 days in brooding, the page asks you to move birds to a shed. Part of a batch can move. The batch number stays.
+- Medicine lines are the ones already copied from `patil-poultry-step-by-step-process.pdf`. The day count starts on the hatch date. Each line shows the medicine, how to give it, today, the next day, and a Given tick. The paper has one list, so summer, monsoon, and winter do not change it.
+- Feed is only what you type. The papers do not list a quantity, and the month is not turned into a season.
+- Eggs store collected, sold, and used for the incubator. Stock is collected minus those two, and it can fall below zero.
+- Taking birds away asks for the shed and Died, Sold, or Other. Sold writes a hisaab sale.
+- Hisaab stores expenses and sales. This month shows typed sales minus typed expenses. That is not an official profit.
+- Every new line can be edited or deleted. Account can change the server address stored on the device.
+
 ## 0.36.0 — 2026-10-14
 
 The owner's desi flow, on the new-flow branch.

@@ -1,5 +1,31 @@
 # Gavran user guide
 
+## Eight tabs (flow-3)
+
+Open the farm. The bar has Home, Incubator, Batch, Medicine, Feed, Eggs, Birds, and Hisaab.
+
+Home shows brooding birds, birds in sheds, today's medicine, today's feed, today's eggs, and this month's typed sales minus typed expenses. That last number is not an official profit.
+
+The first visit asks for sheds and for birds you already have. Those birds are Batch 0. Two incubators are already there, for 100 eggs and 80 eggs. You can rename them.
+
+Incubator: tap + Add batch, pick the box, type the eggs, and type the date. The hatch date is that date plus 21 days. If the eggs go past the box, a warning stays on the card and the line is still saved.
+
+Batch has Brooding and Shed. Brooding lists Day 1, Day 2, and so on, with a running total. Bad eggs are eggs set minus that total. The percent on the card is counted live chicks divided by eggs set, not an official hatch percent. Minus a death while they are still in brooding. After about 30 days the card asks you to move them. You can move some of them. The batch number does not change. Shed shows which batches are in each house. You can move birds from one shed to another. A full shed shows a warning.
+
+Medicine uses the step-by-step paper already stored from `patil-poultry-step-by-step-process.pdf`, pages 17 to 27. Day 1 is the hatch date. The first 28 days include Marek, Lasota, Gumboro, and the Gumboro booster. Later lines are the rest of that paper, including the Coryza line that has no day and says to check with the vet. Each dose shows the medicine, how to give it, and morning or evening. Tap ✓ Given when you have given it. The paper does not say which months are summer, monsoon, or winter, so the list is the same on every date.
+
+Feed asks you to type the feed and the quantity. The papers do not list those amounts.
+
+Eggs: type what you collected, what you sold, and what you set in the incubator. Stock is collected minus sold minus incubator.
+
+Birds: the minus button asks which shed, then Died, Sold, or Other. Sold also asks for the buyer and the price and writes that sale under Hisaab.
+
+Hisaab: expenses are feed, medicine, electricity, or other. Sales are eggs or birds, with quantity, price, and buyer.
+
+Every line has Edit and Delete. Account has Change server address. The address is kept on this device under the name `gavran.server`.
+
+Older screens, including the voice helper, are still in the program and are not on this menu.
+
 Gavran is the farm book for a Desi backyard flock. This guide matches the Help screen in the program. Each screen says what it is, where to find it, why it is there, and how to use it.
 
 Hindi and Marathi words still need a person who speaks them well to check the wording. The name Gavran stays in Latin letters.
